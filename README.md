@@ -1,2 +1,4 @@
 # durhack-megateams
-Building the megateams project for DurHack 2023
+
+Building the megateams project for DurHack 2023.
+
