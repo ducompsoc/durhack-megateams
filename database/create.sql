@@ -11,7 +11,7 @@ CREATE TABLE `areas` (
     `area_name` varchar(255) NOT NULL,
     `area_room` varchar(10) NOT NULL,
     `megateam_id` int NOT NULL,
-    PRIMARY KEY (`area_id`)
+    PRIMARY KEY (`area_id`),
     FOREIGN KEY (`megateam_id`) REFERENCES `megateams`(`megateam_id`)
 );
 
@@ -69,7 +69,7 @@ CREATE TABLE `points` (
     `qrcode_id` int DEFAULT NULL,
     `redeemer_user_id` int NOT NULL,
     PRIMARY KEY (`point_id`),
-    FOREIGN KEY (`manual_entry_admin_user_id`) REFERENCES `users`(`user_id`)
-    FOREIGN KEY (`redeemer_user_id`) REFERENCES `users`(`user_id`)
+    FOREIGN KEY (`manual_entry_admin_user_id`) REFERENCES `users`(`user_id`),
+    FOREIGN KEY (`redeemer_user_id`) REFERENCES `users`(`user_id`),
     FOREIGN KEY (`qrcode_id`) REFERENCES `qrcodes`(`crcode_id`)
 );
