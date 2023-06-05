@@ -1,5 +1,7 @@
 CREATE DATABASE durhack2023Megateams;
 
+USE durhack2023Megateams;
+
 CREATE TABLE `megateams` (
     `megateam_id` int NOT NULL AUTO_INCREMENT,
     `megateam_name` varchar(255) NOT NULL,
@@ -71,5 +73,5 @@ CREATE TABLE `points` (
     PRIMARY KEY (`point_id`),
     FOREIGN KEY (`manual_entry_admin_user_id`) REFERENCES `users`(`user_id`),
     FOREIGN KEY (`redeemer_user_id`) REFERENCES `users`(`user_id`),
-    FOREIGN KEY (`qrcode_id`) REFERENCES `qrcodes`(`crcode_id`)
+    FOREIGN KEY (`qrcode_id`) REFERENCES `qrcodes`(`qrcode_id`)
 );
