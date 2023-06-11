@@ -22,6 +22,8 @@ User -> Team -> Area -> Megateam
 
 - If a user changes team, their points would change to be added to that team
 - If a team changed area, their points would change to be added to that area's megateam
+  > After initially selecting a location, the only people that can reassign locations/megateams for a team would be volunteers and admin users (see [#3](https://github.com/ducompsoc/durhack-megateams/issues/3), [#4](https://github.com/ducompsoc/durhack-megateams/issues/4))
+  > \- [tameTNT](https://github.com/ducompsoc/durhack-megateams/commit/adc509d79f99c4e7d4cd88d3944f34c28bfc0da7#r116757013)
 - Will people abuse this lol?
 
 # Points Table Logic Flow
