@@ -5,6 +5,7 @@ USE durhack2023Megateams;
 CREATE TABLE `megateams` (
     `megateam_id` int NOT NULL AUTO_INCREMENT,
     `megateam_name` varchar(255) NOT NULL,
+    `megateam_description` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`megateam_id`)
 );
 
