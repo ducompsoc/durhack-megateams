@@ -59,7 +59,7 @@ CREATE TABLE `qrcodes` (
     `qrcode_file_location` varchar(255) DEFAULT NULL,
     `qrcode_points_value` int NOT NULL,
     `qrcode_use_limit` int NOT NULL,
-    `qrcoded_user_limit` int NOT NULL,
+    `qrcode_user_limit` int NOT NULL,
     `state` tinyint(1) DEFAULT '1',
     PRIMARY KEY (`qrcode_id`)
 );
