@@ -22,6 +22,7 @@ CREATE TABLE `teams` (
     `team_id` int NOT NULL AUTO_INCREMENT,
     `team_name` varchar(255) NOT NULL,
     `area_id` int DEFAULT NULL,
+    `team_join_code` varchar(5) DEFAULT NULL,
     PRIMARY KEY (`team_id`),
     FOREIGN KEY (`area_id`) REFERENCES `areas`(`area_id`)
 );
