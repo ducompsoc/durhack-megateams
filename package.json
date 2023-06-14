@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "npx nodemon",
+    "build:client": "npx next build",
+    "build:server": "npx tsc -p tsconfig.server.json",
+    "build": "npm run build:client && npm run build:server",
+    "start": "npx cross-env NODE_ENV=production node dist/main.js",
+    "lint": "npx next lint"
   },
   "dependencies": {
     "@types/node": "20.3.1",
