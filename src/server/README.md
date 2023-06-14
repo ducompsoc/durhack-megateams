@@ -9,4 +9,4 @@ This is where all the backend source code lives!
 - API routes and supporting code (`/src/server/routes`)
 - Common code/middleware (`/src/server/common`)
 - Frontend content (`/src/app`)
-- Transpiled vanilla JS
+- Transpiled vanilla JS (`/dist`)
