@@ -2,6 +2,9 @@
   "name": "durhack-megateams-server",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "url": "https://github.com/ducompsoc/durhack-megateams"
+  },
   "scripts": {
     "dev": "npx nodemon",
     "build:client": "npx next build",
@@ -39,6 +42,7 @@
     "@types/method-override": "^0.0.32",
     "@types/passport": "^1.0.12",
     "cross-env": "^7.0.3",
+    "eslint-plugin-tsdoc": "^0.2.17",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1"
   }
