@@ -1,3 +1,5 @@
 import { Router as ExpressRouter } from "express";
 
-export const points_router = ExpressRouter();
+const points_router = ExpressRouter();
+
+export default points_router;

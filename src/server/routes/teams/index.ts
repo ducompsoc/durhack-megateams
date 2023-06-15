@@ -1,3 +1,5 @@
 import { Router as ExpressRouter } from "express";
 
-export const teams_router = ExpressRouter();
+const teams_router = ExpressRouter();
+
+export default teams_router;

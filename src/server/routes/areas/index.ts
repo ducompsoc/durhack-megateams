@@ -1,3 +1,5 @@
 import { Router as ExpressRouter } from "express";
 
-export const areas_router = ExpressRouter();
+const areas_router = ExpressRouter();
+
+export default areas_router;

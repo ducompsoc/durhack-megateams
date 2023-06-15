@@ -1,3 +1,5 @@
 import { Router as ExpressRouter } from "express";
 
-export const megateams_router = ExpressRouter();
+const megateams_router = ExpressRouter();
+
+export default megateams_router;

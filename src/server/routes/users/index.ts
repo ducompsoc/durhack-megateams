@@ -1,3 +1,5 @@
 import { Router as ExpressRouter } from "express";
 
-export const users_router = ExpressRouter();
+const users_router = ExpressRouter();
+
+export default users_router;

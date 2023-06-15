@@ -1,3 +1,5 @@
 import { Router as ExpressRouter } from "express";
 
-export const qr_codes_router = ExpressRouter();
+const qr_codes_router = ExpressRouter();
+
+export default qr_codes_router;

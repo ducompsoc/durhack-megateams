@@ -1,7 +1,7 @@
 import next from "next";
 import express from "express";
 
-import { api_router } from "./routes";
+import api_router from "./routes";
 
 const dev = process.env.NODE_ENV !== 'production';
 const next_app = next({ dev });
