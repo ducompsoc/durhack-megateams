@@ -4,5 +4,16 @@
     "semi": ["warn", "always"],
     "indent": ["error", 2],
     "quotes": ["warn", "double", { "avoidEscape": true }]
-  }
+  },
+  "plugins": ["@html-eslint"],
+  "overrides": [
+    {
+      "files": ["*.html"],
+      "parser": "@html-eslint/parser",
+      "extends": ["plugin:@html-eslint/recommended"],
+      "rules": {
+        "@html-eslint/indent": ["warn", 4]
+      }
+    }
+  ]
 }
