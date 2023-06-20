@@ -36,7 +36,7 @@ CREATE TABLE `users` (
   `discord_name` varchar(255) DEFAULT NULL,
   `full_name` varchar(255) NOT NULL,
   `preferred_name` varchar(255) NOT NULL,
-  `role` varchar(255) DEFAULT NULL,
+  `role` ENUM('hacker', 'sponsor', 'volunteer', 'admin') NOT NULL DEFAULT 'hacker',
   `verify_code` varchar(255) DEFAULT NULL,
   `verify_sent_at` datetime DEFAULT NULL,
   `initially_logged_in_at` datetime DEFAULT NULL,
