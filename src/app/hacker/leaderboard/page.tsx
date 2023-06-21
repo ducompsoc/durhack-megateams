@@ -2,26 +2,11 @@
 
 import { TrophyIcon } from "@heroicons/react/24/outline";
 import React from "react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-import ChartDataLabels from "chartjs-plugin-datalabels";
-import annotationPlugin, {
-  AnnotationOptions,
-} from "chartjs-plugin-annotation";
-import { Options } from "chartjs-plugin-datalabels/types/options";
+import dynamic from "next/dynamic";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ChartDataLabels,
-  annotationPlugin
-);
+const MegaChart = dynamic(() => import("./MegaChart"), {
+  ssr: false,
+});
 
 export default function Leaderboard() {
   const teams = [
@@ -34,55 +19,6 @@ export default function Leaderboard() {
     { name: "Team 7", points: 84 },
   ];
 
-  const megateams = [
-    { id: 1, points: 450, name: "Team 1", image: new Image() },
-    { id: 2, points: 500, name: "Team 2", image: new Image() },
-    { id: 3, points: 400, name: "Team 3", image: new Image() },
-    { id: 4, points: 200, name: "Team 4", image: new Image() },
-  ];
-
-  for (let team of megateams) {
-    team.image.src = `/${team.id}.png`;
-  }
-
-  const dataset = {
-    labels: megateams.map((team) => team.name),
-    datasets: [
-      {
-        label: "Points",
-        data: megateams.map((team) => team.points),
-      },
-    ],
-  };
-
-  const datalabels: Options = { anchor: "start", align: "end" };
-
-  const options = {
-    scales: { y: { display: false }, x: { grid: { display: false } } },
-    plugins: {
-      datalabels,
-      annotation: {
-        annotations: megateams.map((team, i) => {
-          const options: AnnotationOptions = {
-            type: "box",
-            yMin: Math.max(team.points - 100, 200),
-            yMax: Math.max(team.points - 100, 200),
-            xMax: i,
-            xMin: i,
-            label: {
-              display: true,
-              content: team.image,
-              width: 32,
-              height: 32,
-              position: "center",
-            },
-          };
-          return options;
-        }),
-      },
-    },
-  };
-
   return (
     <div className="flex flex-col h-full">
       <div className="bg-gray-200 drop-shadow-lg p-2 rounded">
@@ -90,7 +26,7 @@ export default function Leaderboard() {
       </div>
       <div className="bg-purple-200 border border-purple-500 mt-4 rounded p-4">
         <div className="md:w-[50%] md:ml-auto md:mr-auto">
-          <Bar data={dataset} options={options} />
+          <MegaChart />
         </div>
       </div>
       <div className="bg-gray-200 drop-shadow-lg p-2 rounded mt-4">
