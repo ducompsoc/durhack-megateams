@@ -1,5 +1,6 @@
 import { TrophyIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import React from "react";
 
 export default function HackerHome() {
   const challenges = [
@@ -45,11 +46,11 @@ export default function HackerHome() {
         <h2 className="underline mb-2">Challenges</h2>
         <div className="grid grid-cols-[min-content_1fr_auto] mx-2 gap-y-2">
           {challenges.map((challenge, i) => (
-            <>
+            <React.Fragment key={i}>
               <p className="mr-2">{i + 1}.</p>
               <p>{challenge.details}</p>
               <p>{challenge.points} points</p>
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
