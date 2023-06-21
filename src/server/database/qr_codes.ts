@@ -1,15 +1,33 @@
+import {RowDataPacket} from "mysql2";
 import { QRCodeModel } from "@/server/common/models";
-import database from "./";
+import User from "@/server/database/users";
+import database from "@/server/database";
 
 interface qrcodeIdentifier {
   id: number,
   name: string,
 }
 
-export function listQRCodes(): qrcodeIdentifier[] {
-  throw new Error("Not implemented.");
-}
+export default class QRCode implements QRCodeModel {
+  creator: User;
+  description?: string;
+  expiry_time: Date;
+  id: number;
+  name: string;
+  payload: string;
+  points_value: number;
+  start_time: Date;
+  state: boolean;
 
-export function getQRCode(id: number): QRCodeModel {
-  throw new Error("Not implemented.");
+  constructor(row: RowDataPacket) {
+    throw new Error();
+  }
+
+  static async listQRCodes(): Promise<qrcodeIdentifier[]> {
+    throw new Error("Not implemented.");
+  }
+
+  static async getQRCode(id: number): Promise<QRCodeModel> {
+    throw new Error("Not implemented.");
+  }
 }

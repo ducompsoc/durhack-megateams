@@ -1,15 +1,27 @@
+import { RowDataPacket } from "mysql2";
 import { TeamModel } from "@/server/common/models";
-import database from "./";
+import Area from "@/server/database/areas";
+import database from "@/server/database";
 
 interface teamIdentifier {
   id: number,
   name: string,
 }
 
-export function listTeams(): teamIdentifier[] {
-  throw new Error("Not implemented.");
-}
+export default class Team implements TeamModel {
+  id: number;
+  name: string;
+  area?: Area;
 
-export function getTeam(id: number): TeamModel {
-  throw new Error("Not implemented.");
+  constructor(row: RowDataPacket) {
+
+  }
+
+  static async listTeams(): Promise<teamIdentifier[]> {
+    throw new Error("Not implemented.");
+  }
+
+  static async getTeam(id: number): Promise<TeamModel> {
+    throw new Error("Not implemented.");
+  }
 }

@@ -1,15 +1,26 @@
+import { RowDataPacket } from "mysql2";
 import { MegateamModel } from "@/server/common/models";
-import database from "./";
+import database from "@/server/database";
 
 interface megateamIdentifier {
   id: number,
   name: string,
 }
 
-export function listMegateams(): megateamIdentifier[] {
-  throw new Error("Not implemented.");
-}
+export default class Megateam implements MegateamModel {
+  id: number;
+  name: string;
+  description?: string;
 
-export function getMegateam(id: number): MegateamModel {
-  throw new Error("Not implemented.");
+  constructor(row: RowDataPacket) {
+
+  }
+
+  static async listMegateams(): Promise<megateamIdentifier[]> {
+    throw new Error("Not implemented.");
+  }
+
+  static async getMegateam(id: number): Promise<MegateamModel> {
+    throw new Error("Not implemented.");
+  }
 }
