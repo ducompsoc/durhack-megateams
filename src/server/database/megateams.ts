@@ -1,4 +1,4 @@
-import { Megateam } from "@/server/common/models";
+import { MegateamModel } from "@/server/common/models";
 import database from "./";
 
 interface megateamIdentifier {
@@ -10,6 +10,6 @@ export function listMegateams(): megateamIdentifier[] {
   throw new Error("Not implemented.");
 }
 
-export function getMegateam(id: number): Megateam {
+export function getMegateam(id: number): MegateamModel {
   throw new Error("Not implemented.");
 }

@@ -1,4 +1,4 @@
-import { QRCode } from "@/server/common/models";
+import { QRCodeModel } from "@/server/common/models";
 import database from "./";
 
 interface qrcodeIdentifier {
@@ -10,6 +10,6 @@ export function listQRCodes(): qrcodeIdentifier[] {
   throw new Error("Not implemented.");
 }
 
-export function getQRCode(id: number): QRCode {
+export function getQRCode(id: number): QRCodeModel {
   throw new Error("Not implemented.");
 }

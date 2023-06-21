@@ -1,4 +1,4 @@
-import { User as UserModel, UserRole } from "@/server/common/models";
+import { UserModel, UserRole } from "@/server/common/models";
 import database from "./";
 
 interface userIdentifier {

@@ -1,20 +1,20 @@
-export interface Megateam {
+export interface MegateamModel {
   id: number,
   name: string,
   description?: string,
 }
 
-export interface Area {
+export interface AreaModel {
   id: number,
   name: string,
   room: string,
-  megateam: Megateam,
+  megateam: MegateamModel,
 }
 
-export interface Team {
+export interface TeamModel {
   id: number,
   name: string,
-  area?: Area,
+  area?: AreaModel,
 }
 
 export enum UserRole {
@@ -24,7 +24,7 @@ export enum UserRole {
   admin,
 }
 
-export interface UserDetails {
+export interface UserDetailsModel {
   discord_id?: string,
   discord_name?: string,
   full_name: string,
@@ -37,9 +37,9 @@ export interface UserDetails {
   gender?: string,
 }
 
-export interface User extends UserDetails {
+export interface UserModel extends UserDetailsModel {
   id: number,
-  team?: Team,
+  team?: TeamModel,
   email: string,
   hashed_password?: Buffer,
   password_salt?: Buffer,
@@ -55,7 +55,7 @@ export interface User extends UserDetails {
   updated_at: Date,
 }
 
-export interface QRCode {
+export interface QRCodeModel {
   id: number,
   name: string,
   description?: string,
@@ -64,12 +64,12 @@ export interface QRCode {
   state: boolean,
   start_time: Date,
   expiry_time: Date,
-  creator: User,
+  creator: UserModel,
 }
 
-export interface Point {
+export interface PointModel {
   id: number,
   value: number,
-  qrcode: QRCode,
-  redeemer: User,
+  qrcode: QRCodeModel,
+  redeemer: UserModel,
 }
