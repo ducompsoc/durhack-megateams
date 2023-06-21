@@ -14,7 +14,7 @@ export default function HackerHome() {
   ];
 
   return (
-    <div className="flex flex-col h-full font-semibold">
+    <div className="flex flex-col h-full">
       <p>Hello Hacker_name,</p>
       <div className="flex mt-4">
         <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow mr-4 md:min-w-[50%] min-w-[40%]">

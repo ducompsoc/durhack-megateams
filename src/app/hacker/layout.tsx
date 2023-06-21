@@ -32,7 +32,7 @@ export default function HackerLayout({
   ];
 
   return (
-    <div className="h-full flex flex-col text-black">
+    <div className="h-full flex flex-col text-black font-semibold">
       <div className="flex flex-row py-4 px-6 items-center justify-center border-b border-black justify-evenly">
         <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
         <h1 className="text-4xl font-bold">DurHack</h1>
