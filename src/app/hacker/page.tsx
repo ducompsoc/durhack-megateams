@@ -1,8 +1,12 @@
-import { TrophyIcon } from "@heroicons/react/24/outline";
+"use client";
+
+import { ShareIcon, TrophyIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 export default function HackerHome() {
+  const [showTeamCode, setShowTeamCode] = useState(false);
+
   const challenges = [
     { details: "Details of challenge 1", points: 2 },
     { details: "Details of challenge 2", points: 2 },
@@ -13,9 +17,25 @@ export default function HackerHome() {
     <div className="flex flex-col h-full font-semibold">
       <p>Hello Hacker_name,</p>
       <div className="flex mt-4">
-        <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow mr-4">
+        <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow mr-4 md:min-w-[50%] min-w-[40%]">
           <h2 className="underline mb-2">Team</h2>
-          <p>Team 1</p>
+          {!showTeamCode ? (
+            <>
+              <p>Team 1</p>
+              <div className="flex items-center">
+                <span className="grow"></span>
+                <ShareIcon onClick={() => setShowTeamCode(true)} className="w-6 h-6" />
+              </div>
+            </>
+          ) : (
+            <>
+              <p>1234</p>
+              <div className="flex items-center">
+                <span className="grow"></span>
+                <XMarkIcon onClick={() => setShowTeamCode(false)} className="w-6 h-6" />
+              </div>
+            </>
+          )}
         </div>
         <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow">
           <h2 className="underline mb-2">Megateam</h2>
