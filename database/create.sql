@@ -36,7 +36,7 @@ CREATE TABLE `users` (
   `discord_name` varchar(255) DEFAULT NULL,
   `full_name` varchar(255) NOT NULL,
   `preferred_name` varchar(255) NOT NULL,
-  `role` varchar(255) DEFAULT NULL,
+  `role` ENUM('hacker', 'sponsor', 'volunteer', 'admin') NOT NULL DEFAULT 'hacker',
   `verify_code` varchar(255) DEFAULT NULL,
   `verify_sent_at` datetime DEFAULT NULL,
   `initially_logged_in_at` datetime DEFAULT NULL,
@@ -58,12 +58,17 @@ CREATE TABLE `users` (
 
 CREATE TABLE `qrcodes` (
     `qrcode_id` int NOT NULL AUTO_INCREMENT,
+    `qrcode_name` varchar(255) NOT NULL,
+    `qrcode_description` varchar(255) DEFAULT '',
     `qrcode_file_location` varchar(255) DEFAULT NULL,
     `qrcode_points_value` int NOT NULL,
     `qrcode_use_limit` int NOT NULL,
-    `qrcode_user_limit` int NOT NULL,
     `state` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`qrcode_id`)
+    `qrcode_start_time` datetime DEFAULT CURRENT_TIMESTAMP,
+    `qrcode_expiry_time` datetime DEFAULT CURRENT_TIMESTAMP,
+    `qrcode_creator_user_id` int NOT NULL,
+    PRIMARY KEY (`qrcode_id`),
+    FOREIGN KEY (`qrcode_creator_user_id`) REFERENCES `users`(`user_id`)
 );
 
 CREATE TABLE `points` (
