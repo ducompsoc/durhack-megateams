@@ -1,4 +1,4 @@
-import { Router as ExpressRouter } from "express";
+import { Request, Response, Router as ExpressRouter } from "express";
 import passport from "passport";
 import Local from "passport-local";
 import { handle_next_app_request } from "./next";
@@ -19,7 +19,7 @@ passport.deserializeUser(async function(user, callback) {
 
 const auth_router = new ExpressRouter();
 
-auth_router.get("/login", function(request, response) {
+auth_router.get("/login", function(request: Request, response: Response) {
   return handle_next_app_request(request, response);
 });
 
@@ -29,11 +29,11 @@ auth_router.post("/login", passport.authenticate("local", {
   failureMessage: true
 }));
 
-auth_router.get("/signup", function(request, response) {
+auth_router.get("/signup", function(request: Request, response: Response) {
   return handle_next_app_request(request, response);
 });
 
-auth_router.post("/signup", function(request, response, next) {
+auth_router.post("/signup", function(request: Request, response: Response) {
 
 });
 

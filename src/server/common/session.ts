@@ -1,8 +1,9 @@
-import session, { MemoryStore, SessionOptions } from "express-session";
-import MySQLStore from "express-mysql-session";
+import session, { MemoryStore, Store, SessionOptions } from "express-session";
+import * as constructor_session from "express-session";
+import MySQLStoreMeta, { MySQLStore as MySQLStoreType } from "express-mysql-session";
 
-function get_mysql_session_store(): ReturnType<MySQLStore> {
-  const MySQLStoreClass = MySQLStore(session);
+function get_mysql_session_store(): MySQLStoreType {
+  const MySQLStore = MySQLStoreMeta(constructor_session);
 
   const options  = {
     host: "localhost",
@@ -12,14 +13,14 @@ function get_mysql_session_store(): ReturnType<MySQLStore> {
     database: "session_db"
   };
 
-  return new MySQLStoreClass(options);
+  return new MySQLStore(options);
 }
 
 function get_memory_session_store(): MemoryStore {
   return new MemoryStore();
 }
 
-function get_session_store(): session.Store {
+function get_session_store(): Store {
   if (process.env.NODE_ENV !== "production") {
     return get_memory_session_store();
   }
