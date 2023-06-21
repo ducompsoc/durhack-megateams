@@ -1,5 +1,5 @@
 import createHttpError, { HttpError, isHttpError } from "http-errors";
-import { Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 interface ErrorResponseBody {
     status: number
@@ -26,7 +26,7 @@ function send_http_error_response(response: Response, error: HttpError) {
   response.json(response_body);
 }
 
-export default function api_error_handler(error, request, response, next) {
+export default function api_error_handler(error: Error, request: Request, response: Response, next: NextFunction) {
   if (response.headersSent) {
     return next(error);
   }
