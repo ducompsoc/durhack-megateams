@@ -13,7 +13,7 @@ passport.serializeUser(async function(user, callback) {
 
 });
 
-passport.deserializeUser(async function(user, callback) {
+passport.deserializeUser(async function(id, callback) {
 
 });
 
