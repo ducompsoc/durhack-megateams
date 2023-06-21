@@ -3,6 +3,7 @@ import database from "./";
 
 interface userIdentifier {
   id: number,
+  full_name: string,
 }
 
 export function listUsers(): userIdentifier[] {
