@@ -11,6 +11,6 @@ export default class Point implements PointModel {
   value: number;
 
   constructor(row: RowDataPacket) {
-
+    throw new Error("Not implemented.");
   }
 }

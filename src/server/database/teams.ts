@@ -14,7 +14,7 @@ export default class Team implements TeamModel {
   area?: Area;
 
   constructor(row: RowDataPacket) {
-
+    throw new Error("Not implemented.");
   }
 
   static async listTeams(): Promise<teamIdentifier[]> {

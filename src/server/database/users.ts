@@ -37,7 +37,7 @@ export default class User implements UserModel {
   gender?: string;
 
   constructor(row: RowDataPacket) {
-
+    throw new Error("Not implemented.");
   }
 
   static async listUsers(): Promise<userIdentifier[]> {

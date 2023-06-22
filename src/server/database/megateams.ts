@@ -13,7 +13,7 @@ export default class Megateam implements MegateamModel {
   description?: string;
 
   constructor(row: RowDataPacket) {
-
+    throw new Error("Not implemented.");
   }
 
   static async listMegateams(): Promise<megateamIdentifier[]> {

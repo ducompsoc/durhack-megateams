@@ -20,7 +20,7 @@ export default class QRCode implements QRCodeModel {
   state: boolean;
 
   constructor(row: RowDataPacket) {
-    throw new Error();
+    throw new Error("Not implemented.");
   }
 
   static async listQRCodes(): Promise<qrcodeIdentifier[]> {
