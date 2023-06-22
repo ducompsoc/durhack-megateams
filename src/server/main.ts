@@ -1,6 +1,5 @@
-import "dotenv/config";
-
 import express from "express";
+import "./path-alias";
 import passport from "passport";
 import session from "./common/session";
 import next_app, { handle_next_app_request } from "./common/next";
