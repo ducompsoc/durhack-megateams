@@ -49,15 +49,15 @@ export default function MegaChart() {
         annotations: megateams.map((team, i) => {
           const options: AnnotationOptions = {
             type: "box",
-            yMin: Math.max(team.points - 100, 200),
-            yMax: Math.max(team.points - 100, 200),
+            yMin: Math.max(team.points - 100, 250),
+            yMax: Math.max(team.points - 100, 250),
             xMax: i,
             xMin: i,
             label: {
               display: true,
               content: team.image,
-              width: 32,
-              height: 32,
+              width: 50,
+              height: 50,
               position: "center",
             },
           };
