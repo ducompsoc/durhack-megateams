@@ -37,7 +37,7 @@ export default function HackerLayout({
         <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
         <h1 className="text-4xl font-bold">DurHack</h1>
         <Link href="/hacker">
-          <UserCircleIcon className="w-12 h-12 fill-[#7d6399]" />
+          <UserCircleIcon className="w-12 h-12 fill-accent" />
         </Link>
       </div>
       <div className="p-6 grow overflow-auto">{children}</div>
