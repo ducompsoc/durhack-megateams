@@ -1,6 +1,16 @@
+"use client";
+
 import Image from "next/image";
 
 export default function Register() {
+  async function formSubmit(e: React.SyntheticEvent) {
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    e.preventDefault();
+    formData.forEach((val, key) => {
+      console.log(`${key}: ${val}`);
+    });
+  }
+
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="flex flex-row py-4 px-6 items-center justify-center justify-center mb-4 pt-0">
@@ -9,7 +19,7 @@ export default function Register() {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <div className="space-y-6">
+        <form className="space-y-6" onSubmit={formSubmit}>
           <div>
             <label
               htmlFor="email"
@@ -258,17 +268,18 @@ export default function Register() {
                 id="hackathons"
                 name="hackathons"
                 type="checkbox"
-                required
                 className="text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent focus:ring-2"
               />
-            <label
-              htmlFor="hackathons"
-              className="block text-sm font-medium leading-6 text-gray-900 ml-4"
-            >
-              Hackathons UK Consent
-            </label>
+              <label
+                htmlFor="hackathons"
+                className="block text-sm font-medium leading-6 text-gray-900 ml-4"
+              >
+                Hackathons UK Consent
+              </label>
             </div>
-            <p className="text-sm mt-2">Allow DurHack to share anonymised details with Hackathons UK.</p>
+            <p className="text-sm mt-2">
+              Allow DurHack to share anonymised details with Hackathons UK.
+            </p>
           </div>
 
           <div>
@@ -277,25 +288,29 @@ export default function Register() {
                 id="hackathons-marketing"
                 name="hackathons-marketing"
                 type="checkbox"
-                required
                 className="text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent focus:ring-2"
               />
-            <label
-              htmlFor="hackathons-marketing"
-              className="block text-sm font-medium leading-6 text-gray-900 ml-4"
-            >
-              Hackathons UK Marketing Consent
-            </label>
+              <label
+                htmlFor="hackathons-marketing"
+                className="block text-sm font-medium leading-6 text-gray-900 ml-4"
+              >
+                Hackathons UK Marketing Consent
+              </label>
             </div>
-            <p className="text-sm mt-2">Allow Hackathons UK to contact you for marketing purposes.</p>
+            <p className="text-sm mt-2">
+              Allow Hackathons UK to contact you for marketing purposes.
+            </p>
           </div>
 
           <div>
-            <button className="flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-400 hover:text-black">
+            <button
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-400 hover:text-black"
+            >
               Register
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
