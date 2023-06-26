@@ -1,26 +1,9 @@
 import { Router as ExpressRouter } from "express";
-import User from "../../database/users";
+import { handleGetUserByID } from "./handlers";
 
 const users_router = ExpressRouter();
 
-import mysql from "mysql2/promise";
-import { isPositiveInteger } from "@/server/common/validation";
-import { NullError } from "@/server/common/errors";
-import createHttpError from "http-errors";
-
-
-users_router.get("/:user_id", async (req, res) => {
-  const {user_id} = req.params;
-  console.log(user_id);
-
-  if(!isPositiveInteger(user_id)) throw new createHttpError.BadRequest("ID must be a number");
-  try{
-    res.json(User.getUser(parseInt(user_id)));
-  }catch(error){
-    if (error instanceof NullError) throw new createHttpError.NotFound();
-    throw error;
-  }
-});
+users_router.get("/:user_id", handleGetUserByID);
 
 // users_router.get("/users", async (req, res) => {
 //   const query = "SELECT user_id FROM users WHERE role = `hacker`";
