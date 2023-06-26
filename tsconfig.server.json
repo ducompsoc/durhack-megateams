@@ -6,7 +6,10 @@
     "lib": ["es2019"],
     "target": "es2019",
     "isolatedModules": false,
-    "noEmit": false
+    "noEmit": false,
+    "paths": {
+      "@/server/*": ["./src/server/*"]
+    }
   },
   "include": ["src/server"]
 }

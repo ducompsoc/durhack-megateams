@@ -1,6 +1,6 @@
 import next from "next";
 import express from "express";
-
+import "./path-alias";
 import api_router from "./routes";
 
 const dev = process.env.NODE_ENV !== "production";
