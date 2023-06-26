@@ -44,3 +44,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## .env Setup
+
+```Dotenv
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_USER=durhack
+DATABASE_PASSWORD=durhack
+DATABASE_NAME=durhack2023megateams
+SESSION_DATABASE_HOST=localhost
+SESSION_DATABASE_PORT=3306
+SESSION_DATABASE_USER=durhack
+SESSION_DATABASE_PASSWORD=durhack
+SESSION_DATABASE_NAME=durhack2023megateamssession
+```
