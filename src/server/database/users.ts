@@ -2,6 +2,7 @@ import { RowDataPacket } from "mysql2";
 import { UserModel, UserRole } from "@/server/common/models";
 import Team from "@/server/database/teams";
 import database from "@/server/database";
+import { NullError } from "../common/errors";
 
 interface userIdentifier {
   id: number,
@@ -45,7 +46,11 @@ export default class User implements UserModel {
   }
 
   static async getUser(id: number): Promise<User> {
-    throw new Error("Not implemented.");
+    const query = "SELECT * FROM users WHERE id = ? AND role = `hacker`";
+    const [rows] = await database.execute<RowDataPacket[]>(query, [id]);
+    if (rows == undefined) throw new NullError();
+    return new User(rows[0]);
+    // throw new Error("Not implemented.");
   }
 
   static async findUserByEmail(email: string): Promise<User> {

@@ -6,11 +6,11 @@ function get_mysql_session_store(): MySQLStoreType {
   const MySQLStore = MySQLStoreMeta(constructor_session);
 
   const options  = {
-    host: "localhost",
-    port: 3306,
-    user: "session_db_user",
-    password: "session_db_password",
-    database: "session_db"
+    host     : process.env.SESSION_DATABASE_HOST,
+    port     : Number(process.env.SESSION_DATABASE_PORT),
+    user     : process.env.SESSION_DATABASE_USER,
+    password : process.env.SESSION_DATABASE_PASSWORD,
+    database : process.env.SESSION_DATABASE_NAME
   };
 
   return new MySQLStore(options);

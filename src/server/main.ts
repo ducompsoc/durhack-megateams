@@ -1,3 +1,4 @@
+import "./common/config";
 import express from "express";
 import "./path-alias";
 import passport from "passport";
