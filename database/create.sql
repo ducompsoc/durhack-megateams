@@ -60,7 +60,7 @@ CREATE TABLE `qrcodes` (
     `qrcode_id` int NOT NULL AUTO_INCREMENT,
     `qrcode_name` varchar(255) NOT NULL,
     `qrcode_description` varchar(255) DEFAULT '',
-    `qrcode_payload` varchar(255) NOT NULL
+    `qrcode_payload` varchar(255) NOT NULL,
     `qrcode_points_value` int NOT NULL,
     `qrcode_use_limit` int NOT NULL,
     `state` tinyint(1) DEFAULT '1',
