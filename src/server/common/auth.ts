@@ -13,7 +13,7 @@ import { NullError, ValueError } from "@/server/common/errors";
 import { UserModel, UserIdentifierModel } from "@/server/common/models";
 
 const promise_pbkdf2 = promisify(pbkdf2);
-const promise_validate_email = promisify(EmailValidator.validate_async);
+const promise_validate_email = promisify((email: string, callback: EmailValidator.AsyncCallback) => { return EmailValidator.validate_async(email, callback); } );
 
 declare global {
   namespace Express {
