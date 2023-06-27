@@ -7,10 +7,10 @@ import { randomBytes as cryptoRandomBytes } from "crypto";
 import createHttpError from "http-errors";
 import * as EmailValidator from "email-validator";
 
-import { handle_next_app_request } from "./next";
 import User from "@/server/database/users";
 import { NullError, ValueError } from "@/server/common/errors";
 import { UserModel, UserIdentifierModel } from "@/server/common/models";
+import { HandleMethodNotAllowed } from "@/server/common/middleware";
 
 const promise_pbkdf2 = promisify(pbkdf2);
 const promise_validate_email = promisify((email: string, callback: EmailValidator.AsyncCallback) => { return EmailValidator.validate_async(email, callback); } );
@@ -111,54 +111,50 @@ passport.deserializeUser(async function(id: UserIdentifierModel, callback) {
 
 const auth_router = ExpressRouter();
 
-auth_router.get("/login", function(request: Request, response: Response) {
-  return handle_next_app_request(request, response);
-});
+auth_router.route("login")
+  .post(passport.authenticate("local", {
+    successReturnToOrRedirect: "/",
+    failureRedirect: "/login",
+    failureMessage: true
+  }))
+  .all(HandleMethodNotAllowed);
 
-auth_router.post("/login", passport.authenticate("local", {
-  successReturnToOrRedirect: "/",
-  failureRedirect: "/login",
-  failureMessage: true
-}));
+auth_router.route("signup")
+  .post(async function(request: Request, response: Response) {
+    if (request.user) {
+      throw new createHttpError.BadRequest("You are already logged in!");
+    }
 
-auth_router.get("/signup", function(request: Request, response: Response) {
-  return handle_next_app_request(request, response);
-});
+    const { full_name, preferred_name, email, password } = request.body;
 
-auth_router.post("/signup", async function(request: Request, response: Response) {
-  if (request.user) {
-    throw new createHttpError.BadRequest("You are already logged in!");
-  }
+    if (typeof full_name !== "string" || full_name === "") {
+      throw new createHttpError.BadRequest("Full name should be a non-empty string.");
+    }
 
-  const { full_name, preferred_name, email, password } = request.body;
+    if (typeof preferred_name !== "string" || preferred_name === "") {
+      throw new createHttpError.BadRequest("Preferred name should be a non-empty string.");
+    }
 
-  if (typeof full_name !== "string" || full_name === "") {
-    throw new createHttpError.BadRequest("Full name should be a non-empty string.");
-  }
+    if (typeof email !== "string" || !await promise_validate_email(email)) {
+      throw new createHttpError.BadRequest("Email address needs to be mailable.");
+    }
 
-  if (typeof preferred_name !== "string" || preferred_name === "") {
-    throw new createHttpError.BadRequest("Preferred name should be a non-empty string.");
-  }
+    if (typeof password !== "string" || !validatePassword(password)) {
+      throw new createHttpError.BadRequest("Password should be a string containing no illegal characters.");
+    }
 
-  if (typeof email !== "string" || !await promise_validate_email(email)) {
-    throw new createHttpError.BadRequest("Email address needs to be mailable.");
-  }
+    const password_salt = cryptoRandomBytes(16);
+    const hashed_password = await hashPasswordText(password, password_salt);
 
-  if (typeof password !== "string" || !validatePassword(password)) {
-    throw new createHttpError.BadRequest("Password should be a string containing no illegal characters.");
-  }
+    const payload = { full_name, preferred_name, email, password_salt, hashed_password };
 
-  const password_salt = cryptoRandomBytes(16);
-  const hashed_password = await hashPasswordText(password, password_salt);
-
-  const payload = { full_name, preferred_name, email, password_salt, hashed_password };
-
-  try {
-    await User.createNewUser(payload);
-  } catch (error) {
-    if (error instanceof ValueError) throw new createHttpError.BadRequest("Invalid values provided.");
-    throw error;
-  }
-});
+    try {
+      await User.createNewUser(payload);
+    } catch (error) {
+      if (error instanceof ValueError) throw new createHttpError.BadRequest("Invalid values provided.");
+      throw error;
+    }
+  })
+  .all(HandleMethodNotAllowed);
 
 export default auth_router;
