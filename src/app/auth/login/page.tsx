@@ -4,14 +4,11 @@ export default function Login() {
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Image
-          className="mx-auto"
-          src="/logo.png"
-          alt="DurHack Logo"
-          width={64}
-          height={64}
-        />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <div className="flex flex-row py-4 px-6 items-center justify-center justify-center mb-4 pt-0">
+          <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
+          <h1 className="text-4xl font-bold ml-4">DurHack</h1>
+        </div>
+        <h2 className="mt-4 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Sign in to your account
         </h2>
       </div>
