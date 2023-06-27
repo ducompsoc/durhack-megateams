@@ -11,10 +11,10 @@ interface ErrorResponseBody {
 function make_http_error_response_body(error: HttpError): ErrorResponseBody {
   const response_body: ErrorResponseBody = {
     status: error.statusCode,
-    message: STATUS_CODES[error.statusCode] || "Unrecognised Error"
+    message: STATUS_CODES[error.statusCode] || error.message
   };
 
-  if (error.message) {
+  if (error.message && error.message !== response_body.message) {
     response_body.detail = error.message;
   }
   return response_body;
