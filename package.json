@@ -20,6 +20,7 @@
     "autoprefixer": "10.4.14",
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
+    "email-validator": "^2.0.4",
     "eslint-config-next": "13.4.5",
     "express": "github:expressjs/express#5.0",
     "express-mysql-session": "^3.0.0",
