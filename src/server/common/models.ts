@@ -55,6 +55,8 @@ export interface UserModel extends UserDetailsModel {
   updated_at: Date,
 }
 
+export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
+
 export interface QRCodeModel {
   id: number,
   name: string,

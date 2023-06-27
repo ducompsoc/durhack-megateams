@@ -1,12 +1,21 @@
 import { RowDataPacket } from "mysql2";
-import { UserModel, UserRole } from "@/server/common/models";
+import { UserIdentifierModel, UserModel, UserRole } from "@/server/common/models";
 import Team from "@/server/database/teams";
 import database from "@/server/database";
-import { NullError } from "../common/errors";
+import {NullError, ValueError} from "../common/errors";
 
-interface userIdentifier {
-  id: number,
-  full_name: string,
+type CreateUserPayload = Pick<UserModel, "email" | "hashed_password" | "password_salt" | "full_name" | "preferred_name">;
+
+function isCreateUserPayload(something: any): something is CreateUserPayload {
+  if (typeof something !== "object") return false;
+
+  return [
+    typeof something.email === "string",
+    typeof something.full_name === "string",
+    typeof something.preferred_name === "string",
+    something.hashed_password instanceof Buffer,
+    something.password_salt instanceof Buffer,
+  ].every(v => v);
 }
 
 export default class User implements UserModel {
@@ -41,7 +50,7 @@ export default class User implements UserModel {
     throw new Error("Not implemented.");
   }
 
-  static async listUsers(): Promise<userIdentifier[]> {
+  static async listUsers(): Promise<UserIdentifierModel[]> {
     throw new Error("Not implemented.");
   }
 
@@ -57,7 +66,10 @@ export default class User implements UserModel {
     throw new Error("Not implemented.");
   }
 
-  static async createNewUser(): Promise<void> {
+  static async createNewUser(payload: CreateUserPayload): Promise<void> {
+    if (!isCreateUserPayload(payload)) {
+      throw new ValueError("Missing necessary fields.");
+    }
     throw new Error("Not implemented.");
   }
 
