@@ -1,6 +1,7 @@
 import { Router as ExpressRouter, Request, Response } from "express";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";
+import auth_router from "./auth";
 import areas_router from "./areas";
 import megateams_router from "./megateams";
 import points_router from "./points";
@@ -8,6 +9,7 @@ import qr_codes_router from "./qr_codes";
 import teams_router from "./teams";
 import users_router from "./users";
 import api_error_handler from "./error_handling";
+import createHttpError from "http-errors";
 
 const api_router = ExpressRouter();
 
@@ -27,6 +29,7 @@ function handle_unhandled_request(request: Request, response: Response) {
 api_router.route("/")
   .get(handle_root_request);
 
+api_router.use("/auth", auth_router);
 api_router.use("/areas", areas_router);
 api_router.use("/megateams", megateams_router);
 api_router.use("/points", points_router);
