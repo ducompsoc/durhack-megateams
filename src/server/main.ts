@@ -4,7 +4,6 @@ import "./path-alias";
 import passport from "passport";
 import session from "./common/session";
 import next_app, { handle_next_app_request } from "./common/next";
-import auth_router from "./common/auth";
 import api_router from "./routes";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -16,7 +15,6 @@ async function main() {
   server.use(session);
   server.use(passport.authenticate("session"));
 
-  server.use("/", auth_router);
   server.use("/api", api_router);
   server.use("/", (request, response) => {
     return handle_next_app_request(request, response);
