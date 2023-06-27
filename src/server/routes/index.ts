@@ -21,7 +21,7 @@ function handle_root_request(request: Request, response: Response) {
   response.json({"status": response.statusCode, "message": "OK", "api_version": 1});
 }
 
-function handle_unhandled_request(request: Request, response: Response) {
+function handle_unhandled_request() {
   throw new createHttpError.NotFound("Unknown API route.");
 }
 
@@ -36,8 +36,7 @@ api_router.use("/qr_codes", qr_codes_router);
 api_router.use("/teams", teams_router);
 api_router.use("/users", users_router);
 
-api_router.route("/*")
-  .all(handle_unhandled_request);
+api_router.use(handle_unhandled_request);
 
 api_router.use(methodOverride());
 api_router.use(api_error_handler);
