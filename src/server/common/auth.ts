@@ -6,8 +6,15 @@ import User from "@/server/database/users";
 import { NullError } from "@/server/common/errors";
 import { pbkdf2, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import { UserModel } from "@/server/common/models";
 
 const promise_pbkdf2 = promisify(pbkdf2);
+
+declare global {
+  namespace Express {
+    interface User extends UserModel {}
+  }
+}
 
 async function hashPasswordText(password: string, salt: Buffer): Promise<Buffer> {
   const normalized_password = password.normalize();
@@ -51,11 +58,16 @@ const local_strategy = new Local.Strategy(localVerifyFunction);
 passport.use("local", local_strategy);
 
 passport.serializeUser(async function(user, callback) {
-
+  return callback(null, { id: user.id });
 });
 
 passport.deserializeUser(async function(id, callback) {
-
+  try {
+    return callback(null, await User.getUser(id.id));
+  } catch (error) {
+    if (error instanceof NullError) return callback(null, null);
+    return callback(error);
+  }
 });
 
 const auth_router = ExpressRouter();
