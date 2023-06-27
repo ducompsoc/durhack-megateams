@@ -22,8 +22,7 @@ function handle_root_request(request: Request, response: Response) {
 }
 
 function handle_unhandled_request(request: Request, response: Response) {
-  response.status(404);
-  response.json({"status": response.statusCode, "message": "Unknown API route."});
+  throw new createHttpError.NotFound("Unknown API route.");
 }
 
 api_router.route("/")
