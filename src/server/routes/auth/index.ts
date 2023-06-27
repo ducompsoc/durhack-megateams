@@ -111,7 +111,7 @@ passport.deserializeUser(async function(id: UserIdentifierModel, callback) {
 
 const auth_router = ExpressRouter();
 
-auth_router.route("login")
+auth_router.route("/login")
   .post(passport.authenticate("local", {
     successReturnToOrRedirect: "/",
     failureRedirect: "/login",
@@ -119,7 +119,7 @@ auth_router.route("login")
   }))
   .all(HandleMethodNotAllowed);
 
-auth_router.route("signup")
+auth_router.route("/signup")
   .post(async function(request: Request, response: Response) {
     if (request.user) {
       throw new createHttpError.BadRequest("You are already logged in!");
