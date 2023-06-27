@@ -40,10 +40,9 @@ export default function HackerLayout({
         <div className="flex flex-row py-4 px-6 items-center justify-center border-b border-black justify-evenly">
           <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
           <h1 className="text-4xl font-bold">DurHack</h1>
-          <ArrowRightOnRectangleIcon
-            className="w-12 h-12"
-            onClick={() => setOpen(true)}
-          />
+          <button onClick={() => setOpen(true)}>
+            <ArrowRightOnRectangleIcon className="w-12 h-12" />
+          </button>
         </div>
         <div className="p-6 grow overflow-auto">{children}</div>
         <div className="flex">
