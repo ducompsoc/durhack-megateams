@@ -9,7 +9,7 @@ import * as EmailValidator from "email-validator";
 
 import { handle_next_app_request } from "./next";
 import User from "@/server/database/users";
-import {NullError, ValueError} from "@/server/common/errors";
+import { NullError, ValueError } from "@/server/common/errors";
 import { UserModel, UserIdentifierModel } from "@/server/common/models";
 
 const promise_pbkdf2 = promisify(pbkdf2);
