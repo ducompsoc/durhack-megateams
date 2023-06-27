@@ -8,8 +8,8 @@ import {
   ChartBarIcon,
   UserGroupIcon,
   CogIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function HackerLayout({
   children,
@@ -32,12 +32,12 @@ export default function HackerLayout({
   ];
 
   return (
-    <div className="h-full flex flex-col text-black font-semibold">
+    <div className="h-full flex flex-col text-black">
       <div className="flex flex-row py-4 px-6 items-center justify-center border-b border-black justify-evenly">
         <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
         <h1 className="text-4xl font-bold">DurHack</h1>
         <Link href="/hacker">
-          <UserCircleIcon className="w-12 h-12 fill-accent" />
+          <ArrowRightOnRectangleIcon className="w-12 h-12" />
         </Link>
       </div>
       <div className="p-6 grow overflow-auto">{children}</div>
