@@ -1,5 +1,6 @@
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import { Request, Response, NextFunction } from "express";
+import { STATUS_CODES } from "http";
 
 interface ErrorResponseBody {
     status: number
@@ -10,7 +11,7 @@ interface ErrorResponseBody {
 function make_http_error_response_body(error: HttpError): ErrorResponseBody {
   const response_body: ErrorResponseBody = {
     status: error.statusCode,
-    message: error.name
+    message: STATUS_CODES[error.statusCode] || "Unrecognised Error"
   };
 
   if (error.message) {
