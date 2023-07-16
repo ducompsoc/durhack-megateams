@@ -20,7 +20,7 @@ export default function HackerHome() {
 
   function scanSuccess(result: string) {
     setScanning(false);
-    alert(`Scanned: ${result}`);
+    console.log(result);
   }
 
   const challenges = [
