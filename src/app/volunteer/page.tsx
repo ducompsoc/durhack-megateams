@@ -1,11 +1,14 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
+import QRCode from "react-qr-code";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
   const [open, setOpen] = useState(false);
+  const [qr, setQR] = useState({ name: "", uuid: "" });
+  const renderedQR = useRef(null);
 
   function getClasses(name: string) {
     let classes =
@@ -19,7 +22,12 @@ export default function Volunteer() {
     return classes;
   }
 
+  async function downloadQR() {
+    // need to work out how to do this well and support chrome
+  }
+
   function generate(name: string, uuid: string) {
+    setQR({ name, uuid });
     setOpen(true);
   }
 
@@ -120,12 +128,21 @@ export default function Volunteer() {
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                  <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"></div>
+                  <div className="bg-white px-4 py-5 sm:p-6 text-center flex flex-col items-center justify-center">
+                    <div ref={renderedQR}>
+                      <QRCode
+                        value={qr.uuid}
+                        fgColor="#7d6399"
+                        className="p-4"
+                      />
+                    </div>
+                    <p>{qr.name}</p>
+                  </div>
                   <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                     <button
                       type="button"
-                      className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={() => setOpen(false)}
+                      className="inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 bg-accent hover:bg-gray-50 sm:mt-0 sm:w-auto hover:text-gray-900"
+                      onClick={downloadQR}
                     >
                       Download
                     </button>
