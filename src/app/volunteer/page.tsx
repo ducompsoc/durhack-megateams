@@ -3,6 +3,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useRef, useState } from "react";
 import QRCode from "react-qr-code";
+import { exportComponentAsJPEG } from "react-component-export-image";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
@@ -23,7 +24,9 @@ export default function Volunteer() {
   }
 
   async function downloadQR() {
-    // need to work out how to do this well and support chrome
+    exportComponentAsJPEG(renderedQR, {
+      fileName: "durhackQR.jpg",
+    });
   }
 
   function generate(name: string, uuid: string) {
@@ -129,11 +132,10 @@ export default function Volunteer() {
               >
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                   <div className="bg-white px-4 py-5 sm:p-6 text-center flex flex-col items-center justify-center">
-                    <div ref={renderedQR}>
+                    <div ref={renderedQR} className="p-4">
                       <QRCode
                         value={qr.uuid}
                         fgColor="#7d6399"
-                        className="p-4"
                       />
                     </div>
                     <p>{qr.name}</p>

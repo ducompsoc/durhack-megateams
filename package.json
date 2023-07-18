@@ -41,6 +41,7 @@
     "qrcode-scanner-react": "^0.2.2",
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
+    "react-component-export-image": "^1.0.6",
     "react-dom": "18.2.0",
     "reflect-metadata": "^0.1.13",
     "react-qr-code": "^2.0.11",
