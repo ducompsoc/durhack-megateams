@@ -49,6 +49,8 @@ export default function Volunteer() {
 
   const [selected, setSelected] = useState(presets[0]);
 
+  const qrTypes = ['Workshop', 'Hacker', 'Volunteer', 'Sponsor'];
+
   const tabs = [
     {
       name: "Preset",
@@ -79,7 +81,26 @@ export default function Volunteer() {
         </div>
       ),
     },
-    { name: "Custom", content: <p>Placeholder for custom...</p> },
+    {
+      name: "Custom",
+      content: (
+        <div className="bg-gray-200 drop-shadow-lg p-4 rounded">
+          <p className="font-semibold mb-2">Generate Custom QR</p>
+          <input
+            type="text"
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+            placeholder="Name..."
+          />
+          <select className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6">
+            {qrTypes.map((qrType) => (
+              <option key={qrType} value={qrType}>
+                {qrType}
+              </option>
+            ))}
+          </select>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -133,10 +154,7 @@ export default function Volunteer() {
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                   <div className="bg-white px-4 py-5 sm:p-6 text-center flex flex-col items-center justify-center">
                     <div ref={renderedQR} className="p-4">
-                      <QRCode
-                        value={qr.uuid}
-                        fgColor="#7d6399"
-                      />
+                      <QRCode value={qr.uuid} fgColor="#7d6399" />
                     </div>
                     <p>{qr.name}</p>
                   </div>
