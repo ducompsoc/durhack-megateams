@@ -12,7 +12,7 @@
     "moduleResolution": "node",
     "noEmit": false,
     "paths": {
-      "@server/*": ["src/server/*"]
+      "@server/*": ["./src/server/*"]
     }
   },
   "include": ["src/server/**/*.ts"]
