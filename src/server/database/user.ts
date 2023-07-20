@@ -1,7 +1,9 @@
 import { DataType, Table, Column, Model, BelongsTo, ForeignKey, Sequelize } from "sequelize-typescript";
-import { UserModel, UserRole } from "@/server/common/models";
+
+import { UserModel, UserRole } from "@server/common/models";
+
 import Team from "./team";
-import { NullError, ValueError } from "../common/errors";
+
 
 type CreateUserPayload = Pick<UserModel, "email" | "hashed_password" | "password_salt" | "full_name" | "preferred_name">;
 

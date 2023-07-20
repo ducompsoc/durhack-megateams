@@ -1,8 +1,8 @@
 import createHttpError from "http-errors";
 import { Request, Response } from "express";
 
-import { NullError } from "@/server/common/errors";
-import Area from "@/server/database/area";
+import { NullError } from "@server/common/errors";
+import Area from "@server/database/area";
 
 
 export async function getAreasList(request: Request, response: Response): Promise<void> {

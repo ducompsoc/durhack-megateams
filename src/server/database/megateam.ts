@@ -1,5 +1,5 @@
 import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
-import { MegateamModel } from "@/server/common/models";
+import { MegateamModel } from "@server/common/models";
 import Area from "./area";
 
 interface megateamIdentifier {

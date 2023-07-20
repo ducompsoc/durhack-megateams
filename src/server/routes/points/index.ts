@@ -1,7 +1,9 @@
 import { Router as ExpressRouter } from "express";
 
+import { HandleMethodNotAllowed } from "@server/common/middleware";
+
 import * as handlers from "./point_handlers";
-import { HandleMethodNotAllowed } from "@/server/common/middleware";
+
 
 
 const points_router = ExpressRouter();

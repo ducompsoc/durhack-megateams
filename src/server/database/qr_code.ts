@@ -1,5 +1,5 @@
 import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
-import { QRCodeModel } from "@/server/common/models";
+import { QRCodeModel } from "@server/common/models";
 import User from "./user";
 import {Col} from "sequelize/types/utils";
 

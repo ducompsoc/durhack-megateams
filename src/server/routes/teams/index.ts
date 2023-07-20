@@ -1,7 +1,8 @@
 import { Router as ExpressRouter } from "express";
 
+import { HandleMethodNotAllowed } from "@server/common/middleware";
+
 import * as handlers from "./team_handlers";
-import { HandleMethodNotAllowed } from "@/server/common/middleware";
 
 
 const teams_router = ExpressRouter();

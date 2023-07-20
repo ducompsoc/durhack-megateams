@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./megateam_handlers";
-import { HandleMethodNotAllowed } from "@/server/common/middleware";
+import { HandleMethodNotAllowed } from "@server/common/middleware";
 
 
 const megateams_router = ExpressRouter();

@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./area_handlers";
-import { HandleMethodNotAllowed } from "@/server/common/middleware";
+import { HandleMethodNotAllowed } from "@server/common/middleware";
 
 
 const areas_router = ExpressRouter();

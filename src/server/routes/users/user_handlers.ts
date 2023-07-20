@@ -1,9 +1,9 @@
 import createHttpError from "http-errors";
 import { Request, Response } from "express";
 
-import { isPositiveInteger } from "@/server/common/validation";
-import { NullError } from "@/server/common/errors";
-import User from "@/server/database/user";
+import { isPositiveInteger } from "@server/common/validation";
+import { NullError } from "@server/common/errors";
+import User from "@server/database/user";
 
 
 export async function getUsersList(request: Request, response: Response): Promise<void> {

@@ -1,7 +1,10 @@
 import { DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey } from "sequelize-typescript";
-import { AreaModel } from "@/server/common/models";
-import Megateam from "@/server/database/megateam";
+
+import { AreaModel } from "@server/common/models";
+import Megateam from "@server/database/megateam";
+
 import Team from "./team";
+
 
 interface areaIdentifier {
   id: number,

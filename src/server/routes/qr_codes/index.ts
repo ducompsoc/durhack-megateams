@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./qr_code_handlers";
-import { HandleMethodNotAllowed } from "@/server/common/middleware";
+import { HandleMethodNotAllowed } from "@server/common/middleware";
 
 
 const qr_codes_router = ExpressRouter();

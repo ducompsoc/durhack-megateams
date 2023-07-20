@@ -1,7 +1,10 @@
 import { DataType, Table, Column, Model, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
-import { TeamModel } from "@/server/common/models";
+
+import { TeamModel } from "@server/common/models";
+
 import Area from "./area";
 import User from "./user";
+
 
 interface teamIdentifier {
   id: number,

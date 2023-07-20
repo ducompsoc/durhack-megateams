@@ -1,8 +1,8 @@
 import createHttpError from "http-errors";
 import { Request, Response } from "express";
 
-import { NullError } from "@/server/common/errors";
-import Point from "@/server/database/point";
+import { NullError } from "@server/common/errors";
+import Point from "@server/database/point";
 
 
 export async function getPointsList(request: Request, response: Response): Promise<void> {

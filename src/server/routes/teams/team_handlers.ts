@@ -1,8 +1,8 @@
 import createHttpError from "http-errors";
 import { Request, Response } from "express";
 
-import { NullError } from "@/server/common/errors";
-import Team from "@/server/database/team";
+import { NullError } from "@server/common/errors";
+import Team from "@server/database/team";
 
 
 export async function getTeamsList(request: Request, response: Response): Promise<void> {

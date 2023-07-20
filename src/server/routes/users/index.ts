@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./user_handlers";
-import { HandleMethodNotAllowed } from "@/server/common/middleware";
+import { HandleMethodNotAllowed } from "@server/common/middleware";
 
 
 const users_router = ExpressRouter();
