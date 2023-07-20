@@ -1,4 +1,4 @@
-import { DataType, Table, Column, Model, HasOne, Sequelize } from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, ForeignKey, Sequelize } from "sequelize-typescript";
 import { UserModel, UserRole } from "@/server/common/models";
 import Team from "./team";
 import { NullError, ValueError } from "../common/errors";
@@ -28,12 +28,20 @@ export default class User extends Model implements UserModel {
   })
     id!: number;
 
-  @HasOne(() => Team)
+  @ForeignKey(() => Team)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+    team_id?: number;
+
+  @BelongsTo(() => Team)
     team?: Team;
   
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    unique: true,
   })
     email!: string;
 
@@ -98,20 +106,6 @@ export default class User extends Model implements UserModel {
     defaultValue: false,
   })
     checked_in!: boolean;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
-  })
-    created_at!: Date;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-  })
-    updated_at!: Date;
 
   @Column({
     type: DataType.STRING,

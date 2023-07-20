@@ -1,5 +1,6 @@
-import { DataType, Table, Column, Model } from "sequelize-typescript";
+import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
 import { MegateamModel } from "@/server/common/models";
+import Area from "./area";
 
 interface megateamIdentifier {
   id: number,
@@ -30,6 +31,9 @@ export default class Megateam extends Model implements MegateamModel {
     allowNull: true,
   })
     description?: string;
+
+  @HasMany(() => Area)
+    areas!: Area[];
 
   static async listMegateams(): Promise<megateamIdentifier[]> {
     throw new Error("Not implemented.");

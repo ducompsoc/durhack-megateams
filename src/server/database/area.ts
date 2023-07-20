@@ -1,6 +1,7 @@
-import { DataType, Table, Column, Model, HasOne } from "sequelize-typescript";
+import { DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey } from "sequelize-typescript";
 import { AreaModel } from "@/server/common/models";
 import Megateam from "@/server/database/megateam";
+import Team from "./team";
 
 interface areaIdentifier {
   id: number,
@@ -10,6 +11,7 @@ interface areaIdentifier {
 @Table
 export default class Area extends Model implements AreaModel {
   @Column({
+    field: "area_id",
     type: DataType.INTEGER,
     allowNull: false,
     autoIncrement: true,
@@ -17,20 +19,30 @@ export default class Area extends Model implements AreaModel {
   })
     id!: number;
 
-  @HasOne(() => Megateam)
+  @ForeignKey(() => Megateam)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+    megateam_id!: number;
+
+  @BelongsTo(() => Megateam)
     megateam!: Megateam;
 
-  @Column
+  @HasOne(() => Team)
+    team?: Team;
+
+  @Column({
+    field: "area_name",
+    type: DataType.STRING,
+    allowNull: false,
+  })
     name!: string;
 
-  @Column
+  @Column({
+    field: "area_room",
+    type: DataType.STRING,
+    allowNull: false,
+  })
     room!: string;
-
-  static async listAreas(): Promise<areaIdentifier[]> {
-    throw new Error("Not implemented.");
-  }
-
-  static async getArea(id: number): Promise<AreaModel> {
-    throw new Error("Not implemented.");
-  }
 }

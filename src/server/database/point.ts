@@ -1,4 +1,4 @@
-import { DataType, Table, Column, Model, HasOne } from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
 import { PointModel } from "@/server/common/models";
 import QRCode from "./qr_code";
 import User from "./user";
@@ -14,13 +14,28 @@ export default class Point extends Model implements PointModel {
   })
     id!: number;
 
-  @HasOne(() => QRCode)
+  @ForeignKey(() => QRCode)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+    qrcode_id?: number;
+
+  @BelongsTo(() => QRCode)
     qrcode?: QRCode;
 
-  @HasOne(() => User)
-    redeemer?: User;
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+    redeeemer_user_id!: number;
+
+  @BelongsTo(() => User)
+    redeemer!: User;
 
   @Column({
+    type: DataType.INTEGER,
     allowNull: false,
   })
     value!: number;

@@ -51,8 +51,6 @@ export interface UserModel extends UserDetailsModel {
   h_UK_marketing?: boolean,
   h_UK_Consent?: boolean,
   checked_in: boolean,
-  created_at: Date,
-  updated_at: Date,
 }
 
 export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
@@ -72,6 +70,6 @@ export interface QRCodeModel {
 export interface PointModel {
   id: number,
   value: number,
-  qrcode: QRCodeModel,
+  qrcode?: QRCodeModel,
   redeemer: UserModel,
 }
