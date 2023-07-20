@@ -24,7 +24,7 @@ export default class QRCode extends Model implements QRCodeModel {
     name!: string;
 
   @HasOne(() => User)
-    creator: User;
+    creator!: User;
 
   @Column({
     allowNull: true,
