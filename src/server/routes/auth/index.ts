@@ -149,7 +149,7 @@ auth_router.route("/signup")
     const payload = { full_name, preferred_name, email, password_salt, hashed_password };
 
     try {
-      await User.createNewUser(payload);
+      throw new Error("Not Implemented");
     } catch (error) {
       if (error instanceof ValueError) throw new createHttpError.BadRequest("Invalid values provided.");
       throw error;
