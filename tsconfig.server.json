@@ -1,17 +1,18 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "commonjs",
     "outDir": "dist",
-    "lib": ["ESNext"],
+    "lib": ["esnext"],
     "target": "es2019",
+    "baseUrl": "src/server",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "isolatedModules": false,
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "node",
     "noEmit": false,
     "paths": {
-      "@/server/*": ["./src/server/*"]
+      "@/server/*": ["*"]
     }
   },
   "include": ["src/server"]

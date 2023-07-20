@@ -2,7 +2,6 @@
   "name": "durhack-megateams-server",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "repository": {
     "url": "https://github.com/ducompsoc/durhack-megateams"
   },
@@ -11,7 +10,7 @@
     "build:client": "npx next build",
     "build:server": "npx tsc -p tsconfig.server.json && npx tsc-alias -p tsconfig.server.json",
     "build": "npm run build:client && npm run build:server",
-    "start": "npx cross-env NODE_ENV=production node dist/main.js",
+    "start": "npx cross-env NODE_ENV=production node --experimental-specifier-resolution=node dist/main.js",
     "lint": "npx next lint"
   },
   "dependencies": {
@@ -58,6 +57,7 @@
     "eslint": "^8.42.0",
     "eslint-plugin-tsdoc": "^0.2.17",
     "nodemon": "^2.0.22",
-    "tsx": "^3.12.7"
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0"
   }
 }
