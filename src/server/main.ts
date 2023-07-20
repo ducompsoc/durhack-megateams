@@ -3,14 +3,16 @@ import express from "express";
 import "./path-alias";
 import passport from "passport";
 import session from "./common/session";
-import next_app, { handle_next_app_request } from "./common/next";
+import next_app, { handle_next_app_request } from "./common/nextApp";
 import api_router from "./routes";
-import "./database";
+import sequelize, { ensureDatabaseExists } from "./database";
 
 const dev = process.env.NODE_ENV !== "production";
 
 async function main() {
   await next_app.prepare();
+  await ensureDatabaseExists();
+  await sequelize.sync({ force: dev });
   const server = express();
 
   server.use(session);
