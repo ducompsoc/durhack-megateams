@@ -18,10 +18,10 @@ export interface TeamModel {
 }
 
 export enum UserRole {
-  hacker,
-  sponsor,
-  volunteer,
-  admin,
+  hacker = "hacker",
+  sponsor = "sponsor",
+  volunteer = "volunteer",
+  admin = "admin",
 }
 
 export interface UserDetailsModel {

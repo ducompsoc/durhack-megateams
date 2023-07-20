@@ -1,5 +1,5 @@
 import { Router as ExpressRouter } from "express";
-import User from "../../database/users";
+import User from "../../database/user";
 
 const users_router = ExpressRouter();
 
@@ -15,7 +15,7 @@ users_router.get("/:user_id", async (req, res) => {
 
   if(!isPositiveInteger(user_id)) throw new createHttpError.BadRequest("ID must be a number");
   try{
-    res.json(User.getUser(parseInt(user_id)));
+    res.json(User.findByPk(parseInt(user_id), { rejectOnEmpty: new NullError }));
   }catch(error){
     if (error instanceof NullError) throw new createHttpError.NotFound();
     throw error;

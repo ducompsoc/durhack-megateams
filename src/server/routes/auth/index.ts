@@ -7,7 +7,7 @@ import { randomBytes as cryptoRandomBytes } from "crypto";
 import createHttpError from "http-errors";
 import * as EmailValidator from "email-validator";
 
-import User from "@/server/database/users";
+import User from "@/server/database/user";
 import { NullError, ValueError } from "@/server/common/errors";
 import { UserModel, UserIdentifierModel } from "@/server/common/models";
 import { HandleMethodNotAllowed } from "@/server/common/middleware";
@@ -70,7 +70,7 @@ const localVerifyFunction: VerifyFunction = async function(username, password, c
    */
   let user;
   try {
-    user = await User.findUserByEmail(username);
+    user = await User.findOne({ where: { email: username }, rejectOnEmpty: new NullError() });
   } catch (error) {
     if (error instanceof NullError) {
       return callback(null, false, { message: "Incorrect username or password." });
@@ -97,12 +97,12 @@ passport.serializeUser(async function(user, callback) {
   return callback(null, { id: user.id });
 });
 
-passport.deserializeUser(async function(id: UserIdentifierModel, callback) {
-  if (typeof id?.id !== "number") {
+passport.deserializeUser(async function(identifier: UserIdentifierModel, callback) {
+  if (typeof identifier?.id !== "number") {
     return callback(null, null);
   }
   try {
-    return callback(null, await User.getUser(id.id));
+    return callback(null, await User.findByPk(identifier.id, { rejectOnEmpty: new NullError() }));
   } catch (error) {
     if (error instanceof NullError) return callback(null, null);
     return callback(error);

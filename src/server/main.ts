@@ -5,6 +5,7 @@ import passport from "passport";
 import session from "./common/session";
 import next_app, { handle_next_app_request } from "./common/next";
 import api_router from "./routes";
+import "./database";
 
 const dev = process.env.NODE_ENV !== "production";
 
