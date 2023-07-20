@@ -8,17 +8,21 @@ import Area from "./area";
 import Megateam from "./megateam";
 import Point from "./point";
 import QRCode from "./qr_code";
+import {NullError} from "../common/errors";
 
-async function ensureDatabaseExists() {
+export async function ensureDatabaseExists() {
   const connection = await mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
   });
-  await connection.execute("CREATE DATABASE IF NOT EXISTS ?;", process.env.DATABASE_NAME);
-}
 
-await ensureDatabaseExists();
+  if (!process.env.DATABASE_NAME) {
+    throw new NullError("Database name cannot be nulL!");
+  }
+
+  await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${process.env.DATABASE_NAME}\`;`);
+}
 
 const sequelize = new Sequelize({
   host     : process.env.DATABASE_HOST,
@@ -37,7 +41,5 @@ sequelize.addModels([
   Point,
   QRCode,
 ]);
-
-await sequelize.sync();
 
 export default sequelize;
