@@ -38,4 +38,6 @@ sequelize.addModels([
   QRCode,
 ]);
 
+await sequelize.sync();
+
 export default sequelize;
