@@ -1,13 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "es2022",
+    "module": "NodeNext",
     "outDir": "dist",
-    "lib": ["es2021"],
+    "lib": ["ESNext"],
     "target": "es2019",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "isolatedModules": false,
+    "moduleResolution": "NodeNext",
     "noEmit": false,
     "paths": {
       "@/server/*": ["./src/server/*"]
