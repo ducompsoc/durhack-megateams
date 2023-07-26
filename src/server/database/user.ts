@@ -5,20 +5,6 @@ import { UserModel, UserRole } from "@server/common/models";
 import Team from "./team";
 
 
-type CreateUserPayload = Pick<UserModel, "email" | "hashed_password" | "password_salt" | "full_name" | "preferred_name">;
-
-function isCreateUserPayload(something: any): something is CreateUserPayload {
-  if (typeof something !== "object") return false;
-
-  return [
-    typeof something.email === "string",
-    typeof something.full_name === "string",
-    typeof something.preferred_name === "string",
-    something.hashed_password instanceof Buffer,
-    something.password_salt instanceof Buffer,
-  ].every(v => v);
-}
-
 @Table
 export default class User extends Model implements UserModel {
   @Column({
