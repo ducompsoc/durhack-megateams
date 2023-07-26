@@ -12,7 +12,7 @@ const dev = process.env.NODE_ENV !== "production";
 async function main() {
   await next_app.prepare();
   await ensureDatabaseExists();
-  await sequelize.sync({ force: dev });
+  await sequelize.sync({ force: false });
   const server = express();
 
   server.use(session);
