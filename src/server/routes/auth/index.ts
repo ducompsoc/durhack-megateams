@@ -4,9 +4,10 @@ import Local from "passport-local";
 
 import SequelizeUser from "@server/database/user";
 import { NullError } from "@server/common/errors";
-import { HandleMethodNotAllowed } from "@server/common/middleware";
+import { handleMethodNotAllowed } from "@server/common/middleware";
 
 import { localVerifyFunction } from "./auth_util";
+import { handleSignUp, handleSetPassword, handleLoginSuccess } from "./auth_handlers";
 
 
 declare global {
@@ -23,7 +24,7 @@ const local_strategy = new Local.Strategy(localVerifyFunction);
 
 passport.use("local", local_strategy);
 
-passport.serializeUser<SerializedUser>(async function(user, callback) {
+passport.serializeUser<SerializedUser>(async function(user: Express.User, callback) {
   return callback(null, { id: user.id });
 });
 
@@ -42,15 +43,21 @@ passport.deserializeUser<SerializedUser>(async function(identifier, callback) {
 const auth_router = ExpressRouter();
 
 auth_router.route("/login")
-  .post(passport.authenticate("local", {
-    successReturnToOrRedirect: "/",
-    failureRedirect: "/login",
-    failureMessage: true
-  }))
-  .all(HandleMethodNotAllowed);
+  .post(
+    passport.authenticate("local", {
+      failureRedirect: "/login",
+      failureMessage: true
+    }),
+    handleLoginSuccess
+  )
+  .all(handleMethodNotAllowed);
 
 auth_router.route("/signup")
-  .post()
-  .all(HandleMethodNotAllowed);
+  .post(handleSignUp)
+  .all(handleMethodNotAllowed);
+
+auth_router.route("/setpassword")
+  .post(handleSetPassword)
+  .all(handleMethodNotAllowed);
 
 export default auth_router;

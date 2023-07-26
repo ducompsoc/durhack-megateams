@@ -1,9 +1,9 @@
 import createHttpError from "http-errors";
 
-export function HandleMethodNotAllowed() {
+export function handleMethodNotAllowed() {
   throw new createHttpError.MethodNotAllowed();
 }
 
-export function HandleNotImplemented() {
+export function handleNotImplemented() {
   throw new createHttpError.NotImplemented();
 }
