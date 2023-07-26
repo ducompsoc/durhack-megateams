@@ -30,7 +30,7 @@ CREATE TABLE `teams` (
 CREATE TABLE `users` (
   `user_id` int NOT NULL AUTO_INCREMENT,
   `team_id` int DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL UNIQUE,
   `hashed_password` BINARY(32) DEFAULT NULL,
   `password_salt` BINARY(16) DEFAULT NULL,
   `discord_id` varchar(255) DEFAULT NULL,
