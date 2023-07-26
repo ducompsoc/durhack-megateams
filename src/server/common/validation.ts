@@ -1,7 +1,4 @@
 import { promisify } from "util";
-import * as EmailValidator from "email-validator";
-
-export const validateEmail = promisify((email: string, callback: EmailValidator.AsyncCallback) => { return EmailValidator.validate_async(email, callback); } );
 
 export function isPositiveInteger(str: string) {
   if (typeof str !== "string") {
