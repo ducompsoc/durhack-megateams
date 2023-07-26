@@ -1,31 +1,8 @@
-import createHttpError, { HttpError, isHttpError } from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 import { Request, Response, NextFunction } from "express";
-import { STATUS_CODES } from "http";
 
-interface ErrorResponseBody {
-    status: number
-    message: string
-    detail?: string
-}
+import { sendHttpErrorResponse } from "@server/common/response";
 
-function make_http_error_response_body(error: HttpError): ErrorResponseBody {
-  const response_body: ErrorResponseBody = {
-    status: error.statusCode,
-    message: STATUS_CODES[error.statusCode] || error.message
-  };
-
-  if (error.message && error.message !== response_body.message) {
-    response_body.detail = error.message;
-  }
-  return response_body;
-}
-
-function send_http_error_response(response: Response, error: HttpError) {
-  const response_body = make_http_error_response_body(error);
-
-  response.status(error.statusCode);
-  response.json(response_body);
-}
 
 export default function api_error_handler(error: Error, request: Request, response: Response, next: NextFunction) {
   if (response.headersSent) {
@@ -33,11 +10,11 @@ export default function api_error_handler(error: Error, request: Request, respon
   }
 
   if (isHttpError(error)) {
-    return send_http_error_response(response, error);
+    return sendHttpErrorResponse(response, error);
   }
 
   console.error("Unexpected API error:");
   Error.captureStackTrace(error);
   console.error(error.stack);
-  return send_http_error_response(response, new createHttpError.InternalServerError());
+  return sendHttpErrorResponse(response, new createHttpError.InternalServerError());
 }
