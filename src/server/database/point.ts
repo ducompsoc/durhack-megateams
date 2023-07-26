@@ -32,7 +32,7 @@ export default class Point extends Model implements PointModel {
     type: DataType.INTEGER,
     allowNull: false,
   })
-    redeeemer_user_id!: number;
+    redeemer_user_id!: number;
 
   @BelongsTo(() => User)
     redeemer!: User;
