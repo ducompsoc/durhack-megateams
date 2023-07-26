@@ -70,4 +70,10 @@ export default class QRCode extends Model implements QRCodeModel {
     allowNull: false,
   })
     state!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+    public!: boolean;
 }
