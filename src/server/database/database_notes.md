@@ -39,7 +39,7 @@ Required:
 - start time
 - end time
 
-*NB: presets will be available which automatically set many of these options*
+_NB: presets will be available which automatically set many of these options_
 
 Optional:
 

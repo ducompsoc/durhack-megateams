@@ -45,9 +45,9 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-## .env Setup
+## Example `.env.local`
 
-```Dotenv
+```dotenv
 DATABASE_HOST=localhost
 DATABASE_PORT=3306
 DATABASE_USER=durhack
@@ -59,3 +59,16 @@ SESSION_DATABASE_USER=durhack
 SESSION_DATABASE_PASSWORD=durhack
 SESSION_DATABASE_NAME=durhack2023megateamssession
 ```
+
+## mysql server
+
+Make sure you are running a [mysql server](https://dev.mysql.com/doc/refman/8.1/en/installing.html) 
+on your machine before trying to run the project otherwise you will get connection refused errors etc.
+as the javascript can't find a server to connect to on your localhost 🥲.
+
+This server should also have an appropriate user with permissions to manage the database, e.g.
+```sql
+CREATE USER 'durhack'@'localhost' IDENTIFIED BY 'durhack';
+GRANT ALL PRIVILEGES ON durhack2023megateams.* TO 'durhack'@'localhost'
+```
+_This follows the naming used in the `.env.local` file given above_

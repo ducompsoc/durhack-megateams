@@ -12,25 +12,26 @@ import {NullError} from "../common/errors";
 
 export async function ensureDatabaseExists() {
   const connection = await mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER,
+    host    : process.env.DATABASE_HOST,
+    user    : process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
+    // port    : Number(process.env.DATABASE_PORT),
   });
 
   if (!process.env.DATABASE_NAME) {
-    throw new NullError("Database name cannot be nulL!");
+    throw new NullError("Database name cannot be null!");
   }
 
   await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${process.env.DATABASE_NAME}\`;`);
 }
 
 const sequelize = new Sequelize({
-  host     : process.env.DATABASE_HOST,
-  // port     : Number(process.env.DATABASE_PORT),
-  username     : process.env.DATABASE_USER,
-  password : process.env.DATABASE_PASSWORD,
-  database : process.env.DATABASE_NAME,
-  dialect  : "mysql",
+  host    : process.env.DATABASE_HOST,
+  // port    : Number(process.env.DATABASE_PORT),
+  username: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
+  dialect : "mysql",
 });
 
 sequelize.addModels([
