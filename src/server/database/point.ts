@@ -17,6 +17,12 @@ export default class Point extends Model implements PointModel {
   })
     id!: number;
 
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+    value!: number;
+
   @ForeignKey(() => QRCode)
   @Column({
     type: DataType.INTEGER,
@@ -36,10 +42,4 @@ export default class Point extends Model implements PointModel {
 
   @BelongsTo(() => User)
     redeemer!: User;
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-    value!: number;
 }

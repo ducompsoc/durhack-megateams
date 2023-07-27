@@ -25,7 +25,7 @@ export default class User extends Model implements UserModel {
 
   @BelongsTo(() => Team)
     team?: Team;
-  
+
   @Column({
     type: DataType.STRING,
     allowNull: false,

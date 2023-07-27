@@ -6,9 +6,9 @@ export interface MegateamModel {
 
 export interface AreaModel {
   id: number,
+  megateam: MegateamModel,
   name: string,
   location: string,
-  megateam: MegateamModel,
 }
 
 export interface TeamModel {

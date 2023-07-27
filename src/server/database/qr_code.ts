@@ -25,27 +25,11 @@ export default class QRCode extends Model implements QRCodeModel {
   })
     name!: string;
 
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-    creator_user_id!: number;
-
-  @BelongsTo(() => User)
-    creator!: User;
-
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
     description?: string;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
-    expiry_time!: Date;
 
   @Column({
     type: DataType.STRING,
@@ -60,16 +44,32 @@ export default class QRCode extends Model implements QRCodeModel {
     points_value!: number;
 
   @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+    state!: boolean;
+
+  @Column({
     type: DataType.DATE,
     allowNull: false,
   })
     start_time!: Date;
 
   @Column({
-    type: DataType.BOOLEAN,
+    type: DataType.DATE,
     allowNull: false,
   })
-    state!: boolean;
+    expiry_time!: Date;
+
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+    creator_user_id!: number;
+
+  @BelongsTo(() => User)
+    creator!: User;
 
   @Column({
     type: DataType.INTEGER,
