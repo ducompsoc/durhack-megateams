@@ -72,8 +72,9 @@ export default class QRCode extends Model implements QRCodeModel {
     state!: boolean;
 
   @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
+    type: DataType.INTEGER,
+    allowNull: true,
+    unique: true,
   })
-    public!: boolean;
+    challenge_rank?: number;
 }

@@ -7,7 +7,7 @@ export interface MegateamModel {
 export interface AreaModel {
   id: number,
   name: string,
-  room: string,
+  location: string,
   megateam: MegateamModel,
 }
 
@@ -65,6 +65,7 @@ export interface QRCodeModel {
   start_time: Date,
   expiry_time: Date,
   creator: UserModel,
+  challenge_rank?: number,
 }
 
 export interface PointModel {

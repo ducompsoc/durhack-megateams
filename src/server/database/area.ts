@@ -43,9 +43,9 @@ export default class Area extends Model implements AreaModel {
     name!: string;
 
   @Column({
-    field: "area_room",
+    field: "area_location",
     type: DataType.STRING,
     allowNull: false,
   })
-    room!: string;
+    location!: string;
 }
