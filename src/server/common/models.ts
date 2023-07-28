@@ -73,10 +73,16 @@ export interface UserModel extends UserDetailsModel {
 
 export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
 
+export enum QRCategory {
+  workshop = "workshop",
+  sponsor = "sponsor",
+  challenge = "challenge",
+}
+
 export interface QRCodeModel {
   id: number,
   name: string,
-  description?: string,
+  category: keyof typeof QRCategory,
   payload: string,
   points_value: number,
   state: boolean,

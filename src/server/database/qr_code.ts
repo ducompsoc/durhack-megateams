@@ -1,5 +1,5 @@
 import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
-import { QRCodeModel } from "@server/common/models";
+import {QRCategory, QRCodeModel} from "@server/common/models";
 import User from "./user";
 import {Col} from "sequelize/types/utils";
 
@@ -26,10 +26,11 @@ export default class QRCode extends Model implements QRCodeModel {
     name!: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
+    type: DataType.ENUM(...Object.values(QRCategory)),
+    defaultValue: QRCategory.workshop,
+    allowNull: false,
   })
-    description?: string;
+    category!: QRCategory;
 
   @Column({
     type: DataType.STRING,
