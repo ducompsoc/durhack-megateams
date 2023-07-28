@@ -24,6 +24,24 @@ export enum UserRole {
   admin = "admin",
 }
 
+export enum Ethnicity {
+  american = "american",  //"American Indian or Alaskan Native",
+  asian = "asian",        //"Asian / Pacific Islander",
+  black = "black",        //"Black or African American",
+  hispanic = "hispanic",  //"Hispanic",
+  white = "white",        //"White / Caucasian",
+  multiple = "multiple",  //"Multiple ethnicity / Other",
+  pnts = "pnts",          //"Prefer not to say",
+}
+
+export enum Gender {
+  male = "male",           // Male
+  female = "female",       // Female
+  nonbinary = "nonbinary", // Non-binary / Third Gender
+  other = "other",         // Other
+  pnts = "pnts",           // Prefer not to say
+}
+
 export interface UserDetailsModel {
   discord_id?: string,
   discord_name?: string,
@@ -33,8 +51,8 @@ export interface UserDetailsModel {
   phone_number?: string,
   university?: string,
   graduation_year?: string,
-  ethnicity?: string,
-  gender?: string,
+  ethnicity: keyof typeof Ethnicity,
+  gender: keyof typeof Gender,
 }
 
 export interface UserModel extends UserDetailsModel {
