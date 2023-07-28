@@ -2,20 +2,22 @@ import "../common/config";
 import mysql from "mysql2/promise";
 import { Sequelize } from "sequelize-typescript";
 
+import { NullError } from "@server/common/errors";
+
 import User from "./user";
 import Team from "./team";
 import Area from "./area";
 import Megateam from "./megateam";
 import Point from "./point";
 import QRCode from "./qr_code";
-import {NullError} from "../common/errors";
+
 
 export async function ensureDatabaseExists() {
   const connection = await mysql.createConnection({
     host    : process.env.DATABASE_HOST,
+    port    : Number(process.env.DATABASE_PORT),
     user    : process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    // port    : Number(process.env.DATABASE_PORT),
   });
 
   if (!process.env.DATABASE_NAME) {
@@ -27,7 +29,7 @@ export async function ensureDatabaseExists() {
 
 const sequelize = new Sequelize({
   host    : process.env.DATABASE_HOST,
-  // port    : Number(process.env.DATABASE_PORT),
+  port    : Number(process.env.DATABASE_PORT),
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
