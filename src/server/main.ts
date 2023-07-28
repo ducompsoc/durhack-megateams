@@ -1,18 +1,29 @@
-import next from "next";
+import "./common/config";
 import express from "express";
 import "./path-alias";
+import passport from "passport";
+import session from "./common/session";
+import next_app, { handle_next_app_request } from "./common/nextApp";
 import api_router from "./routes";
+import sequelize, { ensureDatabaseExists } from "./database";
 
 const dev = process.env.NODE_ENV !== "production";
-const next_app = next({ dev });
-const handle_next_app_request = next_app.getRequestHandler();
 
 async function main() {
   await next_app.prepare();
+  await ensureDatabaseExists();
+
+  // Run with the force: true option to update your schema if your server's schema
+  // is out-of-date compared to the code's schema. Note this will wipe your database.
+  // https://github.com/ducompsoc/durhack-megateams/pull/32#issuecomment-1652556468
+  await sequelize.sync({ force: false });
+
   const server = express();
 
-  server.use("/api", api_router);
+  server.use(session);
+  server.use(passport.authenticate("session"));
 
+  server.use("/api", api_router);
   server.use("/", (request, response) => {
     return handle_next_app_request(request, response);
   });
