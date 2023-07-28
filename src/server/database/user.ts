@@ -5,6 +5,8 @@ import { UserModel, UserRole } from "@server/common/models";
 import Team from "./team";
 
 
+export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
+
 @Table
 export default class User extends Model implements UserModel {
   @Column({

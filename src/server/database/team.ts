@@ -6,10 +6,7 @@ import Area from "./area";
 import User from "./user";
 
 
-interface teamIdentifier {
-  id: number,
-  name: string,
-}
+export type teamIdentifier = Pick<TeamModel, "id" | "name">
 
 @Table
 export default class Team extends Model implements TeamModel {

@@ -1,12 +1,9 @@
 import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
 import { QRCodeModel } from "@server/common/models";
 import User from "./user";
-import {Col} from "sequelize/types/utils";
 
-interface qrcodeIdentifier {
-  id: number,
-  name: string,
-}
+
+export type qrcodeIdentifier = Pick<QRCodeModel, "id" | "name">
 
 @Table
 export default class QRCode extends Model implements QRCodeModel {

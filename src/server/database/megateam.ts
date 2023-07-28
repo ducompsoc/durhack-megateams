@@ -2,10 +2,8 @@ import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
 import { MegateamModel } from "@server/common/models";
 import Area from "./area";
 
-interface megateamIdentifier {
-  id: number,
-  name: string,
-}
+
+export type megateamIdentifier = Pick<MegateamModel, "id" | "name">
 
 @Table
 export default class Megateam extends Model implements MegateamModel {

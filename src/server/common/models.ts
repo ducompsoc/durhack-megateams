@@ -53,8 +53,6 @@ export interface UserModel extends UserDetailsModel {
   checked_in: boolean,
 }
 
-export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
-
 export interface QRCodeModel {
   id: number,
   name: string,

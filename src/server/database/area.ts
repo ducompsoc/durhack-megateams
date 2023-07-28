@@ -6,10 +6,7 @@ import Megateam from "@server/database/megateam";
 import Team from "./team";
 
 
-interface areaIdentifier {
-  id: number,
-  name: string,
-}
+export type areaIdentifier = Pick<AreaModel, "id" | "name">
 
 @Table
 export default class Area extends Model implements AreaModel {
