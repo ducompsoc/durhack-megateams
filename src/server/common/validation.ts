@@ -1,6 +1,6 @@
 import { promisify } from "util";
 
-export function isPositiveInteger(str: string) {
+export function strIsPositiveInteger(str: unknown) {
   if (typeof str !== "string") {
     return false;
   }

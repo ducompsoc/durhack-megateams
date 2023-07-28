@@ -1,6 +1,6 @@
 import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
 
-import { UserModel, UserRole } from "@server/common/models";
+import { UserModel, UserRole, Ethnicity, Gender } from "@server/common/models";
 
 import Team from "./team";
 
@@ -146,14 +146,16 @@ export default class User extends Model implements UserModel {
     graduation_year?: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
+    type: DataType.ENUM(...Object.values(Ethnicity)),
+    defaultValue: Ethnicity.white,
+    allowNull: false,
   })
-    ethnicity?: string;
+    ethnicity!: Ethnicity;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
+    type: DataType.ENUM(...Object.values(Gender)),
+    defaultValue: Gender.male,
+    allowNull: false,
   })
-    gender?: string;
+    gender!: Gender;
 }
