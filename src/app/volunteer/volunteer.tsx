@@ -33,12 +33,21 @@ export default function Volunteer() {
   }
 
   async function downloadQR() {
-    const date = new Date().toISOString();
+    const date = new Date();
+    const [year, month, day, hour, minutes, seconds] = [
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    ].map((num) => num.toString().padStart(2, "0"));
+    const datetimeString = `${year}${month}${day}_${hour}${minutes}${seconds}`;
 
-    exportComponentAsJPEG(renderedQR, {
+    await exportComponentAsJPEG(renderedQR, {
       fileName: qr.preset
-        ? `${qr.name}_preset_${date}.jpg`
-        : `${qr.name}_${qr.category}_${date}.jpg`,
+        ? `${qr.name}_PRESET_${datetimeString}.jpg`
+        : `${qr.name}_${qr.category}_${datetimeString}.jpg`,
     });
   }
 
