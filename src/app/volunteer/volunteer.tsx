@@ -18,6 +18,8 @@ export default function Volunteer() {
   });
   const renderedQR = useRef(null);
 
+  const isAdmin = true;
+
   function getClasses(name: string) {
     let classes =
       "font-semibold pb-4 px-4 inline-flex items-center border-b-[3px] text-sm";
@@ -140,6 +142,7 @@ export default function Volunteer() {
         </div>
       ),
     },
+    ...(isAdmin ? [{ name: "Manage", content: <p>Placeholder...</p> }] : []),
   ];
 
   return (
