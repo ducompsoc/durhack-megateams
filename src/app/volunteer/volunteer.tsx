@@ -61,6 +61,12 @@ export default function Volunteer() {
     });
   }
 
+  function getExpiryDate(minutesValid: number) {
+    let now = new Date();
+    now.setMinutes(now.getMinutes() + minutesValid);
+    return now.toLocaleString("en-GB", {timeStyle: "short", dateStyle: "short"});
+  }
+
   function generate(name: string, uuid: string) {
     setQR({ name, uuid, category: "", preset: true });
     setOpen(true);
@@ -110,6 +116,15 @@ export default function Volunteer() {
             ))}
           </select>
           <p className="my-2">{selected.description}</p>
+          <div className="flex items-center my-2" title="Expiry time">
+            <ClockIcon className="w-6 h-6 mr-2" />
+            <p>{getExpiryDate(selected.minutesValid)}</p>
+          </div>
+          <div className="flex items-center my-2">
+            <InformationCircleIcon className="w-6 h-6 mr-2" />
+            <p><b>{selected.points}</b> point{selected.points !== 1 ? "s" : ""},&nbsp;
+              <b>{selected.uses}</b> use{selected.uses !== 1 ? "s" : ""}</p>
+          </div>
           <button
             className="rounded px-2 py-1 bg-accent text-white"
             onClick={() => generate(selected.name, selected.uuid)}
