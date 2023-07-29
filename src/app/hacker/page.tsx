@@ -10,6 +10,7 @@ import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import dynamic from "next/dynamic";
 import { Dialog, Transition } from "@headlessui/react";
+import {positionMedals} from "@/app/page";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
@@ -76,18 +77,17 @@ export default function HackerHome() {
         <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded flex mt-4">
           <div className="grow">
             <h2 className="font-semibold mb-2">My Points</h2>
-            <p>14</p>
+            <p>14 {positionMedals[2]}</p>
           </div>
           <div className="grow px-4">
             <h2 className="font-semibold mb-2">Team Points</h2>
             <div className="flex justify-center items-center">
-              <p>8 (#1)</p>
-              <TrophyIcon className="w-5 h-5 ml-2" />
+              <p>8 (#5)</p>
             </div>
           </div>
           <div className="grow">
             <h2 className="font-semibold mb-2">Megateam Points</h2>
-            <p>6</p>
+            <p>6 {positionMedals[1]}</p>
           </div>
         </div>
         <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded mt-4">
