@@ -5,11 +5,17 @@ import { Fragment, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { exportComponentAsJPEG } from "react-component-export-image";
 import { ClockIcon } from "@heroicons/react/24/outline";
+import presets from "./QR_presets.json";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
   const [open, setOpen] = useState(false);
-  const [qr, setQR] = useState({ name: "", uuid: "" });
+  const [qr, setQR] = useState({
+    name: "",
+    uuid: "",
+    category: "",
+    preset: false,
+  });
   const renderedQR = useRef(null);
 
   function getClasses(name: string) {
@@ -25,13 +31,17 @@ export default function Volunteer() {
   }
 
   async function downloadQR() {
+    const date = new Date().toISOString();
+
     exportComponentAsJPEG(renderedQR, {
-      fileName: "durhackQR.jpg",
+      fileName: qr.preset
+        ? `${qr.name}_preset_${date}.jpg`
+        : `${qr.name}_${qr.category}_${date}.jpg`,
     });
   }
 
   function generate(name: string, uuid: string) {
-    setQR({ name, uuid });
+    setQR({ name, uuid, category: "", preset: true });
     setOpen(true);
   }
 
@@ -40,19 +50,6 @@ export default function Volunteer() {
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
   }
-
-  const presets = [
-    {
-      name: "Sponsor",
-      description: "A single use QR for a sponsor to reward a hacker.",
-      uuid: "abc-123",
-    },
-    {
-      name: "Volunteer",
-      description: "A single use QR for a volunteer to reward a hacker.",
-      uuid: "def-456",
-    },
-  ];
 
   const [selected, setSelected] = useState(presets[0]);
 
