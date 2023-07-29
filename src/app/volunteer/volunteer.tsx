@@ -6,6 +6,7 @@ import QRCode from "react-qr-code";
 import { exportComponentAsJPEG } from "react-component-export-image";
 import {
   ClockIcon,
+  InformationCircleIcon,
   MagnifyingGlassIcon,
   TagIcon,
   GiftIcon,
@@ -14,7 +15,7 @@ import {
   HandRaisedIcon
 } from "@heroicons/react/24/outline";
 import dateFormat from "dateformat";
-import presets from "./QR_presets.json";
+import presets from "../QR_presets.json";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
