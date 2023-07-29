@@ -80,7 +80,7 @@ export default function Volunteer() {
 
   const [selected, setSelected] = useState(presets[0]);
 
-  const qrTypes = ["Workshop", "Hacker", "Volunteer", "Sponsor"];
+  const qrTypes = ["Workshop", "Challenge", "Volunteer", "Sponsor", "Personal"];
 
   const qrs = [
     {
@@ -191,90 +191,84 @@ export default function Volunteer() {
     },
     ...(isAdmin
       ? [
-          {
-            name: "Manage",
-            content: (
-              <>
-                <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
-                  <div className="flex flex-row items-center">
-                    <input
-                      type="text"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
-                      placeholder="Search for QRs..."
-                    />
-                    <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
-                  </div>
+        {
+          name: "Manage",
+          content: (
+            <>
+              <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
+                <div className="flex flex-row items-center">
+                  <input
+                    type="text"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
+                    placeholder="Search for QRs..."
+                  />
+                  <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
                 </div>
-                {qrs.map(
-                  (
-                    { creator, points, scans, type, limit, expiry, name, uuid },
-                    i
-                  ) => (
-                    <div
-                      className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4"
-                      key={i}
-                    >
-                      <p className="mb-2">{name}</p>
-                      <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
-                        <div className="col-span-1">
-                          <p className="flex items-center">
-                            <TagIcon className="w-4 h-4 mr-2" />
-                            {type}
-                          </p>
-                        </div>
-                        <div className="col-span-1">
-                          <p className="flex items-center">
-                            <CameraIcon className="w-4 h-4 mr-2" />
-                            {scans} scans
-                          </p>
-                        </div>
-                        <div className="col-span-1">
-                          <p className="flex items-center">
-                            <UserIcon className="w-4 h-4 mr-2" />
-                            {creator}
-                          </p>
-                        </div>
-                        <div className="col-span-1">
-                          <p className="flex items-center">
-                            <GiftIcon className="w-4 h-4 mr-2" />
-                            {points} points
-                          </p>
-                        </div>
-                        <div className="col-span-2">
-                          <p className="flex items-center">
-                            <HandRaisedIcon className="w-4 h-4 mr-2" />
-                            Limit: {limit}
-                          </p>
-                        </div>
-                        <div className="col-span-2">
-                          <p className="flex items-center">
-                            <ClockIcon className="w-4 h-4 mr-2" />
-                            Expiry: {dateFormat(expiry, "dd/mm/yy hh:MM")}
-                          </p>
-                        </div>
+              </div>
+              {qrs.map(
+                (
+                  { creator, points, scans, type, limit, expiry, name, uuid },
+                  i
+                ) => (
+                  <div
+                    className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4"
+                    key={i}
+                  >
+                    <p className="mb-2">{name}</p>
+                    <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
+                      <div className="col-span-1">
+                        <p className="flex items-center">
+                          <TagIcon className="w-4 h-4 mr-2" />
+                          {type}
+                        </p>
                       </div>
-                      <div className="flex items-center">
-                        <button className="rounded px-2 py-1 bg-accent text-white">
-                          View
-                        </button>
-                        <p className="ml-4">Enabled:</p>
-                        <input
-                          type="checkbox"
-                          className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                        />
-                        <p className="ml-4">Publicised:</p>
-                        <input
-                          type="checkbox"
-                          className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                        />
+                      <div className="col-span-1">
+                        <p className="flex items-center">
+                          <CameraIcon className="w-4 h-4 mr-2" />
+                          {scans}/{limit} scans
+                        </p>
+                      </div>
+                      <div className="col-span-1">
+                        <p className="flex items-center">
+                          <UserIcon className="w-4 h-4 mr-2" />
+                          {creator}
+                        </p>
+                      </div>
+                      <div className="col-span-1">
+                        <p className="flex items-center">
+                          <GiftIcon className="w-4 h-4 mr-2" />
+                          {points} points
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="flex items-center">
+                          <ClockIcon className="w-4 h-4 mr-2" />
+                          Expiry: {dateFormat(expiry, "dd/mm/yy hh:MM")}
+                        </p>
                       </div>
                     </div>
-                  )
-                )}
-              </>
-            ),
-          },
-        ]
+                    <div className="flex items-center">
+                      <button className="rounded px-2 py-1 bg-accent text-white">
+                        View
+                      </button>
+                      <p className="ml-4">Enabled:</p>
+                      <input
+                        type="checkbox"
+                        className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+                      />
+                      <p className="ml-4">Publicised:</p>
+                      <input
+                        type="checkbox"
+                        className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+                      />
+                    </div>
+                  </div>
+                )
+              )}
+            </>
+          ),
+        },
+      ]
       : []),
   ];
 
