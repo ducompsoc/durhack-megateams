@@ -68,6 +68,10 @@ Make sure you are running a [mysql server](https://dev.mysql.com/doc/refman/8.1/
 on your machine before trying to run the project otherwise you will get connection refused errors etc.
 as the javascript can't find a server to connect to on your localhost 🥲.
 
+If your computer's `hosts` file contains `::1 localhost` (IPv6 local loopback) then you will need to use 
+`127.0.0.1` as the database host, as the IPv6 spec clashes with the port spec (`::1:3306` is recognised as an IPv6 address,
+not an address followed by a port).
+
 This server should also have an appropriate user with permissions to manage the database, e.g.
 ```sql
 CREATE USER 'durhack'@'localhost' IDENTIFIED BY 'durhack';
