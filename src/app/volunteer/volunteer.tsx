@@ -12,7 +12,6 @@ import {
   GiftIcon,
   CameraIcon,
   UserIcon,
-  HandRaisedIcon
 } from "@heroicons/react/24/outline";
 import dateFormat from "dateformat";
 import presets from "../QR_presets.json";
@@ -64,7 +63,10 @@ export default function Volunteer() {
   function getExpiryDate(minutesValid: number) {
     let now = new Date();
     now.setMinutes(now.getMinutes() + minutesValid);
-    return now.toLocaleString("en-GB", {timeStyle: "short", dateStyle: "short"});
+    return now.toLocaleString("en-GB", {
+      timeStyle: "short",
+      dateStyle: "short",
+    });
   }
 
   function generate(name: string, uuid: string) {
@@ -122,15 +124,25 @@ export default function Volunteer() {
           </div>
           <div className="flex items-center my-2">
             <InformationCircleIcon className="w-6 h-6 mr-2" />
-            <p><b>{selected.points}</b> point{selected.points !== 1 ? "s" : ""},&nbsp;
-              <b>{selected.uses}</b> use{selected.uses !== 1 ? "s" : ""}</p>
+            <p>
+              <b>{selected.points}</b> point{selected.points !== 1 ? "s" : ""}
+              ,&nbsp;
+              <b>{selected.uses}</b> use{selected.uses !== 1 ? "s" : ""}
+            </p>
           </div>
-          <button
-            className="rounded px-2 py-1 bg-accent text-white"
-            onClick={() => generate(selected.name, selected.uuid)}
-          >
-            Generate
-          </button>
+          <div className="flex items-center">
+            <p>Publicised:</p>
+            <input
+              type="checkbox"
+              className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+            />
+            <button
+              className="rounded px-2 py-1 bg-accent text-white ml-4"
+              onClick={() => generate(selected.name, selected.uuid)}
+            >
+              Generate
+            </button>
+          </div>
         </div>
       ),
     },
@@ -142,7 +154,7 @@ export default function Volunteer() {
           <input
             type="text"
             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
-            placeholder="Name..."
+            placeholder="Name/Description"
           />
           <select className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6">
             {qrTypes.map((qrType) => (
@@ -183,92 +195,99 @@ export default function Volunteer() {
               <ClockIcon className="w-6 h-6" />
             </button>
           </div>
-          <button className="rounded px-2 py-1 bg-accent text-white mt-2">
-            Generate
-          </button>
+          <div className="flex items-center mt-2">
+            <p>Publicised:</p>
+            <input
+              type="checkbox"
+              className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+            />
+            <button className="rounded px-2 py-1 bg-accent text-white ml-4">
+              Generate
+            </button>
+          </div>
         </div>
       ),
     },
     ...(isAdmin
       ? [
-        {
-          name: "Manage",
-          content: (
-            <>
-              <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
-                <div className="flex flex-row items-center">
-                  <input
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
-                    placeholder="Search for QRs..."
-                  />
-                  <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
-                </div>
-              </div>
-              {qrs.map(
-                (
-                  { creator, points, scans, type, limit, expiry, name, uuid },
-                  i
-                ) => (
-                  <div
-                    className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4"
-                    key={i}
-                  >
-                    <p className="mb-2">{name}</p>
-                    <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
-                      <div className="col-span-1">
-                        <p className="flex items-center">
-                          <TagIcon className="w-4 h-4 mr-2" />
-                          {type}
-                        </p>
-                      </div>
-                      <div className="col-span-1">
-                        <p className="flex items-center">
-                          <CameraIcon className="w-4 h-4 mr-2" />
-                          {scans}/{limit} scans
-                        </p>
-                      </div>
-                      <div className="col-span-1">
-                        <p className="flex items-center">
-                          <UserIcon className="w-4 h-4 mr-2" />
-                          {creator}
-                        </p>
-                      </div>
-                      <div className="col-span-1">
-                        <p className="flex items-center">
-                          <GiftIcon className="w-4 h-4 mr-2" />
-                          {points} points
-                        </p>
-                      </div>
-                      <div className="col-span-2">
-                        <p className="flex items-center">
-                          <ClockIcon className="w-4 h-4 mr-2" />
-                          Expiry: {dateFormat(expiry, "dd/mm/yy hh:MM")}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <button className="rounded px-2 py-1 bg-accent text-white">
-                        View
-                      </button>
-                      <p className="ml-4">Enabled:</p>
-                      <input
-                        type="checkbox"
-                        className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                      />
-                      <p className="ml-4">Publicised:</p>
-                      <input
-                        type="checkbox"
-                        className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                      />
-                    </div>
+          {
+            name: "Manage",
+            content: (
+              <>
+                <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
+                  <div className="flex flex-row items-center">
+                    <input
+                      type="text"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
+                      placeholder="Search for QRs..."
+                    />
+                    <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
                   </div>
-                )
-              )}
-            </>
-          ),
-        },
-      ]
+                </div>
+                {qrs.map(
+                  (
+                    { creator, points, scans, type, limit, expiry, name, uuid },
+                    i
+                  ) => (
+                    <div
+                      className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4"
+                      key={i}
+                    >
+                      <p className="mb-2">{name}</p>
+                      <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
+                        <div className="col-span-1">
+                          <p className="flex items-center">
+                            <TagIcon className="w-4 h-4 mr-2" />
+                            {type}
+                          </p>
+                        </div>
+                        <div className="col-span-1">
+                          <p className="flex items-center">
+                            <CameraIcon className="w-4 h-4 mr-2" />
+                            {scans}/{limit} scans
+                          </p>
+                        </div>
+                        <div className="col-span-1">
+                          <p className="flex items-center">
+                            <UserIcon className="w-4 h-4 mr-2" />
+                            {creator}
+                          </p>
+                        </div>
+                        <div className="col-span-1">
+                          <p className="flex items-center">
+                            <GiftIcon className="w-4 h-4 mr-2" />
+                            {points} points
+                          </p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="flex items-center">
+                            <ClockIcon className="w-4 h-4 mr-2" />
+                            Expiry: {dateFormat(expiry, "dd/mm/yy hh:MM")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <button className="rounded px-2 py-1 bg-accent text-white">
+                          View
+                        </button>
+                        <p className="ml-4">Enabled:</p>
+                        <input
+                          type="checkbox"
+                          className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+                        />
+                        <p className="ml-4">Publicised:</p>
+                        <input
+                          type="checkbox"
+                          className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+                        />
+                      </div>
+                    </div>
+                  )
+                )}
+              </>
+            ),
+          },
+        ]
       : []),
   ];
 
