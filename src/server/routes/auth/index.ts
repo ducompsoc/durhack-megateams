@@ -8,6 +8,7 @@ import { handleMethodNotAllowed } from "@server/common/middleware";
 
 import { localVerifyFunction } from "./auth_util";
 import { handleSignUp, handleSetPassword, handleLoginSuccess } from "./auth_handlers";
+import { handleGetCsrfToken } from "./csrf";
 
 
 declare global {
@@ -58,6 +59,10 @@ auth_router.route("/signup")
 
 auth_router.route("/setpassword")
   .post(handleSetPassword)
+  .all(handleMethodNotAllowed);
+
+auth_router.route("/csrf-token")
+  .get(handleGetCsrfToken)
   .all(handleMethodNotAllowed);
 
 export default auth_router;
