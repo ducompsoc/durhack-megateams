@@ -21,8 +21,13 @@ import api_error_handler from "./error_handling";
 
 const api_router = ExpressRouter();
 
+api_router.use(cookie_parser("cookie_secret"));
 api_router.use(bodyParser.json());
 api_router.use(bodyParser.urlencoded({ extended: true }));
+
+if (process.env.MEGATEAMS_NO_MITIGATE_CSRF !== "true") {
+  api_router.use(doubleCsrfProtection);
+}
 
 function handle_root_request(request: Request, response: Response) {
   response.status(200);
@@ -34,7 +39,8 @@ function handle_unhandled_request() {
 }
 
 api_router.route("/")
-  .get(handle_root_request);
+  .get(handle_root_request)
+  .all(handleMethodNotAllowed);
 
 api_router.use("/auth", auth_router);
 api_router.use("/areas", areas_router);
