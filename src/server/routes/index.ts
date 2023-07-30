@@ -1,6 +1,14 @@
+import "@server/common/config";
+
 import { Router as ExpressRouter, Request, Response } from "express";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";
+import createHttpError from "http-errors";
+import cookie_parser from "cookie-parser";
+
+import { handleMethodNotAllowed } from "@server/common/middleware";
+
+import { doubleCsrfProtection } from "./auth/csrf";
 import auth_router from "./auth";
 import areas_router from "./areas";
 import megateams_router from "./megateams";
@@ -9,7 +17,7 @@ import qr_codes_router from "./qr_codes";
 import teams_router from "./teams";
 import users_router from "./users";
 import api_error_handler from "./error_handling";
-import createHttpError from "http-errors";
+
 
 const api_router = ExpressRouter();
 
