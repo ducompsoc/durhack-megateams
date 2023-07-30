@@ -59,6 +59,7 @@ SESSION_DATABASE_USER=durhack
 SESSION_DATABASE_PASSWORD=durhack
 SESSION_DATABASE_NAME=durhack2023megateamssession
 MEGATEAMS_SKIP_EMAIL_VERIFICATION=false
+MEGATEAMS_NO_MITIGATE_CSRF=false
 ```
 
 ## mysql server
@@ -73,3 +74,9 @@ CREATE USER 'durhack'@'localhost' IDENTIFIED BY 'durhack';
 GRANT ALL PRIVILEGES ON durhack2023megateams.* TO 'durhack'@'localhost'
 ```
 _This follows the naming used in the `.env.local` file given above_
+
+
+## environment options
+- `MEGATEAMS_SKIP_EMAIL_VERIFICATION`: set to `true` to allow users to set their password without verifying email
+- `MEGATEAMS_NO_MITIGATE_CSRF`: set to `true` to allow `POST/PATCH/DELETE` (etc.) requests 
+without a CSRF hash cookie and token header.
