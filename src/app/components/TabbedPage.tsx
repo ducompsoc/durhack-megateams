@@ -12,7 +12,15 @@ interface Tab {
   icon: React.ReactNode;
 }
 
-export default function TabbedPage({ tabs, children }: { tabs: Tab[], children: React.ReactNode }) {
+export default function TabbedPage({
+  tabs,
+  children,
+  showTabs = true,
+}: {
+  tabs: Tab[];
+  children: React.ReactNode;
+  showTabs?: boolean;
+}) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -27,26 +35,28 @@ export default function TabbedPage({ tabs, children }: { tabs: Tab[], children: 
           </button>
         </div>
         <div className="p-6 grow overflow-auto">{children}</div>
-        <div className="flex">
-          <span className="md:grow border border-black border-r-0 md:border-r"></span>
-          {tabs.map((tab) => {
-            const active = tab.path === path;
+        {showTabs && (
+          <div className="flex">
+            <span className="md:grow border border-black border-r-0 md:border-r"></span>
+            {tabs.map((tab) => {
+              const active = tab.path === path;
 
-            return (
-              <Link
-                href={tab.path}
-                key={tab.path}
-                className={
-                  "w-full md:w-fit py-4 md:px-6 border border-black border-l-0 flex justify-center " +
-                  (active ? "bg-blue-200" : "bg-gray-200")
-                }
-              >
-                {tab.icon}
-              </Link>
-            );
-          })}
-          <span className="md:grow border border-black border-l-0 border-r-0 md:border-r"></span>
-        </div>
+              return (
+                <Link
+                  href={tab.path}
+                  key={tab.path}
+                  className={
+                    "w-full md:w-fit py-4 md:px-6 border border-black border-l-0 flex justify-center " +
+                    (active ? "bg-blue-200" : "bg-gray-200")
+                  }
+                >
+                  {tab.icon}
+                </Link>
+              );
+            })}
+            <span className="md:grow border border-black border-l-0 border-r-0 md:border-r"></span>
+          </div>
+        )}
       </div>
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={setOpen}>
