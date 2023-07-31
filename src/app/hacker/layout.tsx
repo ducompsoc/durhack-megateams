@@ -15,7 +15,10 @@ export default function HackerLayout({
   children: React.ReactNode;
 }) {
   const tabs = [
-    { icon: <HomeIcon className="w-10 h-10" />, path: "/hacker" },
+    {
+      icon: <HomeIcon className="w-10 h-10" />,
+      path: "/hacker",
+    },
     {
       icon: <ChartBarIcon className="w-10 h-10" />,
       path: "/hacker/leaderboard",
@@ -24,7 +27,11 @@ export default function HackerLayout({
       icon: <UserGroupIcon className="w-10 h-10" />,
       path: "/hacker/team",
     },
-    { icon: <CogIcon className="w-10 h-10" />, path: "https://durhack.com/" },
+    {
+      icon: <CogIcon className="w-10 h-10" />,
+      path: "https://durhack.com/",
+      openNewWindow: true,
+    },
   ];
 
   const hasTeam = false;

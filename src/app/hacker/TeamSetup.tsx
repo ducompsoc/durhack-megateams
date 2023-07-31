@@ -30,6 +30,7 @@ export default function TeamSetup() {
       </div>
       <div className="bg-gray-200 drop-shadow-lg p-4 rounded mt-4">
         <h2 className="font-semibold">Join Team</h2>
+        <p><i>This is a 4 character code anyone on the team can view and share with you.</i></p>
         <input
           type="text"
           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 my-2"

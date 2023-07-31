@@ -10,6 +10,7 @@ import { Fragment, useState } from "react";
 interface Tab {
   path: string;
   icon: React.ReactNode;
+  openNewWindow?: boolean;
 }
 
 export default function TabbedPage({
@@ -45,6 +46,7 @@ export default function TabbedPage({
                 <Link
                   href={tab.path}
                   key={tab.path}
+                  target={tab.openNewWindow ? "_blank" : undefined}
                   className={
                     "w-full md:w-fit py-4 md:px-6 border border-black border-l-0 flex justify-center " +
                     (active ? "bg-blue-200" : "bg-gray-200")
