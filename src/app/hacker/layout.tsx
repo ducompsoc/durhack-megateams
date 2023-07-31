@@ -7,7 +7,7 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import TabbedPage from "../components/TabbedPage";
-import TeamSetup from "./teamSetup";
+import TeamSetup from "./TeamSetup";
 
 export default function HackerLayout({
   children,
