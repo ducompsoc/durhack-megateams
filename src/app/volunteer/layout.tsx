@@ -28,17 +28,17 @@ export default function VolunteerLayout({
     },
     ...(isAdmin
       ? [
-          {
-            icon: <NewspaperIcon className="w-10 h-10" />,
-            path: "/volunteer/challenges",
-          },
-          {
-            icon: <ScaleIcon className="w-10 h-10" />,
-            path: "/volunteer/admin",
-          },
-        ]
+        {
+          icon: <NewspaperIcon className="w-10 h-10" />,
+          path: "/volunteer/challenges",
+        },
+        {
+          icon: <ScaleIcon className="w-10 h-10" />,
+          path: "/volunteer/admin",
+        },
+      ]
       : []),
   ];
 
-  return <TabbedPage tabs={tabs} children={children} />;
+  return <TabbedPage tabs={tabs}>{children}</TabbedPage>;
 }

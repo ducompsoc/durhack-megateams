@@ -30,8 +30,8 @@ export default function HackerLayout({
   const hasTeam = false;
 
   return hasTeam ? (
-    <TabbedPage tabs={tabs} children={children} />
+    <TabbedPage tabs={tabs}>{children}</TabbedPage>
   ) : (
-    <TabbedPage tabs={tabs} children={<TeamSetup />} showTabs={false} />
+    <TabbedPage tabs={tabs} showTabs={false}><TeamSetup /></TabbedPage>
   );
 }

@@ -116,7 +116,7 @@ export default function HackerHome() {
               No Megateam Assigned
             </p>
             <p>
-              Please speak to a volunteer to ensure your team's points are
+              Please speak to a volunteer to ensure your team&apos;s points are
               recorded!
             </p>
           </div>

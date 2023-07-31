@@ -10,5 +10,5 @@ const Volunteer = dynamic(
 );
 
 export default function VolunteerPage() {
-  return <Volunteer />
+  return <Volunteer />;
 }

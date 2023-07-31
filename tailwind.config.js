@@ -8,9 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        accent: '#7d6399'
+        accent: "#7d6399"
       }
     }
   },
-  plugins: [require('@tailwindcss/forms')],
-}
+  plugins: [require("@tailwindcss/forms")],
+};
