@@ -25,5 +25,3 @@ export default function Home() {
     </div>
   );
 }
-
-export const positionMedals = Object({1: "🥇", 2: "🥈", 3: "🥉",});

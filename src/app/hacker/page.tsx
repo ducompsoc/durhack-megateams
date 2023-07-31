@@ -10,7 +10,7 @@ import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import dynamic from "next/dynamic";
 import { Dialog, Transition } from "@headlessui/react";
-import { positionMedals } from "@/app/page";
+import { positionMedals } from "@/app/constants";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });

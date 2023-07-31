@@ -1,9 +1,8 @@
 "use client";
 
-import { TrophyIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import MegaChart from "./MegaChart";
-import {positionMedals} from "@/app/page";
+import {positionMedals} from "@/app/constants";
 
 export default function Leaderboard() {
   const teams = [
