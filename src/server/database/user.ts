@@ -1,8 +1,10 @@
-import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript";
 
 import { UserModel, UserRole, Ethnicity, Gender } from "@server/common/models";
 
 import Team from "./team";
+import Point from "./point";
+import QRCode from "@server/database/qr_code";
 
 
 export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
@@ -27,6 +29,12 @@ export default class User extends Model implements UserModel {
 
   @BelongsTo(() => Team)
     team?: Team;
+
+  @HasMany(() => QRCode)
+    createdQrCodes?: QRCode[];
+
+  @HasMany(() => Point)
+    points?: Point[];
 
   @Column({
     type: DataType.STRING,
