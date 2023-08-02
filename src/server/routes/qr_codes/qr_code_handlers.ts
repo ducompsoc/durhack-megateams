@@ -5,22 +5,22 @@ import { NullError } from "@server/common/errors";
 import QRCode from "@server/database/qr_code";
 
 
-export async function getQrCodeList(request: Request, response: Response): Promise<void> {
+export async function getQRCodeList(request: Request, response: Response): Promise<void> {
   throw new createHttpError.NotImplemented();
 }
 
-export async function createQrCode(request: Request, response: Response): Promise<void> {
+export async function createQRCode(request: Request, response: Response): Promise<void> {
   throw new createHttpError.NotImplemented();
 }
 
-export async function getQrCodeDetails(request: Request, response: Response): Promise<void> {
+export async function getQRCodeDetails(request: Request, response: Response): Promise<void> {
   throw new createHttpError.NotImplemented();
 }
 
-export async function patchQrCodeDetails(request: Request, response: Response): Promise<void> {
+export async function patchQRCodeDetails(request: Request, response: Response): Promise<void> {
   throw new createHttpError.NotImplemented();
 }
 
-export async function deleteQrCode(request: Request, response: Response): Promise<void> {
+export async function deleteQRCode(request: Request, response: Response): Promise<void> {
   throw new createHttpError.NotImplemented();
 }

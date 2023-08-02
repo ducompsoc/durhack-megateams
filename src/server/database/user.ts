@@ -31,7 +31,7 @@ export default class User extends Model implements UserModel {
     team?: Team;
 
   @HasMany(() => QRCode)
-    createdQrCodes?: QRCode[];
+    createdQRCodes?: QRCode[];
 
   @HasMany(() => Point)
     points?: Point[];
