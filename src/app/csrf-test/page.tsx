@@ -16,7 +16,7 @@ async function send_bad_login_request() {
 
 export default function CsrfTestPage() {
     return <main>
-        <button onClick={send_login_request}>Send Login Request</button>
-        <button onClick={send_bad_login_request}>Send Forbidden Login Request</button>
+        <div><button onClick={send_login_request}>Send Login Request</button></div>
+        <div><button onClick={send_bad_login_request}>Send Forbidden Login Request</button></div>
     </main>
 }
