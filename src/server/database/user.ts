@@ -4,7 +4,7 @@ import { UserModel, UserRole, Ethnicity, Gender } from "@server/common/models";
 
 import Team from "./team";
 import Point from "./point";
-import QRCode from "@server/database/qr_code";
+import QRCode from "./qr_code";
 
 
 export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">

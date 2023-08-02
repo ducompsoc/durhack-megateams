@@ -1,6 +1,7 @@
-import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, ForeignKey, HasMany } from "sequelize-typescript";
 import {QRCategory, QRCodeModel} from "@server/common/models";
 import User from "./user";
+import Point from "./point";
 
 
 export type qrcodeIdentifier = Pick<QRCodeModel, "id" | "name">
