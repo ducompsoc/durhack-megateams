@@ -4,6 +4,6 @@ const isClient = typeof window !== "undefined";
 export const megateams_api_base_url = isClient? window.location.origin : "";
 
 export function makeMegateamsApiRequest(endpoint: string, options?: RequestInit): Request {
-    const api_endpoint_url = new URL("/api" + endpoint, megateams_api_base_url)
-    return new Request(api_endpoint_url, options);
+  const api_endpoint_url = new URL("/api" + endpoint, megateams_api_base_url);
+  return new Request(api_endpoint_url, options);
 }
