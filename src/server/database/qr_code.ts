@@ -71,7 +71,7 @@ export default class QRCode extends Model implements QRCodeModel {
     creator!: User;
 
   @HasMany(() => Point)
-    redeems?: Point[];
+    uses?: Point[];
 
   @Column({
     type: DataType.INTEGER,

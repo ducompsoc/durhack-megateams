@@ -18,7 +18,11 @@ Each area is associated with a megateam
 
 User -> Team -> Area -> Megateam
 
-## Notes
+## Entity Relationship Diagram
+
+![img.png](database_entity_relationship_diagram.png)
+
+## Notes on implications
 
 - If a user changes team, their points would change to be added to that team
 - If a team changed area, their points would change to be added to that area's megateam
