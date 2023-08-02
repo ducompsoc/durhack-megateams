@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import TabbedPage from "../components/TabbedPage";
 import TeamSetup from "./TeamSetup";
+import { useState } from "react";
 
 export default function HackerLayout({
   children,
@@ -34,7 +35,7 @@ export default function HackerLayout({
     },
   ];
 
-  const hasTeam = false;
+  const [hasTeam] = useState(true);
 
   return hasTeam ? (
     <TabbedPage tabs={tabs}>{children}</TabbedPage>

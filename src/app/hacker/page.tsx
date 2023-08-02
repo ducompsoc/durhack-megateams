@@ -2,8 +2,6 @@
 
 import {
   QrCodeIcon,
-  ShareIcon,
-  XMarkIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -11,12 +9,12 @@ import React, { Fragment, useState } from "react";
 import dynamic from "next/dynamic";
 import { Dialog, Transition } from "@headlessui/react";
 import { positionMedals } from "@/app/constants";
+import TeamBox from "./team/TeamBox";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
 
 export default function HackerHome() {
-  const [showTeamCode, setShowTeamCode] = useState(false);
   const [scanning, setScanning] = useState(false);
 
   function scanSuccess(result: string) {
@@ -30,39 +28,14 @@ export default function HackerHome() {
     { details: "Details of challenge 3", points: 4 },
   ];
 
-  const hasMegateam = false;
+  const hasMegateam = true;
 
   return (
     <>
       <div className="flex flex-col h-full">
         <p>Hello Hacker_name,</p>
         <div className="flex mt-4">
-          <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow md:min-w-[50%] min-w-[40%]">
-            <h2 className="font-semibold mb-2">Team</h2>
-            {!showTeamCode ? (
-              <>
-                <p>Team 1</p>
-                <div className="flex items-center">
-                  <span className="grow"></span>
-                  <ShareIcon
-                    onClick={() => setShowTeamCode(true)}
-                    className="w-6 h-6"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <p>1234</p>
-                <div className="flex items-center">
-                  <span className="grow"></span>
-                  <XMarkIcon
-                    onClick={() => setShowTeamCode(false)}
-                    className="w-6 h-6"
-                  />
-                </div>
-              </>
-            )}
-          </div>
+          <TeamBox />
           {hasMegateam && (
             <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow ml-4">
               <h2 className="font-semibold mb-2">Megateam</h2>
