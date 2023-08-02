@@ -43,15 +43,7 @@ export default function Volunteer() {
 
   async function downloadQR() {
     const date = new Date();
-    const [year, month, day, hour, minutes, seconds] = [
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-    ].map((num) => num.toString().padStart(2, "0"));
-    const datetimeString = `${year}${month}${day}_${hour}${minutes}${seconds}`;
+    const datetimeString = dateFormat(date, "yyyymmdd_hhMMss");
 
     await exportComponentAsJPEG(renderedQR, {
       fileName: qr.preset
@@ -91,11 +83,45 @@ export default function Volunteer() {
       scans: 25,
       type: "Sponsor",
       limit: 30,
-      expiry: new Date("10/10/23 06:30"),
+      startDate: new Date("10/10/23 06:30"),
+      endDate: new Date("10/10/23 07:30"),
       name: "Amazon Workshop",
       uuid: "abc-123",
+      enabled: true,
+    },
+    {
+      creator: "Luca",
+      points: 10,
+      scans: 25,
+      type: "Sponsor",
+      limit: 30,
+      startDate: new Date("02/08/23 06:30"),
+      endDate: new Date("10/10/23 07:30"),
+      name: "Netcraft Workshop",
+      uuid: "def-456",
+      enabled: true,
+    },
+    {
+      creator: "Luca",
+      points: 10,
+      scans: 25,
+      type: "Sponsor",
+      limit: 30,
+      startDate: new Date("02/08/23 06:30"),
+      endDate: new Date("02/08/23 07:30"),
+      name: "Waterstons Workshop",
+      uuid: "ghi-789",
+      enabled: false,
     },
   ];
+
+  function qrClasses(enabled: boolean, startDate: Date, endDate: Date) {
+    let bgClass = "bg-gray-200";
+    let now = new Date();
+    if (!enabled || startDate > now) bgClass = "pattern-diagonal-lines pattern-gray-100 pattern-bg-gray-200 pattern-size-6 pattern-opacity-80";
+    if (endDate < now) bgClass = "bg-red-100 opacity-80";
+    return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
+  }
 
   const tabs = [
     {
@@ -226,11 +252,11 @@ export default function Volunteer() {
               </div>
               {qrs.map(
                 (
-                  { creator, points, scans, type, limit, expiry, name, uuid },
+                  { creator, points, scans, type, limit, startDate, endDate, name, enabled, uuid },
                   i
                 ) => (
                   <div
-                    className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4"
+                    className={qrClasses(enabled, startDate, endDate)}
                     key={i}
                   >
                     <p className="mb-2">{name}</p>
@@ -262,7 +288,7 @@ export default function Volunteer() {
                       <div className="col-span-2">
                         <p className="flex items-center">
                           <ClockIcon className="w-4 h-4 mr-2" />
-                            Expiry: {dateFormat(expiry, "dd/mm/yy hh:MM")}
+                            {dateFormat(startDate, "hh:MM dd/mm")} - {dateFormat(endDate, "hh:MM dd/mm")}
                         </p>
                       </div>
                     </div>
@@ -273,6 +299,7 @@ export default function Volunteer() {
                       <p className="ml-4">Enabled:</p>
                       <input
                         type="checkbox"
+                        checked={enabled}
                         className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
                       />
                       <p className="ml-4">Publicised:</p>
