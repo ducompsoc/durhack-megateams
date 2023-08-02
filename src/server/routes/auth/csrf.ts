@@ -37,5 +37,5 @@ export const { generateToken, doubleCsrfProtection } = doubleCsrf({
 export function handleGetCsrfToken(request: Request, response: Response): void {
   const csrfToken = generateToken(response, request);
   response.status(200);
-  response.json({ "status": 200, "message": "OK", "token": csrfToken });
+  response.json({ "status": 200, "message": "Token generation OK", "token": csrfToken });
 }

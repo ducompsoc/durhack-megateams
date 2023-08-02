@@ -83,4 +83,4 @@ _This follows the naming used in the `.env.local` file given above_
 ## environment options
 - `MEGATEAMS_SKIP_EMAIL_VERIFICATION`: set to `true` to allow users to set their password without verifying email
 - `MEGATEAMS_NO_MITIGATE_CSRF`: set to `true` to allow `POST/PATCH/DELETE` (etc.) requests 
-without a CSRF hash cookie and token header.
+_without_ a CSRF hash cookie and token header.
