@@ -1,16 +1,13 @@
 import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript";
 
-import { UserModel, UserRole, Ethnicity, Gender } from "@server/common/models";
+import { UserRole, Ethnicity, Gender } from "@server/common/model_enums";
 
 import Team from "./team";
 import Point from "./point";
 import QRCode from "./qr_code";
 
-
-export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
-
 @Table
-export default class User extends Model implements UserModel {
+export default class User extends Model {
   @Column({
     field: "user_id",
     type: DataType.INTEGER,
@@ -166,4 +163,8 @@ export default class User extends Model implements UserModel {
     allowNull: false,
   })
     gender!: Gender;
+
+  static async listUsers(): Promise<Pick<User, "id" | "email" | "full_name">[]> {
+    throw new Error("Not implemented.");
+  }
 }

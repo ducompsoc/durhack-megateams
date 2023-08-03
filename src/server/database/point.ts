@@ -1,17 +1,14 @@
-import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
-
-import { PointModel } from "@server/common/models";
+import {DataType, Table, Column, Model, BelongsTo, ForeignKey} from "sequelize-typescript";
 
 import QRCode from "./qr_code";
 import User from "./user";
 
 
 @Table
-export default class Point extends Model implements PointModel {
+export default class Point extends Model {
   @Column({
     field: "point_id",
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   })

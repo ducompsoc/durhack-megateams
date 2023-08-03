@@ -1,15 +1,10 @@
-import { DataType, Table, Column, Model, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
-
-import { TeamModel } from "@server/common/models";
+import {DataType, Table, Column, Model, HasMany, BelongsTo, ForeignKey} from "sequelize-typescript";
 
 import Area from "./area";
 import User from "./user";
 
-
-export type teamIdentifier = Pick<TeamModel, "id" | "name">
-
 @Table
-export default class Team extends Model implements TeamModel {
+export default class Team extends Model {
   @Column({
     field: "team_id",
     type: DataType.INTEGER,
@@ -39,11 +34,11 @@ export default class Team extends Model implements TeamModel {
   @HasMany(() => User)
     members?: User[];
 
-  static async listTeams(): Promise<teamIdentifier[]> {
+  static async listTeams(): Promise<Pick<Team, "id" | "name">[]> {
     throw new Error("Not implemented.");
   }
 
-  static async getTeam(id: number): Promise<TeamModel> {
+  static async getTeam(id: number): Promise<Team> {
     throw new Error("Not implemented.");
   }
 }
