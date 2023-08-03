@@ -8,7 +8,6 @@ export default class Team extends Model {
   @Column({
     field: "team_id",
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -27,8 +26,7 @@ export default class Team extends Model {
     allowNull: true,
   })
     area_id?: number;
-
-  @BelongsTo(() => Area)
+  @BelongsTo(() => Area, "area_id")
     area?: Area;
 
   @HasMany(() => User)

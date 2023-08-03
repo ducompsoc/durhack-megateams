@@ -63,9 +63,8 @@ export default class QRCode extends Model {
     type: DataType.INTEGER,
     allowNull: false,
   })
-    creator_user_id!: number;
-
-  @BelongsTo(() => User)
+    creator_id!: number;
+  @BelongsTo(() => User, "creator_id")
     creator!: User;
 
   @HasMany(() => Point)

@@ -11,7 +11,6 @@ export default class User extends Model {
   @Column({
     field: "user_id",
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -23,14 +22,13 @@ export default class User extends Model {
     allowNull: true,
   })
     team_id?: number;
-
-  @BelongsTo(() => Team)
+  @BelongsTo(() => Team, "team_id")
     team?: Team;
 
-  @HasMany(() => QRCode)
+  @HasMany(() => QRCode, "creator_id")
     createdQRCodes?: QRCode[];
 
-  @HasMany(() => Point)
+  @HasMany(() => Point, "redeemer_id")
     points?: Point[];
 
   @Column({

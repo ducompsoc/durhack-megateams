@@ -1,4 +1,4 @@
-import { DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey } from "sequelize-typescript";
+import {DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey} from "sequelize-typescript";
 
 import Megateam from "@server/database/megateam";
 
@@ -21,11 +21,10 @@ export default class Area extends Model {
     allowNull: false,
   })
     megateam_id!: number;
-
-  @BelongsTo(() => Megateam)
+  @BelongsTo(() => Megateam, "megateam_id")
     megateam!: Megateam;
 
-  @HasOne(() => Team)
+  @HasOne(() => Team, "area_id")
     team?: Team;
 
   @Column({

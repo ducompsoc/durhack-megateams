@@ -25,9 +25,8 @@ export default class Point extends Model {
     type: DataType.INTEGER,
     allowNull: true,
   })
-    qrcode_id?: number;
-
-  @BelongsTo(() => QRCode)
+    origin_qrcode_id?: number;
+  @BelongsTo(() => QRCode, "origin_qrcode_id")
     qrcode?: QRCode;
 
   @ForeignKey(() => User)
@@ -35,8 +34,7 @@ export default class Point extends Model {
     type: DataType.INTEGER,
     allowNull: false,
   })
-    redeemer_user_id!: number;
-
-  @BelongsTo(() => User)
+    redeemer_id!: number;
+  @BelongsTo(() => User, "redeemer_id")
     redeemer!: User;
 }

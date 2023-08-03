@@ -26,7 +26,7 @@ export default class Megateam extends Model {
   })
     description?: string;
 
-  @HasMany(() => Area)
+  @HasMany(() => Area, "megateam_id")
     areas!: Area[];
 
   static async listMegateams(): Promise<Pick<Megateam, "id" | "name">[]> {
