@@ -262,33 +262,33 @@ export default function Volunteer() {
                     <p className="mb-2">{name}</p>
                     <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
                       <div className="col-span-1">
-                        <p className="flex items-center">
+                        <p className="flex items-center" title="QR Category/Type">
                           <TagIcon className="w-4 h-4 mr-2" />
                           {type}
                         </p>
                       </div>
                       <div className="col-span-1">
-                        <p className="flex items-center">
+                        <p className="flex items-center" title="Current Scans/Use Limit">
                           <CameraIcon className="w-4 h-4 mr-2" />
                           {scans}/{limit} scans
                         </p>
                       </div>
                       <div className="col-span-1">
-                        <p className="flex items-center">
+                        <p className="flex items-center" title="Creator">
                           <UserIcon className="w-4 h-4 mr-2" />
                           {creator}
                         </p>
                       </div>
                       <div className="col-span-1">
-                        <p className="flex items-center">
+                        <p className="flex items-center" title="Point Value">
                           <GiftIcon className="w-4 h-4 mr-2" />
                           {points} points
                         </p>
                       </div>
                       <div className="col-span-2">
-                        <p className="flex items-center">
+                        <p className="flex items-center" title="Valid From - Until">
                           <ClockIcon className="w-4 h-4 mr-2" />
-                            {dateFormat(startDate, "hh:MM dd/mm")} - {dateFormat(endDate, "hh:MM dd/mm")}
+                          {dateFormat(startDate, "hh:MM dd/mm")} - {dateFormat(endDate, "hh:MM dd/mm")}
                         </p>
                       </div>
                     </div>
@@ -296,13 +296,13 @@ export default function Volunteer() {
                       <button className="rounded px-2 py-1 bg-accent text-white">
                           View
                       </button>
-                      <p className="ml-4">Enabled:</p>
+                      <p className="ml-4" title="Can be scanned for points?">Enabled:</p>
                       <input
                         type="checkbox"
                         checked={enabled}
                         className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
                       />
-                      <p className="ml-4">Publicised:</p>
+                      <p className="ml-4" title="Shown on Challenge list?">Publicised:</p>
                       <input
                         type="checkbox"
                         className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
