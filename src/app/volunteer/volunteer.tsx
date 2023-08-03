@@ -118,8 +118,8 @@ export default function Volunteer() {
   function qrClasses(enabled: boolean, startDate: Date, endDate: Date) {
     let bgClass = "bg-gray-200";
     let now = new Date();
-    if (!enabled || startDate > now) bgClass = "pattern-diagonal-lines pattern-gray-100 pattern-bg-gray-200 pattern-size-6 pattern-opacity-80";
-    if (endDate < now) bgClass = "bg-red-100 opacity-80";
+    if (!enabled || startDate > now) bgClass = "pattern-diagonal-lines pattern-transparent pattern-bg-gray-200 pattern-size-16 pattern-opacity-100";
+    if (endDate < now) bgClass = "bg-red-100 opacity-100";
     return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
   }
 
