@@ -8,6 +8,7 @@ import api_router from "./routes";
 import sequelize, { ensureDatabaseExists } from "./database";
 
 const dev = process.env.NODE_ENV !== "production";
+process.env.TZ = "Europe/London";
 
 async function main() {
   await next_app.prepare();
