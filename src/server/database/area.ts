@@ -1,19 +1,15 @@
-import { DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey } from "sequelize-typescript";
+import {DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey} from "sequelize-typescript";
 
-import { AreaModel } from "@server/common/models";
 import Megateam from "@server/database/megateam";
 
 import Team from "./team";
 
 
-export type areaIdentifier = Pick<AreaModel, "id" | "name">
-
 @Table
-export default class Area extends Model implements AreaModel {
+export default class Area extends Model {
   @Column({
     field: "area_id",
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -25,11 +21,10 @@ export default class Area extends Model implements AreaModel {
     allowNull: false,
   })
     megateam_id!: number;
-
-  @BelongsTo(() => Megateam)
+  @BelongsTo(() => Megateam, "megateam_id")
     megateam!: Megateam;
 
-  @HasOne(() => Team)
+  @HasOne(() => Team, "area_id")
     team?: Team;
 
   @Column({

@@ -1,16 +1,12 @@
 import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
-import { MegateamModel } from "@server/common/models";
 import Area from "./area";
 
 
-export type megateamIdentifier = Pick<MegateamModel, "id" | "name">
-
 @Table
-export default class Megateam extends Model implements MegateamModel {
+export default class Megateam extends Model {
   @Column({
     field: "megateam_id",
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -30,14 +26,14 @@ export default class Megateam extends Model implements MegateamModel {
   })
     description?: string;
 
-  @HasMany(() => Area)
+  @HasMany(() => Area, "megateam_id")
     areas!: Area[];
 
-  static async listMegateams(): Promise<megateamIdentifier[]> {
+  static async listMegateams(): Promise<Pick<Megateam, "id" | "name">[]> {
     throw new Error("Not implemented.");
   }
 
-  static async getMegateam(id: number): Promise<MegateamModel> {
+  static async getMegateam(id: number): Promise<Megateam> {
     throw new Error("Not implemented.");
   }
 }

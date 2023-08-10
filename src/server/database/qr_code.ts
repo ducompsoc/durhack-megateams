@@ -1,12 +1,11 @@
-import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
-import {QRCategory, QRCodeModel} from "@server/common/models";
+import {DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey} from "sequelize-typescript";
+import { QRCategory } from "@server/common/model_enums";
 import User from "./user";
+import Point from "./point";
 
-
-export type qrcodeIdentifier = Pick<QRCodeModel, "id" | "name">
 
 @Table
-export default class QRCode extends Model implements QRCodeModel {
+export default class QRCode extends Model {
   @Column({
     field: "qrcode_id",
     type: DataType.INTEGER,
@@ -64,10 +63,12 @@ export default class QRCode extends Model implements QRCodeModel {
     type: DataType.INTEGER,
     allowNull: false,
   })
-    creator_user_id!: number;
-
-  @BelongsTo(() => User)
+    creator_id!: number;
+  @BelongsTo(() => User, "creator_id")
     creator!: User;
+
+  @HasMany(() => Point)
+    uses?: Point[];
 
   @Column({
     type: DataType.INTEGER,

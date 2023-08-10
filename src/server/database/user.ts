@@ -1,18 +1,16 @@
-import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript";
 
-import { UserModel, UserRole, Ethnicity, Gender } from "@server/common/models";
+import { UserRole, Ethnicity, Gender } from "@server/common/model_enums";
 
 import Team from "./team";
-
-
-export type UserIdentifierModel = Pick<UserModel, "id" | "preferred_name">
+import Point from "./point";
+import QRCode from "./qr_code";
 
 @Table
-export default class User extends Model implements UserModel {
+export default class User extends Model {
   @Column({
     field: "user_id",
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -24,9 +22,14 @@ export default class User extends Model implements UserModel {
     allowNull: true,
   })
     team_id?: number;
-
-  @BelongsTo(() => Team)
+  @BelongsTo(() => Team, "team_id")
     team?: Team;
+
+  @HasMany(() => QRCode, "creator_id")
+    createdQRCodes?: QRCode[];
+
+  @HasMany(() => Point, "redeemer_id")
+    points?: Point[];
 
   @Column({
     type: DataType.STRING,
@@ -158,4 +161,8 @@ export default class User extends Model implements UserModel {
     allowNull: false,
   })
     gender!: Gender;
+
+  static async listUsers(): Promise<Pick<User, "id" | "email" | "full_name">[]> {
+    throw new Error("Not implemented.");
+  }
 }
