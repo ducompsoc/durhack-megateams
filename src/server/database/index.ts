@@ -38,12 +38,12 @@ export function buildQueryFromRequest<M extends Model>(request: Request, transfo
     const parameterValue = request.query[parameterName];
 
     if (typeof parameterValue !== "string") {
-      throw new createHttpError.BadRequest(`query parameter '${parameterName}' should contain a single string.`);
+      throw new createHttpError.BadRequest(`Query parameter '${parameterName}' should be a string.`);
     }
 
     const transformFactory = transforms.get(parameterName);
     if (transformFactory === undefined) {
-      throw new createHttpError.BadRequest(`Invalid query parameter '${parameterName}'`);
+      throw new createHttpError.BadRequest(`Query parameter '${parameterName}' is invalid.`);
     }
 
     const transform = transformFactory(parameterValue);

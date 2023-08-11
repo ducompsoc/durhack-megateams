@@ -7,15 +7,17 @@ import { FormEvent } from "react";
 async function send_login_request(event: FormEvent<HTMLFormElement>) {
   event.preventDefault();
   const form_data = new FormData(event.currentTarget);
+  // @ts-ignore (see https://github.com/microsoft/TypeScript/issues/30584)
   const encoded_form_data = new URLSearchParams(form_data);
   const request = makeMegateamsApiRequest("/auth/login", { method: "POST", body: encoded_form_data });
   await attachCsrfTokenToRequest(request);
   await fetch(request);
 }
 
-async function send_set_password_request(event) {
+async function send_set_password_request(event: FormEvent<HTMLFormElement>) {
   event.preventDefault();
   const form_data = new FormData(event.currentTarget);
+  // @ts-ignore (same as above)
   const encoded_form_data = new URLSearchParams(form_data);
   const request = makeMegateamsApiRequest("/auth/setpassword", { method: "POST", body: encoded_form_data });
   await attachCsrfTokenToRequest(request);
