@@ -36,10 +36,10 @@ const session_options: SessionOptions = {
   store: sessionStore,
   resave: false,
   saveUninitialized: false,
-  cookie: {}
+  cookie: { secure: false }
 };
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV === "production") {
   if (session_options.cookie) {
     session_options.cookie.secure = true;
   }
