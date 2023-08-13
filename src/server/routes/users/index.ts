@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./user_handlers";
-import { handleMethodNotAllowed } from "@server/common/middleware";
+import { handleMethodForbidden } from "@server/common/middleware";
 
 
 const users_router = ExpressRouter();
@@ -9,12 +9,12 @@ const users_router = ExpressRouter();
 users_router.route("/")
   .get(handlers.getUsersList)
   .post(handlers.createUser)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 users_router.route("/:user_id")
   .get(handlers.getUserDetails)
   .patch(handlers.patchUserDetails)
   .delete(handlers.deleteUser)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 export default users_router;

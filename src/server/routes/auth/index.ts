@@ -4,7 +4,7 @@ import Local from "passport-local";
 
 import SequelizeUser from "@server/database/user";
 import { NullError } from "@server/common/errors";
-import { handleMethodNotAllowed } from "@server/common/middleware";
+import { handleMethodForbidden } from "@server/common/middleware";
 
 import { localVerifyFunction } from "./auth_util";
 import { handleSignUp, handleSetPassword, handleLoginSuccess } from "./auth_handlers";
@@ -51,18 +51,18 @@ auth_router.route("/login")
     }),
     handleLoginSuccess
   )
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 auth_router.route("/signup")
   .post(handleSignUp)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 auth_router.route("/setpassword")
   .post(handleSetPassword)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 auth_router.route("/csrf-token")
   .get(handleGetCsrfToken)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 export default auth_router;

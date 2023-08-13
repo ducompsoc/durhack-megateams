@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./qr_code_handlers";
-import { handleMethodNotAllowed } from "@server/common/middleware";
+import { handleMethodForbidden } from "@server/common/middleware";
 
 
 const qr_codes_router = ExpressRouter();
@@ -9,12 +9,12 @@ const qr_codes_router = ExpressRouter();
 qr_codes_router.route("/")
   .get(handlers.getQRCodeList)
   .post(handlers.createQRCode)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 qr_codes_router.route("/:qr_code_id")
   .get(handlers.getQRCodeDetails)
   .patch(handlers.patchQRCodeDetails)
   .delete(handlers.deleteQRCode)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodForbidden);
 
 export default qr_codes_router;
