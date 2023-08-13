@@ -6,7 +6,7 @@ import methodOverride from "method-override";
 import createHttpError from "http-errors";
 import cookie_parser from "cookie-parser";
 
-import { handleMethodNotAllowed } from "@server/common/middleware";
+import { handleMethodNotAllowed, setAdminRequestFlag } from "@server/common/middleware";
 
 import { doubleCsrfProtection } from "./auth/csrf";
 import auth_router from "./auth";
@@ -24,6 +24,8 @@ const api_router = ExpressRouter();
 api_router.use(cookie_parser("cookie_secret"));
 api_router.use(bodyParser.json());
 api_router.use(bodyParser.urlencoded({ extended: true }));
+
+api_router.use(setAdminRequestFlag);
 
 if (process.env.MEGATEAMS_NO_MITIGATE_CSRF !== "true") {
   api_router.use(doubleCsrfProtection);

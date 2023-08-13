@@ -1,6 +1,9 @@
 import "../common/config";
 import mysql from "mysql2/promise";
 import { Sequelize } from "sequelize-typescript";
+import { Model, WhereOptions, Attributes, OrderItem, FindOptions } from "sequelize";
+import { Request } from "express";
+import createHttpError from "http-errors";
 
 import { NullError } from "@server/common/errors";
 
@@ -10,6 +13,72 @@ import Area from "./area";
 import Megateam from "./megateam";
 import Point from "./point";
 import QRCode from "./qr_code";
+
+export interface SequelizeQueryTransform<M extends Model> {
+  condition: WhereOptions<Attributes<M>>
+  replacements?: Map<string, string>
+  orders?: OrderItem[]
+}
+
+export type SequelizeQueryTransformFactory<M extends Model> = (value: string) => SequelizeQueryTransform<M>
+
+export function buildQueryFromRequest<M extends Model>(request: Request, transforms: Map<string, SequelizeQueryTransformFactory<M>>): FindOptions<M> {
+  const options = {
+    where: [] as WhereOptions<M>[],
+    replacements: new Map<string, string>(),
+    order: [] as OrderItem[],
+  };
+
+  // https://stackoverflow.com/a/17385088
+  for (let parameterName in request.query) {
+    if (!request.query.hasOwnProperty(parameterName)) {
+      continue;
+    }
+
+    const parameterValue = request.query[parameterName];
+
+    if (typeof parameterValue !== "string") {
+      throw new createHttpError.BadRequest(`Query parameter '${parameterName}' should be a string.`);
+    }
+
+    const transformFactory = transforms.get(parameterName);
+    if (transformFactory === undefined) {
+      throw new createHttpError.BadRequest(`Query parameter '${parameterName}' is invalid.`);
+    }
+
+    const transform = transformFactory(parameterValue);
+
+    if (transform.condition) {
+      options.where.push(transform.condition);
+    }
+
+    if (transform.replacements) {
+      for (let [k,v] of transform.replacements.entries()) {
+        options.replacements.set(k, v);
+      }
+    }
+
+    if (transform.orders) {
+      options.order.push(...transform.orders);
+    }
+  }
+
+  const findOptions: FindOptions<M> = {};
+
+  if (options.where.length > 0) {
+    findOptions.where = options.where as WhereOptions<M>;
+  }
+
+  if (options.replacements.size > 0) {
+    findOptions.replacements = Object.fromEntries(options.replacements);
+  }
+
+  if (options.order.length > 0) {
+    findOptions.order = options.order;
+  }
+
+  return findOptions;
+}
 
 
 export async function ensureDatabaseExists() {

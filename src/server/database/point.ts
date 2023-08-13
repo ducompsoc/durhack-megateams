@@ -37,4 +37,8 @@ export default class Point extends Model {
     redeemer_id!: number;
   @BelongsTo(() => User, "redeemer_id")
     redeemer!: User;
+
+  static getPointsTotal(points: Point[]): number {
+    return points.reduce((accumulator: number, currentPoint: Point) => accumulator + currentPoint.value, 0);
+  }
 }
