@@ -27,4 +27,5 @@ export enum QRCategory {
   workshop = "workshop",
   sponsor = "sponsor",
   challenge = "challenge",
+  preset = "preset",
 }
