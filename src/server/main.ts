@@ -1,11 +1,13 @@
-import "./common/config";
-import express from "express";
 import "./path-alias";
+import "./common/config";
+
+import express from "express";
 import passport from "passport";
+
 import session from "./common/session";
+import sequelize, { ensureDatabaseExists } from "./database";
 import next_app, { handle_next_app_request } from "./common/nextApp";
 import api_router from "./routes";
-import sequelize, { ensureDatabaseExists } from "./database";
 
 const dev = process.env.NODE_ENV !== "production";
 process.env.TZ = "Europe/London";
