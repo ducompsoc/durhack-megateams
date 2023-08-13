@@ -2,6 +2,16 @@ import createHttpError from "http-errors";
 import { NextFunction, Request, Response } from "express";
 import { ValueError } from "@server/common/errors";
 
+export function setVolunteerRequestFlag(request: Request, response: Response, next: NextFunction) {
+  response.locals.isVolunteerRequest = request.user?.role === UserRole.volunteer;
+  next();
+}
+
+export function setSponsorRequestFlag(request: Request, response: Response, next: NextFunction) {
+  response.locals.isSponsorRequest = request.user?.role === UserRole.sponsor;
+  next();
+}
+
 export function handleMethodNotAllowed() {
   throw new createHttpError.MethodNotAllowed();
 }
