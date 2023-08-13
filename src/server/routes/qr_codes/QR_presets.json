@@ -4,31 +4,27 @@
     "description": "A single use QR for a sponsor to reward hacker engagement.",
     "points": 5,
     "uses": 1,
-    "minutesValid": 2,
-    "uuid": "abc-123"
+    "minutesValid": 2
   },
   "volunteer": {
     "name": "Volunteer",
     "description": "A single use QR for a volunteer to reward a hacker with 5 points.",
     "points": 5,
     "uses": 1,
-    "minutesValid": 5,
-    "uuid": "def-456"
+    "minutesValid": 5
   },
   "challenge": {
     "name": "Challenge",
     "description": "A single use QR to reward winning a challenge.",
     "points": 10,
     "uses": 1,
-    "minutesValid": 10,
-    "uuid": "ghi-789"
+    "minutesValid": 10
   },
   "workshop": {
     "name": "Workshop",
     "description": "A 100-use QR for a volunteer to reward workshop attendees.",
     "points": 2,
     "uses": 100,
-    "minutesValid": 10,
-    "uuid": "jkl-012"
+    "minutesValid": 10
   }
 }

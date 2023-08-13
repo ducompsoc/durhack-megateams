@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import { NextFunction, Request, Response } from "express";
 import { ValidationError as SequelizeValidationError } from "sequelize";
 import { readFileSync } from "fs";
+import { v4 as uuid } from "uuid";
 import path from "path";
 
 import { NullError, ValueError } from "@server/common/errors";
@@ -22,6 +23,8 @@ async function handleQRCreation(request: Request, response: Response) {
   if (invalid_fields.length > 0) {
     throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
   }
+
+  request.body.payload = uuid();
 
   let new_instance;
   try {
@@ -76,11 +79,27 @@ export async function getPresets(request: Request, response: Response): Promise<
   });
 }
 
-export async function usePreset(request: Request, response: Response): Promise<void> {
-  const preset = request.params.preset;
-  if (!preset || !presets.hasOwnProperty(preset)) {
+export async function usePreset(request: Request, response: Response, next: NextFunction): Promise<void> {
+  const { isAdminRequest, isVolunteerRequest, isSponsorRequest } = response.locals;
+  if (!isAdminRequest && !isVolunteerRequest && !isSponsorRequest) {
+    return next();
+  }
+  const presetName = request.params.preset;
+  if (!presetName || !presets.hasOwnProperty(presetName)) {
     throw new createHttpError.BadRequest();
   }
-  request.body = presets[preset];
+  const preset = presets[presetName];
+  let expiry = new Date();
+  expiry.setMinutes(expiry.getMinutes() + preset.minutesValid);
+  request.body = {
+    name: preset.name,
+    points_value: preset.points,
+    max_uses: preset.uses,
+    category: "preset",
+    state: true,
+    creator_id: request.user!.id,
+    start_time: new Date(),
+    expiry_time: expiry,
+  };
   await handleQRCreation(request, response);
 }

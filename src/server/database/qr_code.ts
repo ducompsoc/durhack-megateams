@@ -41,6 +41,11 @@ export default class QRCode extends Model {
     points_value!: number;
 
   @Column({
+    type: DataType.INTEGER,
+  })
+    max_uses!: number;
+
+  @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
