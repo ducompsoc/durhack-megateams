@@ -20,10 +20,10 @@ allowed_create_fields.delete("updatedAt");
  * Handles a GET request to /points.
  * For transparency, returns a list of points in the database with their values and redeemer's ID.
  *
- * @param request
+ * @param _request
  * @param response - `points` attribute contains array of points each with an `id`, `value` and `redeemer` (with redeemer's `id`) attribute
  */
-export async function getPointsList(request: Request, response: Response): Promise<void> {
+export async function getPointsList(_request: Request, response: Response): Promise<void> {
   const result = await Point.findAll({
     attributes: [["point_id", "id"], "value"],
     include: [
@@ -82,6 +82,7 @@ export async function createPoint(request: Request, response: Response, next: Ne
 
 export async function getPointDetails(request: Request, response: Response): Promise<void> {
   throw new createHttpError.NotImplemented();
+export async function getPointDetails(_request: Request, response: Response): Promise<void> {
 }
 
 export async function patchPointDetails(request: Request, response: Response): Promise<void> {
