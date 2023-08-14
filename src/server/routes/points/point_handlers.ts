@@ -21,7 +21,7 @@ allowed_create_fields.delete("updatedAt");
  * For transparency, returns a list of points in the database with their values and redeemer's ID.
  *
  * @param request
- * @param response
+ * @param response - `points` attribute contains array of points each with an `id`, `value` and `redeemer` (with redeemer's `id`) attribute
  */
 export async function getPointsList(request: Request, response: Response): Promise<void> {
   const result = await Point.findAll({
@@ -42,7 +42,7 @@ export async function getPointsList(request: Request, response: Response): Promi
  * Handles an authenticated admin POST request to /points to manually add points to the database.
  *
  * @param request
- * @param response
+ * @param response - response attribute `data` contains the newly created point attributes (same types as initial request!)
  * @param next
  */
 export async function createPoint(request: Request, response: Response, next: NextFunction): Promise<void> {
