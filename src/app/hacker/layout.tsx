@@ -17,19 +17,19 @@ export default function HackerLayout({
 }) {
   const tabs = [
     {
-      icon: <HomeIcon className="w-10 h-10" />,
+      icon: HomeIcon,
       path: "/hacker",
     },
     {
-      icon: <ChartBarIcon className="w-10 h-10" />,
+      icon: ChartBarIcon,
       path: "/hacker/leaderboard",
     },
     {
-      icon: <UserGroupIcon className="w-10 h-10" />,
+      icon: UserGroupIcon,
       path: "/hacker/team",
     },
     {
-      icon: <CogIcon className="w-10 h-10" />,
+      icon: CogIcon,
       path: "https://durhack.com/",
       openNewWindow: true,
     },
