@@ -1,6 +1,6 @@
 import { Router as ExpressRouter } from "express";
 
-import { handleMethodForbidden } from "@server/common/middleware";
+import {handleMethodForbidden, parseRouteId} from "@server/common/middleware";
 
 import * as handlers from "./point_handlers";
 
@@ -14,6 +14,7 @@ points_router.route("/")
   .all(handleMethodForbidden);
 
 points_router.route("/:point_id")
+  .all(parseRouteId("point_id"))
   .get(handlers.getPointDetails)
   .patch(handlers.patchPointDetails)
   .delete(handlers.deletePoint)

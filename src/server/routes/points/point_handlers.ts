@@ -8,6 +8,7 @@ import {
 import { NullError, ValueError } from "@server/common/errors";
 import Point from "@server/database/point";
 import User from "@server/database/user";
+import QRCode from "@server/database/qr_code";
 
 const user_attributes = Point.getAttributes();
 const allowed_create_fields = new Set(Object.keys(user_attributes));
@@ -80,9 +81,29 @@ export async function createPoint(request: Request, response: Response, next: Ne
   response.json({ status: response.statusCode, message: "OK", data: new_instance });
 }
 
-export async function getPointDetails(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
+/**
+ * Returns the details of a point entry in the database and linked QR code and user attributes.
+ *
+ * @param _request
+ * @param response - data payload includes: `id`, `value`, `createdAt`, `qrcode` (can be null), and `redeemer`
+ *   the latter two are their own objects with snapshots of QRCode and User attributes
+ */
 export async function getPointDetails(_request: Request, response: Response): Promise<void> {
+  const { point_id } = response.locals;
+  if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
+
+  const result = await Point.findByPk(point_id, {
+    attributes: {exclude: ["origin_qrcode_id", "redeemer_id", "updatedAt"]},
+    include: [
+      { model: QRCode, attributes: ["id", "name", "category", "start_time", "expiry_time"] },
+      { model: User, attributes: ["id", "team_id", "preferred_name"] }],
+    rejectOnEmpty: new NullError(),
+  });
+
+  const payload: any = result.toJSON();
+
+  response.status(200);
+  response.json({ "status": response.statusCode, "message": "OK", "data": payload });
 }
 
 export async function patchPointDetails(request: Request, response: Response): Promise<void> {
