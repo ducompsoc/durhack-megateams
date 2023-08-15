@@ -10,8 +10,10 @@ import Point from "@server/database/point";
 import User from "@server/database/user";
 import QRCode from "@server/database/qr_code";
 
-const user_attributes = Point.getAttributes();
-const allowed_create_fields = new Set(Object.keys(user_attributes));
+const point_attributes = Point.getAttributes();
+
+const allowed_create_fields = new Set(Object.keys(point_attributes));
+["id", "createdAt", "updatedAt"].forEach((key) => allowed_create_fields.delete(key));
 
 allowed_create_fields.delete("createdAt");
 allowed_create_fields.delete("updatedAt");
@@ -42,7 +44,7 @@ export async function getPointsList(_request: Request, response: Response): Prom
 /**
  * Handles an authenticated admin POST request to /points to manually add points to the database.
  *
- * @param request
+ * @param request - fields required are `value` and `redeemer_id` (`origin_qrcode_id` should not be set for manual point creation)
  * @param response - response attribute `data` contains the newly created point attributes (same types as initial request!)
  * @param next
  */
