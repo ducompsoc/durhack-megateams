@@ -15,8 +15,10 @@ const point_attributes = Point.getAttributes();
 const allowed_create_fields = new Set(Object.keys(point_attributes));
 ["id", "createdAt", "updatedAt"].forEach((key) => allowed_create_fields.delete(key));
 
-allowed_create_fields.delete("createdAt");
-allowed_create_fields.delete("updatedAt");
+const patchable_fields = new Set(Object.keys(point_attributes));
+["id", "createdAt", "updatedAt"].forEach((key) => patchable_fields.delete(key));
+
+
 function dbErrorHandler(error: unknown) {
   if (error instanceof SequelizeValidationError) {
     throw new createHttpError.BadRequest(
@@ -113,8 +115,38 @@ export async function getPointDetails(_request: Request, response: Response): Pr
   response.json({ "status": response.statusCode, "message": "OK", "data": payload });
 }
 
-export async function patchPointDetails(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
+/**
+ * Handles an authenticated admin PATCH request to /points/:point_id to manually edit points to the database.
+ *
+ * @param request - includes fields to be edited (can be any of `value`, `origin_qrcode_id`, `redeemer_id`)
+ * @param response - response attribute `data` contains the edited point's attributes (same types as initial request!)
+ * @param next
+ */
+export async function patchPointDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+  if (!response.locals.isAdminRequest) {
+    return next();
+  }
+
+  const { point_id } = response.locals;
+  if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
+
+  const invalid_fields = Object.keys(request.body).filter((key) => !patchable_fields.has(key));
+  if (invalid_fields.length > 0) {
+    throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
+  }
+
+  const found_point = await Point.findByPk(point_id, {
+    rejectOnEmpty: new NullError(),
+  });
+
+  try {
+    await found_point.update(request.body);
+  } catch (error) {
+    dbErrorHandler(error);
+  }
+
+  response.status(200);
+  response.json({ status: response.statusCode, message: "OK", data: found_point });
 }
 
 export async function deletePoint(request: Request, response: Response): Promise<void> {
