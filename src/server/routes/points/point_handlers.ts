@@ -149,6 +149,27 @@ export async function patchPointDetails(request: Request, response: Response, ne
   response.json({ status: response.statusCode, message: "OK", data: found_point });
 }
 
-export async function deletePoint(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
+/**
+ * Handles an authenticated admin DELETE request to /points/:point_id to drop/delete a point record from the db.
+ *
+ * @param _request
+ * @param response - response attribute `data` contains the edited point's attributes (same types as initial request!)
+ * @param next
+ */
+export async function deletePoint(_request: Request, response: Response, next: NextFunction): Promise<void> {
+  if (!response.locals.isAdminRequest) {
+    return next();
+  }
+
+  const { point_id } = response.locals;
+  if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
+
+  const result = await Point.findByPk(point_id, {
+    rejectOnEmpty: new NullError(),
+  });
+
+  await result.destroy();
+
+  response.status(200);
+  response.json({ status: response.statusCode, message: "OK" });
 }
