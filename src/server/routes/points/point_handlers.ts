@@ -17,6 +17,20 @@ const allowed_create_fields = new Set(Object.keys(point_attributes));
 
 allowed_create_fields.delete("createdAt");
 allowed_create_fields.delete("updatedAt");
+function dbErrorHandler(error: unknown) {
+  if (error instanceof SequelizeValidationError) {
+    throw new createHttpError.BadRequest(
+      `${error.message} with fields: ${error.errors.map((e) => `* ${e.path} - ${e.message}`).join("; ")}`
+    );
+  } else if (error instanceof SequelizeForeignKeyConstraintError) {
+    if (error.fields instanceof Array) {
+      throw new createHttpError.BadRequest(`Invalid foreign key(s) provided for field(s): ${error.fields.join(", ")}`);
+    } else {
+      throw new createHttpError.BadRequest(error.message);
+    }
+  }
+  throw error;
+}
 
 
 /**
@@ -67,16 +81,7 @@ export async function createPoint(request: Request, response: Response, next: Ne
   try {
     new_instance = await Point.create(request.body);
   } catch (error) {
-    if (error instanceof SequelizeValidationError) {
-      throw new createHttpError.BadRequest(error.message);
-    } else if (error instanceof SequelizeForeignKeyConstraintError) {
-      if (error.fields instanceof Array) {
-        throw new createHttpError.BadRequest(`Invalid foreign key(s) provided for field(s): ${error.fields.join(", ")}`);
-      } else {
-        throw new createHttpError.BadRequest(error.message);
-      }
-    }
-    throw error;
+    dbErrorHandler(error);
   }
 
   response.status(200);
