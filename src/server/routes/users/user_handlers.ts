@@ -284,7 +284,7 @@ export async function patchMyUserDetails(request: Request, response: Response, n
  * @param next
  */
 export async function deleteUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-  if (request.user?.role !== UserRole.admin) {
+  if (!response.locals.isAdminRequest) {
     return next();
   }
 
