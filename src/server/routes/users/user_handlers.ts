@@ -226,7 +226,7 @@ function getPatchHandler(allowed_fields_set: Set<string>) {
     });
 
     try {
-      await found_user.update(Object.entries(request.body));
+      await found_user.update(request.body);
     } catch (error) {
       if (error instanceof SequelizeValidationError) {
         throw new createHttpError.BadRequest(error.message);
