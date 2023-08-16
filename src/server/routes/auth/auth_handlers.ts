@@ -8,7 +8,7 @@ import User from "@server/database/user";
 
 import { hashPasswordText, validatePassword } from "./auth_util";
 import * as process from "process";
-import {sendStandardResponse} from "@server/common/response";
+import { sendStandardResponse } from "@server/common/response";
 
 
 function ensureCorrectVerifyCode(user: User, verify_code_attempt: string): void {
