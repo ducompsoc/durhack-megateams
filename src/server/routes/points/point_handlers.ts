@@ -9,6 +9,8 @@ import { NullError, ValueError } from "@server/common/errors";
 import Point from "@server/database/point";
 import User from "@server/database/user";
 import QRCode from "@server/database/qr_code";
+import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
+import { strIsPositiveInteger } from "@server/common/validation";
 
 const point_attributes = Point.getAttributes();
 
@@ -34,21 +36,27 @@ function dbErrorHandler(error: unknown) {
   throw error;
 }
 
+const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
+point_transform_factories.set("redeemer_id", (value) => {
+  if (strIsPositiveInteger(value)) return { condition: { redeemer_id: value } };
+  throw new createHttpError.BadRequest("Malformed query parameter value for `redeemer_id`. Should be a positive integer.");
+});
+
 
 /**
  * Handles a GET request to /points.
  * For transparency, returns a list of points in the database with their values and redeemer's ID.
+ * Can be additionally filtered by the redeemer's ID using a query parameter.
  *
- * @param _request
+ * @param request
  * @param response - `points` attribute contains array of points each with an `id`, `value` and `redeemer` (with redeemer's `id`) attribute
  */
-export async function getPointsList(_request: Request, response: Response): Promise<void> {
-  const result = await Point.findAll({
-    attributes: [["point_id", "id"], "value"],
-    include: [
-      { model: User, attributes: [["user_id", "id"]] },
-    ]
-  });
+export async function getPointsList(request: Request, response: Response): Promise<void> {
+  const query = buildQueryFromRequest(request, point_transform_factories);
+  query.attributes = [["point_id", "id"], "value"];
+  query.include = [{ model: User, attributes: [["user_id", "id"]] }];
+  const result = await Point.findAll(query);
+
   response.status(200);
   response.json({
     status: 200,
