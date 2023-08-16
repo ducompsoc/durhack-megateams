@@ -42,7 +42,7 @@ export default function TabbedPage({
         </div>
         <div className="p-6 pt-0 grow overflow-auto">{children}</div>
         {showTabs && (
-          <div className="flex gap-1 border border-b-0 border-gray-400 bg-white rounded-t-xl mx-[-1px]">
+          <div className="flex gap-1 border-t border-gray-200">
             {tabs.map((tab) => {
               const active = tab.path === path;
 
