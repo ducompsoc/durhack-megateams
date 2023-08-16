@@ -31,7 +31,8 @@ export function buildQueryFromRequest<M extends Model>(request: Request, transfo
 
   // https://stackoverflow.com/a/17385088
   for (let parameterName in request.query) {
-    if (!request.query.hasOwnProperty(parameterName)) {
+    // https://github.com/hapijs/hapi/issues/3280#issuecomment-237397365
+    if (!Object.prototype.hasOwnProperty.call(request.query, parameterName)) {
       continue;
     }
 
