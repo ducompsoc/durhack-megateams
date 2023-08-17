@@ -3,7 +3,6 @@ import {NextFunction, Request, Response} from "express";
 import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidationError } from "sequelize";
 
 import { NullError, ValueError } from "@server/common/errors";
-import { UserRole } from "@server/common/model_enums";
 import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
 import User from "@server/database/user";
 import Team from "@server/database/team";
