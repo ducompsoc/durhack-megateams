@@ -1,7 +1,7 @@
 import { Router as ExpressRouter } from "express";
 
 import * as handlers from "./megateam_handlers";
-import { handleMethodForbidden } from "@server/common/middleware";
+import { handleMethodNotAllowed } from "@server/common/middleware";
 
 
 const megateams_router = ExpressRouter();
@@ -9,12 +9,12 @@ const megateams_router = ExpressRouter();
 megateams_router.route("/")
   .get(handlers.getMegateamsList)
   .post(handlers.createMegateam)
-  .all(handleMethodForbidden);
+  .all(handleMethodNotAllowed);
 
 megateams_router.route("/:megateam_id")
   .get(handlers.getMegateamDetails)
   .patch(handlers.patchMegateamDetails)
   .delete(handlers.deleteMegateam)
-  .all(handleMethodForbidden);
+  .all(handleMethodNotAllowed);
 
 export default megateams_router;

@@ -2,9 +2,8 @@ import createHttpError from "http-errors";
 import { NextFunction, Request, Response } from "express";
 import { ValueError } from "@server/common/errors";
 
-export function handleMethodForbidden() {
-  // Re-authenticating will not allow access: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
-  throw new createHttpError.Forbidden();
+export function handleMethodNotAllowed() {
+  throw new createHttpError.MethodNotAllowed();
 }
 
 export function handleNotImplemented() {
