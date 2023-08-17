@@ -9,6 +9,8 @@ import User from "@server/database/user";
 import Team from "@server/database/team";
 import Point from "@server/database/point";
 import { structuredClone } from "next/dist/compiled/@edge-runtime/primitives";
+import Megateam from "@server/database/megateam";
+import Area from "@server/database/area";
 
 
 const user_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
@@ -92,13 +94,25 @@ export async function getUsersListAsAdmin(request: Request, response: Response, 
   }
 
   const query = buildQueryFromRequest(request, user_transform_factories);
-  query.attributes = [["user_id", "id"], "preferred_name"];
+  query.attributes = [["user_id", "id"], "preferred_name", "full_name", "email"];
+  query.include = [Point, Team, Area, Megateam];
   const result = await User.findAll(query);
+
+  const payload = result.map((user: User) => ({
+    id: user.id,
+    preferred_name: user.preferred_name,
+    full_name: user.full_name,
+    email: user.email,
+    points: Point.getPointsTotal(user.points || []),
+    team_name: user.team?.name,
+    megateam_name: user.team?.area?.megateam?.name,
+  }));
+
   response.status(200);
   response.json({
     status: 200,
     message: "OK",
-    users: result,
+    users: payload,
   });
 }
 
