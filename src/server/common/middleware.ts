@@ -1,12 +1,6 @@
 import createHttpError from "http-errors";
 import { NextFunction, Request, Response } from "express";
 import { ValueError } from "@server/common/errors";
-import { UserRole } from "@server/common/model_enums";
-
-export function setAdminRequestFlag(request: Request, response: Response, next: NextFunction) {
-  response.locals.isAdminRequest = request.user?.role === UserRole.admin;
-  next();
-}
 
 export function handleMethodNotAllowed() {
   throw new createHttpError.MethodNotAllowed();
@@ -64,10 +58,16 @@ function validateID(value: unknown): number {
   return num;
 }
 
+/**
+ * Attempts to parse a given route parameter (key) as a number to use as an ID
+ * @param key - The key of the route parameter to parse as an ID
+ * @returns A middleware function that takes a request, response, and next function.
+ * The key is extracted from the request's params and set in the local key of the response.
+ */
 export function parseRouteId(key: string) {
   return mutateRequestValue(
-    getRouteParameter(key),
-    validateID,
-    setLocalValue(key)
+    getRouteParameter(key),  // returns a function that takes a request and returns the value key from the request's params
+    validateID,              // function validates whether input value is a valid ID (i.e. number >= 0) & returns number in this case
+    setLocalValue(key)       // returns a function that takes a response and a value and sets the response's local key to the value
   );
 }

@@ -150,14 +150,14 @@ export default class User extends Model {
 
   @Column({
     type: DataType.ENUM(...Object.values(Ethnicity)),
-    defaultValue: Ethnicity.white,
+    defaultValue: Ethnicity.pnts,
     allowNull: false,
   })
     ethnicity!: Ethnicity;
 
   @Column({
     type: DataType.ENUM(...Object.values(Gender)),
-    defaultValue: Gender.male,
+    defaultValue: Gender.pnts,
     allowNull: false,
   })
     gender!: Gender;
