@@ -1,12 +1,6 @@
 import createHttpError from "http-errors";
 import { NextFunction, Request, Response } from "express";
 import { ValueError } from "@server/common/errors";
-import { UserRole } from "@server/common/model_enums";
-
-export function setAdminRequestFlag(request: Request, response: Response, next: NextFunction) {
-  response.locals.isAdminRequest = request.user?.role === UserRole.admin;
-  next();
-}
 
 export function handleMethodNotAllowed() {
   throw new createHttpError.MethodNotAllowed();
