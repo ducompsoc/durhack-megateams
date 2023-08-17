@@ -83,7 +83,7 @@ class UserHandlers {
   async getUsersListAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
     const query = buildQueryFromRequest(request, user_transform_factories);
     query.attributes = [["user_id", "id"], "preferred_name", "full_name", "email"];
-    query.include = [Point, Team, Area, Megateam];
+    query.include = [Point, Team];
     const result = await User.findAll(query);
 
     const payload = result.map((user: User) => ({
