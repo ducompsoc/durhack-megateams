@@ -1,9 +1,5 @@
 import createHttpError from "http-errors";
 import { Request, Response, NextFunction } from "express";
-import {
-  ForeignKeyConstraintError as SequelizeForeignKeyConstraintError,
-  ValidationError as SequelizeValidationError
-} from "sequelize";
 
 import { NullError, ValueError } from "@server/common/errors";
 import Point from "@server/database/point";
@@ -20,21 +16,6 @@ const allowed_create_fields = new Set(Object.keys(point_attributes));
 const patchable_fields = new Set(Object.keys(point_attributes));
 ["id", "createdAt", "updatedAt"].forEach((key) => patchable_fields.delete(key));
 
-
-function dbErrorHandler(error: unknown) {
-  if (error instanceof SequelizeValidationError) {
-    throw new createHttpError.BadRequest(
-      `${error.message} with fields: ${error.errors.map((e) => `* ${e.path} - ${e.message}`).join("; ")}`
-    );
-  } else if (error instanceof SequelizeForeignKeyConstraintError) {
-    if (error.fields instanceof Array) {
-      throw new createHttpError.BadRequest(`Invalid foreign key(s) provided for field(s): ${error.fields.join(", ")}`);
-    } else {
-      throw new createHttpError.BadRequest(error.message);
-    }
-  }
-  throw error;
-}
 
 const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
 point_transform_factories.set("redeemer_id", (value) => {
@@ -87,12 +68,7 @@ export async function createPoint(request: Request, response: Response, next: Ne
     throw new createHttpError.UnprocessableEntity("You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.");
   }
 
-  let new_instance;
-  try {
-    new_instance = await Point.create(request.body);
-  } catch (error) {
-    dbErrorHandler(error);
-  }
+  const new_instance = await Point.create(request.body);  // database/sequelize errors thrown to error_handling.ts
 
   response.status(200);
   response.json({ status: response.statusCode, message: "OK", data: new_instance });
@@ -146,12 +122,7 @@ export async function patchPointDetails(request: Request, response: Response, ne
   const found_point = await Point.findByPk(point_id, {
     rejectOnEmpty: new NullError(),
   });
-
-  try {
-    await found_point.update(request.body);
-  } catch (error) {
-    dbErrorHandler(error);
-  }
+  await found_point.update(request.body);  // database/sequelize errors thrown to error_handling.ts
 
   response.status(200);
   response.json({ status: response.statusCode, message: "OK", data: found_point });
