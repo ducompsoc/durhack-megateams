@@ -6,8 +6,7 @@ import {
   parseRouteId
 } from "@server/common/middleware";
 
-import * as handlers from "./point_handlers";
-
+import handlers from "./point_handlers";
 
 
 const points_router = ExpressRouter();
