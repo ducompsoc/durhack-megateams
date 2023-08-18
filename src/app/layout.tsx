@@ -1,5 +1,7 @@
 import "./globals.scss";
-import { Inter } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
+
+const headings = Space_Grotesk({ subsets: ["latin"], variable: "--durhack-font" });
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={inter.className + " h-full"}>{children}</body>
+      <body className={inter.className + " h-full " + headings.variable}>{children}</body>
     </html>
   );
 }
