@@ -17,96 +17,132 @@ const qr_attributes = QRCode.getAttributes();
 const allowed_create_fields = new Set(Object.keys(qr_attributes));
 allowed_create_fields.delete("createdAt");
 allowed_create_fields.delete("updatedAt");
+allowed_create_fields.delete("payload");
 
-const patch_fields = new Set(["state"]);
+const patch_fields = new Set(["state", "publicised"]);
 
-async function handleQRCreation(request: Request, response: Response) {
-  const invalid_fields = Object.keys(request.body).filter((key) => !allowed_create_fields.has(key));
-  if (invalid_fields.length > 0) {
-    throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
-  }
-
-  request.body.payload = uuid();
-
-  let new_instance;
-  try {
-    new_instance = await QRCode.create(request.body);
-  } catch (error) {
-    if (error instanceof SequelizeValidationError) {
-      throw new createHttpError.BadRequest(error.message);
+class QRHandlers {
+  async handleQRCreation(request: Request, response: Response) {
+    const invalid_fields = Object.keys(request.body).filter((key) => !allowed_create_fields.has(key));
+    if (invalid_fields.length > 0) {
+      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
     }
-    throw error;
+
+    request.body.payload = uuid();
+
+    let new_instance = await QRCode.create(request.body);
+
+    response.status(200);
+    response.json({ status: response.statusCode, message: "OK", data: new_instance });
   }
 
-  response.status(200);
-  response.json({ status: response.statusCode, message: "OK", data: new_instance });
-}
+  @requireUserIsAdmin
+  async getQRCodeList(_request: Request, response: Response): Promise<void> {
+    const result = await QRCode.findAll({ include: [Point, User] });
 
-export async function getQRCodeList(_request: Request, response: Response): Promise<void> {
-  const result = await QRCode.findAll({ include: [Point, User] });
+    const payload = result.map((code: QRCode) => ({
+      id: code.id,
+      name: code.name,
+      category: code.category,
+      scans: code.uses?.length || 0,
+      max_scans: code.max_uses,
+      creator: code.creator.full_name,
+      value: code.points_value,
+      start: code.start_time,
+      end: code.expiry_time,
+      enabled: code.state,
+      uuid: code.payload,
+      publicised: code.challenge_rank ? true : false,
+    }));
 
-  const payload = result.map((code: QRCode) => ({
-    name: code.name,
-    category: code.category,
-    scans: code.uses?.length || 0,
-    max_scans: code.max_uses,
-    creator: code.creator.full_name,
-    value: code.points_value,
-    start: code.start_time,
-    end: code.expiry_time,
-    enabled: code.state,
-    uuid: code.payload,
-    publicised: code.challenge_rank ? true : false,
-  }));
-
-  response.status(200);
-  response.json({
-    status: 200,
-    message: "OK",
-    codes: payload,
-  });
-}
-
-export async function createQRCode(request: Request, response: Response, next: NextFunction): Promise<void> {
-  if (!response.locals.isAdminRequest && !response.locals.isVolunteerRequest) {
-    return next();
+    response.status(200);
+    response.json({
+      status: 200,
+      message: "OK",
+      codes: payload,
+    });
   }
-  await handleQRCreation(request, response);
-}
 
-export async function getQRCodeDetails(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
-
-export async function patchQRCodeDetails(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
-
-export async function getPresets(_request: Request, response: Response): Promise<void> {
-  response.status(200);
-  response.json({
-    status: 200,
-    message: "OK", presets
-  });
-}
-
-export async function usePreset(request: Request, response: Response): Promise<void> {
-  const presetName = request.params.preset;
-  if (!presetName || !presets.hasOwnProperty(presetName)) {
-    throw new createHttpError.BadRequest();
+  @requireUserIsAdmin
+  async createQRCode(request: Request, response: Response, next: NextFunction): Promise<void> {
+    if (!response.locals.isAdminRequest && !response.locals.isVolunteerRequest) {
+      return next();
+    }
+    await this.handleQRCreation(request, response);
   }
-  const preset = presets[presetName];
-  let expiry = new Date();
-  expiry.setMinutes(expiry.getMinutes() + preset.minutesValid);
-  request.body = {
-    name: preset.name,
-    points_value: preset.points,
-    max_uses: preset.uses,
-    category: "preset",
-    state: true,
-    creator_id: request.user!.id,
-    start_time: new Date(),
-    expiry_time: expiry,
-  };
-  await handleQRCreation(request, response);
+
+  async patchQRCodeDetails(request: Request, response: Response): Promise<void> {
+    const { qr_code_id } = response.locals;
+    if (typeof qr_code_id !== "number") throw new Error("Parsed `qr_code_id` not found.");
+
+    const invalid_fields = Object.keys(request.body).filter((key) => !patch_fields.has(key));
+    if (invalid_fields.length > 0) {
+      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
+    }
+
+    const found_code = await QRCode.findByPk(qr_code_id, {
+      rejectOnEmpty: new NullError(),
+    });
+
+    try {
+      const fields = { challenge_rank: found_code.challenge_rank };
+
+      if (request.body.hasOwnProperty("publicised")) {
+        if (!request.body.publicised) {
+          fields.challenge_rank = undefined;
+        } else {
+          if (!found_code.challenge_rank) {
+            let maxRank: number = await QRCode.max("challenge_rank");
+            if (maxRank) {
+              fields.challenge_rank = maxRank + 1;
+            } else {
+              fields.challenge_rank = 1;
+            }
+          }
+        }
+      }
+
+      await found_code.update({ state: request.body.state, ...fields });
+    } catch (error) {
+      if (error instanceof SequelizeValidationError) {
+        throw new createHttpError.BadRequest(error.message);
+      }
+      throw error;
+    }
+
+    response.status(200);
+    response.json({ status: response.statusCode, message: "OK", data: found_code });
+  }
+
+  async getPresets(_request: Request, response: Response): Promise<void> {
+    response.status(200);
+    response.json({
+      status: 200,
+      message: "OK", presets
+    });
+  }
+
+  async usePreset(request: Request, response: Response): Promise<void> {
+    const presetName = request.params.preset;
+    if (!presetName || !presets.hasOwnProperty(presetName)) {
+      throw new createHttpError.BadRequest();
+    }
+    const preset = presets[presetName];
+    let expiry = new Date();
+    expiry.setMinutes(expiry.getMinutes() + preset.minutesValid);
+    request.body = {
+      name: preset.name,
+      points_value: preset.points,
+      max_uses: preset.uses,
+      category: "preset",
+      state: true,
+      creator_id: request.user!.id,
+      start_time: new Date(),
+      expiry_time: expiry,
+    };
+    await this.handleQRCreation(request, response);
+  }
 }
+
+const handlersInstance = new QRHandlers();
+export default handlersInstance;
