@@ -23,7 +23,6 @@ qr_codes_router.route("/:qr_code_id")
   .all(parseRouteId("qr_code_id"))
   .get(handlers.getQRCodeDetails)
   .patch(handlers.patchQRCodeDetails)
-  .delete(handlers.deleteQRCode)
   .all(handleMethodNotAllowed);
 
 export default qr_codes_router;
