@@ -4,9 +4,11 @@ import { ValidationError as SequelizeValidationError } from "sequelize";
 import { readFileSync } from "fs";
 import { v4 as uuid } from "uuid";
 import path from "path";
-
 import { NullError, ValueError } from "@server/common/errors";
 import QRCode from "@server/database/qr_code";
+import Point from "@server/database/point";
+import User from "@server/database/user";
+import { requireUserIsAdmin, requireUserIsVolunteer, requireUserIsSponsor } from "@server/common/decorators";
 
 const presets = JSON.parse(readFileSync(path.join(__dirname, './QR_presets.json')).toString());
 
@@ -40,15 +42,28 @@ async function handleQRCreation(request: Request, response: Response) {
   response.json({ status: response.statusCode, message: "OK", data: new_instance });
 }
 
-export async function getQRCodeList(request: Request, response: Response): Promise<void> {
-  const result = await QRCode.findAll({
-    attributes: ["id", "name"]
-  });
+export async function getQRCodeList(_request: Request, response: Response): Promise<void> {
+  const result = await QRCode.findAll({ include: [Point, User] });
+
+  const payload = result.map((code: QRCode) => ({
+    name: code.name,
+    category: code.category,
+    scans: code.uses?.length || 0,
+    max_scans: code.max_uses,
+    creator: code.creator.full_name,
+    value: code.points_value,
+    start: code.start_time,
+    end: code.expiry_time,
+    enabled: code.state,
+    uuid: code.payload,
+    publicised: code.challenge_rank ? true : false,
+  }));
+
   response.status(200);
   response.json({
     status: 200,
     message: "OK",
-    codes: result,
+    codes: payload,
   });
 }
 
@@ -67,11 +82,7 @@ export async function patchQRCodeDetails(request: Request, response: Response): 
   throw new createHttpError.NotImplemented();
 }
 
-export async function deleteQRCode(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
-
-export async function getPresets(request: Request, response: Response): Promise<void> {
+export async function getPresets(_request: Request, response: Response): Promise<void> {
   response.status(200);
   response.json({
     status: 200,
@@ -79,11 +90,7 @@ export async function getPresets(request: Request, response: Response): Promise<
   });
 }
 
-export async function usePreset(request: Request, response: Response, next: NextFunction): Promise<void> {
-  const { isAdminRequest, isVolunteerRequest, isSponsorRequest } = response.locals;
-  if (!isAdminRequest && !isVolunteerRequest && !isSponsorRequest) {
-    return next();
-  }
+export async function usePreset(request: Request, response: Response): Promise<void> {
   const presetName = request.params.preset;
   if (!presetName || !presets.hasOwnProperty(presetName)) {
     throw new createHttpError.BadRequest();
