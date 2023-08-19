@@ -1,27 +1,64 @@
 import { Router as ExpressRouter } from "express";
 
 import handlers from "./qr_code_handlers";
-import { handleMethodNotAllowed, parseRouteId } from "@server/common/middleware";
-
+import {
+  handleFailedAuthentication,
+  handleMethodNotAllowed,
+  parseRouteId,
+} from "@server/common/middleware";
 
 const qr_codes_router = ExpressRouter();
 
-qr_codes_router.route("/")
-  .get(handlers.getQRCodeList)
-  .post(handlers.createQRCode)
+qr_codes_router
+  .route("/")
+  .get(handlers.getQRCodeList, handleFailedAuthentication)
+  .post(handlers.createQRCode, handleFailedAuthentication)
   .all(handleMethodNotAllowed);
 
-qr_codes_router.route("/preset")
-  .get(handlers.getPresets)
+qr_codes_router
+  .route("/preset")
+  .get(
+    handlers.getPresetsAdmin,
+    handlers.getPresetsVolunteer,
+    handlers.getPresetsSponsor,
+    handleFailedAuthentication
+  )
   .all(handleMethodNotAllowed);
 
-qr_codes_router.route("/preset/:preset")
-  .post(handlers.usePreset)
+qr_codes_router
+  .route("/preset/:preset")
+  .post(
+    handlers.usePresetAdmin,
+    handlers.usePresetVolunteer,
+    handlers.usePresetSponsor,
+    handleFailedAuthentication
+  )
   .all(handleMethodNotAllowed);
 
-qr_codes_router.route("/:qr_code_id")
+qr_codes_router
+  .route("/:qr_code_id")
   .all(parseRouteId("qr_code_id"))
-  .patch(handlers.patchQRCodeDetails)
+  .patch(
+    handlers.patchQRAdmin,
+    handlers.patchQRVolunteer,
+    handlers.patchQRSponsor,
+    handleFailedAuthentication
+  )
+  .all(handleMethodNotAllowed);
+
+qr_codes_router
+  .route("/redeem")
+  .post(handlers.redeemQR)
+  .all(handleMethodNotAllowed);
+
+qr_codes_router
+  .route("/challenges")
+  .get(
+    handlers.getChallengeListAdmin,
+    handlers.getChallengeListUser,
+    handleMethodNotAllowed
+  )
+  .post(handlers.reorderChallengeList)
   .all(handleMethodNotAllowed);
 
 export default qr_codes_router;
