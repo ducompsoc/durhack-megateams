@@ -1,6 +1,6 @@
 import { Router as ExpressRouter } from "express";
 
-import * as handlers from "./qr_code_handlers";
+import handlers from "./qr_code_handlers";
 import { handleMethodNotAllowed, parseRouteId } from "@server/common/middleware";
 
 
@@ -21,7 +21,6 @@ qr_codes_router.route("/preset/:preset")
 
 qr_codes_router.route("/:qr_code_id")
   .all(parseRouteId("qr_code_id"))
-  .get(handlers.getQRCodeDetails)
   .patch(handlers.patchQRCodeDetails)
   .all(handleMethodNotAllowed);
 
