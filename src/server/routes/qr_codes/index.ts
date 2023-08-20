@@ -36,17 +36,6 @@ qr_codes_router
   .all(handleMethodNotAllowed);
 
 qr_codes_router
-  .route("/:qr_code_id")
-  .all(parseRouteId("qr_code_id"))
-  .patch(
-    handlers.patchQRAdmin,
-    handlers.patchQRVolunteer,
-    handlers.patchQRSponsor,
-    handleFailedAuthentication
-  )
-  .all(handleMethodNotAllowed);
-
-qr_codes_router
   .route("/redeem")
   .post(handlers.redeemQR)
   .all(handleMethodNotAllowed);
@@ -56,9 +45,20 @@ qr_codes_router
   .get(
     handlers.getChallengeListAdmin,
     handlers.getChallengeListUser,
-    handleMethodNotAllowed
+    handleFailedAuthentication
   )
   .post(handlers.reorderChallengeList)
+  .all(handleMethodNotAllowed);
+
+qr_codes_router
+  .route("/:qr_code_id")
+  .all(parseRouteId("qr_code_id"))
+  .patch(
+    handlers.patchQRAdmin,
+    handlers.patchQRVolunteer,
+    handlers.patchQRSponsor,
+    handleFailedAuthentication
+  )
   .all(handleMethodNotAllowed);
 
 export default qr_codes_router;
