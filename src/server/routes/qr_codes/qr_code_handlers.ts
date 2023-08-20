@@ -27,6 +27,7 @@ allowed_create_fields.delete("createdAt");
 allowed_create_fields.delete("updatedAt");
 allowed_create_fields.delete("payload");
 allowed_create_fields.delete("creator_id");
+allowed_create_fields.add("publicised");
 
 const patch_fields = new Set(["state", "publicised"]);
 
@@ -51,7 +52,15 @@ class QRHandlers {
     request.body.payload = uuid();
     request.body.creator_id = request.user?.id;
 
-    let new_instance = await QRCode.create(request.body);
+    const publicisedFields = await this.getPublicisedFields(
+      undefined,
+      request.body.publicised
+    );
+console.warn(publicisedFields)
+    let new_instance = await QRCode.create({
+      ...request.body,
+      ...publicisedFields,
+    });
 
     response.status(200);
     response.json({
@@ -83,6 +92,7 @@ class QRHandlers {
       state: true,
       start_time: new Date(),
       expiry_time: expiry,
+      publicised: request.body.publicised,
     };
     await this.handleQRCreation(request, response);
   }
@@ -129,6 +139,28 @@ class QRHandlers {
     });
   }
 
+  private async getPublicisedFields(
+    existing_rank: number | undefined,
+    publicised: boolean
+  ) {
+    let fields = { challenge_rank: existing_rank };
+
+    if (!publicised) {
+      fields.challenge_rank = undefined;
+    } else {
+      if (!existing_rank) {
+        let maxRank: number = await QRCode.max("challenge_rank");
+        if (maxRank) {
+          fields.challenge_rank = maxRank + 1;
+        } else {
+          fields.challenge_rank = 0;
+        }
+      }
+    }
+
+    return fields;
+  }
+
   private async patchQRCodeDetails(
     request: Request,
     response: Response
@@ -148,21 +180,13 @@ class QRHandlers {
       rejectOnEmpty: new NullError(),
     });
 
-    const fields = { challenge_rank: found_code.challenge_rank };
+    let fields;
 
     if (request.body.hasOwnProperty("publicised")) {
-      if (!request.body.publicised) {
-        fields.challenge_rank = undefined;
-      } else {
-        if (!found_code.challenge_rank) {
-          let maxRank: number = await QRCode.max("challenge_rank");
-          if (maxRank) {
-            fields.challenge_rank = maxRank + 1;
-          } else {
-            fields.challenge_rank = 1;
-          }
-        }
-      }
+      fields = await this.getPublicisedFields(
+        found_code.challenge_rank,
+        request.body.publicised
+      );
     }
 
     await found_code.update({ state: request.body.state, ...fields });
