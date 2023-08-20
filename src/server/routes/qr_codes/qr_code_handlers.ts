@@ -31,6 +31,15 @@ allowed_create_fields.delete("creator_id");
 const patch_fields = new Set(["state", "publicised"]);
 
 class QRHandlers {
+  constructor() {
+    Object.getOwnPropertyNames(QRHandlers.prototype).forEach((key) => {
+      if (key !== "constructor") {
+        // @ts-ignore
+        this[key] = this[key].bind(this);
+      }
+    });
+  }
+
   private async handleQRCreation(request: Request, response: Response) {
     const invalid_fields = Object.keys(request.body).filter(
       (key) => !allowed_create_fields.has(key)
@@ -78,18 +87,18 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  usePresetAdmin(request: Request, response: Response) {
-    this.handlePresetCreation(request, response);
+  async usePresetAdmin(request: Request, response: Response) {
+    await this.handlePresetCreation(request, response);
   }
 
   @requireUserIsSponsor
-  usePresetSponsor(request: Request, response: Response) {
-    this.handlePresetCreation(request, response);
+  async usePresetSponsor(request: Request, response: Response) {
+    await this.handlePresetCreation(request, response);
   }
 
   @requireUserIsVolunteer
-  usePresetVolunteer(request: Request, response: Response) {
-    this.handlePresetCreation(request, response);
+  async usePresetVolunteer(request: Request, response: Response) {
+    await this.handlePresetCreation(request, response);
   }
 
   @requireUserIsAdmin
@@ -166,18 +175,18 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  patchQRAdmin(request: Request, response: Response) {
-    this.patchQRCodeDetails(request, response);
+  async patchQRAdmin(request: Request, response: Response) {
+    await this.patchQRCodeDetails(request, response);
   }
 
   @requireUserIsSponsor
-  patchQRSponsor(request: Request, response: Response) {
-    this.patchQRCodeDetails(request, response);
+  async patchQRSponsor(request: Request, response: Response) {
+    await this.patchQRCodeDetails(request, response);
   }
 
   @requireUserIsVolunteer
-  patchQRVolunteer(request: Request, response: Response) {
-    this.patchQRCodeDetails(request, response);
+  async patchQRVolunteer(request: Request, response: Response) {
+    await this.patchQRCodeDetails(request, response);
   }
 
   private getPresets(_request: Request, response: Response) {
@@ -190,17 +199,17 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  async getPresetsAdmin(request: Request, response: Response) {
+  getPresetsAdmin(request: Request, response: Response) {
     this.getPresets(request, response);
   }
 
   @requireUserIsVolunteer
-  async getPresetsVolunteer(request: Request, response: Response) {
+  getPresetsVolunteer(request: Request, response: Response) {
     this.getPresets(request, response);
   }
 
   @requireUserIsSponsor
-  async getPresetsSponsor(request: Request, response: Response) {
+  getPresetsSponsor(request: Request, response: Response) {
     this.getPresets(request, response);
   }
 
@@ -272,18 +281,18 @@ class QRHandlers {
     await this.getChallengeList(request, response, false);
   }
 
-  private challengeList = z.array(
-    z.object({
-      id: z.number(),
-      rank: z.number(),
-    })
-  );
-
   @requireUserIsAdmin
   async reorderChallengeList(request: Request, response: Response) {
+    const challengeList = z.array(
+      z.object({
+        id: z.number(),
+        rank: z.number(),
+      })
+    );
+
     if (
       !request.body.hasOwnProperty("challenges") ||
-      !this.challengeList.safeParse(request.body.challenges).success
+      !challengeList.safeParse(request.body.challenges).success
     ) {
       throw new createHttpError.BadRequest();
     }
