@@ -68,14 +68,15 @@ class QRHandlers {
 
   private async handlePresetCreation(request: Request, response: Response) {
     const presetName = request.params.preset;
-    if (!presetName || !presets.hasOwnProperty(presetName)) {
+    const name = request.body.name;
+    if (!presetName || !presets.hasOwnProperty(presetName) || !name) {
       throw new createHttpError.BadRequest();
     }
     const preset = presets[presetName];
     let expiry = new Date();
     expiry.setMinutes(expiry.getMinutes() + preset.minutesValid);
     request.body = {
-      name: preset.name,
+      name: name,
       points_value: preset.points,
       max_uses: preset.uses,
       category: "preset",
