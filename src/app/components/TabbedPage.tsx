@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from "@headlessui/react";
@@ -9,7 +8,12 @@ import { Fragment, useState } from "react";
 
 interface Tab {
   path: string;
-  icon: React.ReactNode;
+  icon: React.ForwardRefExoticComponent<
+    Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
+      title?: string | undefined;
+      titleId?: string | undefined;
+    } & React.RefAttributes<SVGSVGElement>
+  >;
   openNewWindow?: boolean;
 }
 
@@ -28,17 +32,22 @@ export default function TabbedPage({
   return (
     <>
       <div className="h-full flex flex-col text-black">
-        <div className="flex flex-row py-4 px-6 items-center justify-center border-b border-black justify-evenly">
-          <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
-          <h1 className="text-4xl font-bold">DurHack</h1>
+        <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
+          <object
+            data="/logo.svg"
+            type="image/svg+xml"
+            className="w-16 h-16"
+          >
+            <img src="/logo.png" />
+          </object>
+          <h1 className="text-4xl font-bold font-heading">DurHack</h1>
           <button onClick={() => setOpen(true)}>
             <ArrowRightOnRectangleIcon className="w-12 h-12" />
           </button>
         </div>
-        <div className="p-6 grow overflow-auto">{children}</div>
+        <div className="p-6 pt-0 grow overflow-auto">{children}</div>
         {showTabs && (
-          <div className="flex">
-            <span className="md:grow border border-black border-r-0 md:border-r"></span>
+          <div className="flex gap-1 border-t border-gray-200">
             {tabs.map((tab) => {
               const active = tab.path === path;
 
@@ -47,16 +56,14 @@ export default function TabbedPage({
                   href={tab.path}
                   key={tab.path}
                   target={tab.openNewWindow ? "_blank" : undefined}
-                  className={
-                    "w-full md:w-fit py-4 md:px-6 border border-black border-l-0 flex justify-center " +
-                    (active ? "bg-blue-200" : "bg-gray-200")
-                  }
+                  className="w-full py-4 flex justify-center"
                 >
-                  {tab.icon}
+                  <tab.icon
+                    className={"w-8 h-8 " + (active ? "stroke-accent" : "")}
+                  />
                 </Link>
               );
             })}
-            <span className="md:grow border border-black border-l-0 border-r-0 md:border-r"></span>
           </div>
         )}
       </div>

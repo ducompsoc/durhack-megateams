@@ -18,25 +18,25 @@ export default function VolunteerLayout({
   const [isAdmin] = useState(true);
 
   const tabs = [
-    { icon: <QrCodeIcon className="w-10 h-10" />, path: "/volunteer" },
+    { icon: QrCodeIcon, path: "/volunteer" },
     {
-      icon: <ChartBarIcon className="w-10 h-10" />,
+      icon: ChartBarIcon,
       path: "/volunteer/leaderboard",
     },
     {
-      icon: <UserGroupIcon className="w-10 h-10" />,
+      icon: UserGroupIcon,
       path: "/volunteer/teams",
     },
     ...(isAdmin
       ? [
           {
-            icon: <NewspaperIcon className="w-10 h-10" />,
+            icon: NewspaperIcon,
             path: "/volunteer/challenges",
           },
         ]
       : []),
     {
-      icon: <ScaleIcon className="w-10 h-10" />,
+      icon: ScaleIcon,
       path: "/volunteer/admin",
     },
   ];

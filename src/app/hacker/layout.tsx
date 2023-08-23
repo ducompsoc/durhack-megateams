@@ -7,7 +7,6 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import TabbedPage from "../components/TabbedPage";
-import TeamSetup from "./TeamSetup";
 import { useState } from "react";
 
 export default function HackerLayout({
@@ -17,19 +16,19 @@ export default function HackerLayout({
 }) {
   const tabs = [
     {
-      icon: <HomeIcon className="w-10 h-10" />,
+      icon: HomeIcon,
       path: "/hacker",
     },
     {
-      icon: <ChartBarIcon className="w-10 h-10" />,
+      icon: ChartBarIcon,
       path: "/hacker/leaderboard",
     },
     {
-      icon: <UserGroupIcon className="w-10 h-10" />,
+      icon: UserGroupIcon,
       path: "/hacker/team",
     },
     {
-      icon: <CogIcon className="w-10 h-10" />,
+      icon: CogIcon,
       path: "https://durhack.com/",
       openNewWindow: true,
     },
@@ -37,9 +36,9 @@ export default function HackerLayout({
 
   const [hasTeam] = useState(true);
 
-  return hasTeam ? (
-    <TabbedPage tabs={tabs}>{children}</TabbedPage>
-  ) : (
-    <TabbedPage tabs={tabs} showTabs={false}><TeamSetup /></TabbedPage>
+  return (
+    <TabbedPage tabs={tabs} showTabs={hasTeam}>
+      {children}
+    </TabbedPage>
   );
 }
