@@ -71,3 +71,12 @@ export function parseRouteId(key: string) {
     setLocalValue(key)       // returns a function that takes a response and a value and sets the response's local key to the value
   );
 }
+
+export function useSelfId(request: Request, response: Response, next: NextFunction): void {
+  if (!request.user) {
+    throw new createHttpError.Unauthorized();
+  }
+
+  response.locals.user_id = request.user.id;
+  next();
+}

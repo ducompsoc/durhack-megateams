@@ -2,6 +2,13 @@ import session, { MemoryStore, Store, SessionOptions } from "express-session";
 import * as constructor_session from "express-session";
 import MySQLStoreMeta, { MySQLStore as MySQLStoreType } from "express-mysql-session";
 
+// Augment express-session with a custom SessionData object
+declare module "express-session" {
+  interface SessionData {
+    generatedTeamName?: string
+  }
+}
+
 function get_mysql_session_store(): MySQLStoreType {
   const MySQLStore = MySQLStoreMeta(constructor_session);
 
