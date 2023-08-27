@@ -25,6 +25,12 @@ export default class Team extends Model {
     type: DataType.INTEGER,
     allowNull: false,
     unique: true,
+    get() {
+      return this.getDataValue("join_code")
+        .toString(16)
+        .padStart(4, "0")
+        .toUpperCase();
+    },
   })
   join_code!: number;
 
@@ -32,6 +38,7 @@ export default class Team extends Model {
     field: "team_name",
     type: DataType.STRING,
     allowNull: false,
+    unique: true,
   })
   name!: string;
 

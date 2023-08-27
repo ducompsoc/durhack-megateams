@@ -13,6 +13,9 @@ import Team from "@server/database/team";
 import { requireUserIsAdmin, requireSelf } from "@server/common/decorators";
 import User from "@server/database/user";
 import sequelize from "@server/database";
+import Area from "@server/database/area";
+import Megateam from "@server/database/megateam";
+import Point from "@server/database/point";
 
 class TeamHandlers {
   @requireSelf
@@ -23,7 +26,18 @@ class TeamHandlers {
     }
 
     const result = await User.findByPk(user_id, {
-      include: [Team],
+      include: [
+        {
+          model: Team,
+          include: [
+            User,
+            {
+              model: Area,
+              include: [Megateam],
+            },
+          ],
+        },
+      ],
       rejectOnEmpty: new NullError(),
     });
 
@@ -38,9 +52,9 @@ class TeamHandlers {
 
     const payload = {
       name: team.name,
-      members: team.members?.map((member) => member.id),
-      megateam: team.area?.megateam.name,
-      joinCode: team.join_code.toString(16).padStart(4, "0").toUpperCase(),
+      members: team.members?.map((member) => member.id) || [],
+      megateam: team.area?.megateam.name || null,
+      joinCode: team.join_code,
     };
 
     res.json({
@@ -98,6 +112,7 @@ class TeamHandlers {
       });
 
       let teamCreated = false;
+      // Don't just keep trying forever, the user can always resend the request if this fails
       for (let i = 1; !teamCreated && i < 10; i++) {
         try {
           team.join_code = randomValue;
@@ -149,12 +164,85 @@ class TeamHandlers {
   }
 
   async listTeamsDefault(req: Request, res: Response) {
-    throw new createHttpError.NotImplemented();
+    const result = await Team.findAll({
+      attributes: [
+        "team_id",
+        "name",
+        [sequelize.fn("sum", sequelize.col("members.points.value")), "points"],
+      ],
+      include: [
+        {
+          model: User,
+          include: [
+            {
+              model: Point,
+              attributes: [],
+            },
+          ],
+          attributes: [],
+        },
+      ],
+      group: "team.team_id",
+    });
+
+    const payload = result.map((team) => {
+      let json = team.toJSON();
+      json.points = json.points || 0;
+      return json;
+    });
+
+    res.json({
+      status: 200,
+      message: "OK",
+      teams: payload,
+    });
   }
 
   @requireUserIsAdmin
   async listTeamsAdmin(req: Request, res: Response) {
-    throw new createHttpError.NotImplemented();
+    const result = await Team.findAll({
+      attributes: [
+        "team_id",
+        "name",
+        "join_code",
+        [sequelize.fn("sum", sequelize.col("members.points.value")), "points"],
+      ],
+      include: [
+        {
+          model: User,
+          include: [
+            {
+              model: Point,
+              attributes: [],
+            },
+          ],
+          attributes: [],
+        },
+        {
+          model: Area,
+          include: [
+            {
+              model: Megateam,
+              attributes: ["megateam_id", "megateam_name"],
+            },
+          ],
+          attributes: ["area_id", "area_name"],
+        },
+      ],
+      group: "team.team_id",
+    });
+
+    const payload = result.map((team) => {
+      let json = team.toJSON();
+      json.points = json.points || 0;
+      return json;
+    });
+
+    res.json({
+      status: 200,
+      message: "OK",
+      teams: payload,
+    });
   }
 
   @requireUserIsAdmin
