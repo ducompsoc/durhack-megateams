@@ -1,4 +1,12 @@
-import {DataType, Table, Column, Model, HasMany, BelongsTo, ForeignKey} from "sequelize-typescript";
+import {
+  DataType,
+  Table,
+  Column,
+  Model,
+  HasMany,
+  BelongsTo,
+  ForeignKey,
+} from "sequelize-typescript";
 
 import Area from "./area";
 import User from "./user";
@@ -11,32 +19,31 @@ export default class Team extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-    id!: number;
+  id!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    unique: true,
+  })
+  join_code!: number;
 
   @Column({
     field: "team_name",
     type: DataType.STRING,
-    allowNull: false
+    allowNull: false,
   })
-    name!: string;
+  name!: string;
 
   @ForeignKey(() => Area)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
-    area_id?: number;
+  area_id?: number;
   @BelongsTo(() => Area, "area_id")
-    area?: Area;
+  area?: Area;
 
   @HasMany(() => User)
-    members?: User[];
-
-  static async listTeams(): Promise<Pick<Team, "id" | "name">[]> {
-    throw new Error("Not implemented.");
-  }
-
-  static async getTeam(id: number): Promise<Team> {
-    throw new Error("Not implemented.");
-  }
+  members?: User[];
 }
