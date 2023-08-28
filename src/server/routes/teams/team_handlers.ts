@@ -194,7 +194,6 @@ class TeamHandlers {
   async listTeamsDefault(req: Request, res: Response) {
     const result = await Team.findAll({
       attributes: [
-        "team_id",
         "name",
         [sequelize.fn("sum", sequelize.col("members.points.value")), "points"],
       ],
@@ -275,7 +274,23 @@ class TeamHandlers {
 
   @requireUserIsAdmin
   async patchTeamAdmin(req: Request, res: Response) {
-    throw new createHttpError.NotImplemented();
+    const { team_id } = res.locals;
+    if (typeof team_id !== "number") {
+      throw new Error("Parsed `team_id` not found.");
+    }
+    const areaCode = z.number();
+
+    const result = areaCode.safeParse(req.body.area_code);
+    if (!result.success) throw new createHttpError.BadRequest();
+
+    let team = await Team.findByPk(team_id, { rejectOnEmpty: new NullError() });
+    team.area_id = result.data;
+    await team.save();
+
+    res.json({
+      status: 200,
+      message: "OK",
+    });
   }
 }
 
