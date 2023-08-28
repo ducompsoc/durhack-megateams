@@ -7,6 +7,7 @@ import {
 } from "unique-names-generator";
 import { getRandomValues } from "crypto";
 import { ValidationError as SequelizeValidationError } from "sequelize";
+import { z } from "zod";
 
 import { NullError } from "@server/common/errors";
 import Team from "@server/database/team";
@@ -71,11 +72,12 @@ class TeamHandlers {
       throw new Error("Parsed `user_id` not found.");
     }
 
-    const user = await User.findByPk(user_id, {
-      rejectOnEmpty: new NullError(),
-    });
-    user.team_id = undefined;
-    await user.save();
+    await User.update(
+      { team_id: null },
+      {
+        where: { user_id },
+      }
+    );
 
     res.json({
       status: 200,
@@ -85,7 +87,33 @@ class TeamHandlers {
 
   @requireSelf
   async joinTeam(req: Request, res: Response) {
-    throw new createHttpError.NotImplemented();
+    const { user_id } = res.locals;
+    if (typeof user_id !== "number") {
+      throw new Error("Parsed `user_id` not found.");
+    }
+
+    const joinCode = z
+      .string()
+      .refine((val) => val.length === 4)
+      .transform((val) => parseInt(val, 16))
+      .refine((val) => !isNaN(val));
+
+    const result = joinCode.safeParse(req.body.join_code);
+    if (!result.success) throw new createHttpError.BadRequest();
+
+    let team = await Team.findOne({
+      where: { join_code: result.data },
+      rejectOnEmpty: new NullError(),
+    });
+    let user = await User.findByPk(user_id, { rejectOnEmpty: new NullError() });
+
+    user.team_id = team.id;
+    await user.save();
+
+    res.json({
+      status: 200,
+      message: "OK",
+    });
   }
 
   @requireSelf
