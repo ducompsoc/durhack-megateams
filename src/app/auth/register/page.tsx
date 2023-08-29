@@ -15,7 +15,7 @@ export default function Register() {
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="flex flex-row py-4 px-6 items-center justify-center justify-center mb-4 pt-0">
         <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />
-        <h1 className="text-4xl font-bold ml-4">DurHack</h1>
+        <h1 className="text-4xl font-bold ml-4 font-heading">DURHACK</h1>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">

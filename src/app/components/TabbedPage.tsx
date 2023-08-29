@@ -40,7 +40,7 @@ export default function TabbedPage({
           >
             <img src="/logo.png" />
           </object>
-          <h1 className="text-4xl font-bold font-heading">DurHack</h1>
+          <h1 className="text-3xl font-bold font-heading">DURHACK</h1>
           <button onClick={() => setOpen(true)}>
             <ArrowRightOnRectangleIcon className="w-12 h-12" />
           </button>

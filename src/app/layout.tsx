@@ -1,7 +1,11 @@
 import "./globals.scss";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Audiowide, Inter } from "next/font/google";
 
-const headings = Space_Grotesk({ subsets: ["latin"], variable: "--durhack-font" });
+const headings = Audiowide({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--durhack-font",
+});
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={inter.className + " h-full " + headings.variable}>{children}</body>
+      <body className={inter.className + " h-full " + headings.variable}>
+        {children}
+      </body>
     </html>
   );
 }
