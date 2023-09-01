@@ -277,8 +277,14 @@ class QRHandlers {
     response: Response,
     includeId: boolean
   ) {
+    const now = new Date();
     let challenges = await QRCode.findAll({
-      where: { challenge_rank: { [Op.ne]: null } },
+      where: {
+        challenge_rank: { [Op.ne]: null },
+        state: true,
+        start_time: { [Op.lt]: now },
+        expiry_time: { [Op.gt]: now },
+      },
     });
 
     challenges.sort((a, b) => a.challenge_rank! - b.challenge_rank!);
