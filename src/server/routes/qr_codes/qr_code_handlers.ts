@@ -243,27 +243,37 @@ class QRHandlers {
       throw new createHttpError.BadRequest();
     }
 
-    let qr = await QRCode.findOne({
-      where: { payload: request.body.uuid },
-      include: [Point],
-      rejectOnEmpty: new createHttpError.BadRequest(),
-    });
+    const t = await sequelize.transaction();
 
-    let now = new Date();
-    if (
-      now < qr.start_time ||
-      now > qr.expiry_time ||
-      !qr.state ||
-      (qr.uses?.length || 0) >= qr.max_uses
-    ) {
-      throw new createHttpError.BadRequest();
+    let qr;
+    try {
+      qr = await QRCode.findOne({
+        where: { payload: request.body.uuid },
+        include: [Point],
+        rejectOnEmpty: new createHttpError.BadRequest(),
+      });
+
+      let now = new Date();
+      if (
+        now < qr.start_time ||
+        now > qr.expiry_time ||
+        !qr.state ||
+        (qr.uses?.length || 0) >= qr.max_uses
+      ) {
+        throw new createHttpError.BadRequest();
+      }
+
+      await Point.create({
+        value: qr.points_value,
+        origin_qrcode_id: qr.id,
+        redeemer_id: request.user?.id,
+      });
+
+      await t.commit();
+    } catch (error) {
+      await t.rollback();
+      throw error;
     }
-
-    await Point.create({
-      value: qr.points_value,
-      origin_qrcode_id: qr.id,
-      redeemer_id: request.user?.id,
-    });
 
     response.json({
       status: 200,
