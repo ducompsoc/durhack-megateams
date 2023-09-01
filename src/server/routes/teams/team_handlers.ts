@@ -249,6 +249,7 @@ class TeamHandlers {
         "name",
         "join_code",
         [sequelize.fn("sum", sequelize.col("members.points.value")), "points"],
+        [sequelize.fn("count", sequelize.col("members.user_id")), "member_count"],
       ],
       include: [
         {
@@ -278,6 +279,7 @@ class TeamHandlers {
     const payload = result.map((team) => {
       let json = team.toJSON();
       json.points = json.points || 0;
+      json.member_count = json.member_count || 0;
       return json;
     });
 
