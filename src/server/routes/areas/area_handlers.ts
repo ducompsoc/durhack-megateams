@@ -1,26 +1,23 @@
-import createHttpError from "http-errors";
 import { Request, Response } from "express";
 
-import { NullError } from "@server/common/errors";
+import { requireUserIsAdmin } from "@server/common/decorators";
 import Area from "@server/database/area";
+import Megateam from "@server/database/megateam";
 
+class AreaHandlers {
+  @requireUserIsAdmin
+  async getAreas(req: Request, res: Response) {
+    const result = await Megateam.findAll({
+      include: [Area],
+    });
 
-export async function getAreasList(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
+    res.json({
+      status: 200,
+      message: "OK",
+      megateams: result,
+    });
+  }
 }
 
-export async function createArea(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
-
-export async function getAreaDetails(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
-
-export async function patchAreaDetails(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
-
-export async function deleteArea(request: Request, response: Response): Promise<void> {
-  throw new createHttpError.NotImplemented();
-}
+const handlersInstance = new AreaHandlers();
+export default handlersInstance;

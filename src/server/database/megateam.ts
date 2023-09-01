@@ -28,12 +28,4 @@ export default class Megateam extends Model {
 
   @HasMany(() => Area, "megateam_id")
     areas!: Area[];
-
-  static async listMegateams(): Promise<Pick<Megateam, "id" | "name">[]> {
-    throw new Error("Not implemented.");
-  }
-
-  static async getMegateam(id: number): Promise<Megateam> {
-    throw new Error("Not implemented.");
-  }
 }
