@@ -101,14 +101,30 @@ class TeamHandlers {
     const result = joinCode.safeParse(req.body.join_code);
     if (!result.success) throw new createHttpError.BadRequest();
 
-    let team = await Team.findOne({
-      where: { join_code: result.data },
-      rejectOnEmpty: new NullError(),
-    });
-    let user = await User.findByPk(user_id, { rejectOnEmpty: new NullError() });
+    const t = await sequelize.transaction();
 
-    user.team_id = team.id;
-    await user.save();
+    try {
+      let team = await Team.findOne({
+        where: { join_code: result.data },
+        include: [User],
+        rejectOnEmpty: new NullError(),
+      });
+
+      if (team.members?.length ?? 0 > Number(process.env.MAX_TEAM_MEMBERS)) {
+        throw new createHttpError.Forbidden();
+      }
+
+      let user = await User.findByPk(user_id, {
+        rejectOnEmpty: new NullError(),
+      });
+      user.team_id = team.id;
+      await user.save();
+
+      await t.commit();
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
 
     res.json({
       status: 200,
