@@ -56,7 +56,7 @@ class QRHandlers {
       undefined,
       request.body.publicised
     );
-console.warn(publicisedFields)
+
     let new_instance = await QRCode.create({
       ...request.body,
       ...publicisedFields,
