@@ -72,6 +72,39 @@ export default function Volunteer() {
     return now.toISOString().slice(0, 16);
   }
 
+  function getQRState(
+    start: Date,
+    end: Date,
+    enabled: boolean
+  ): { checked: boolean; disabled: boolean; preStart: boolean } {
+    let state = { checked: enabled, disabled: false, preStart: false };
+    let now = new Date();
+    if (now > end) {
+      state.checked = false;
+      state.disabled = true;
+    } else if (now < start) {
+      state.disabled = true;
+      state.preStart = true;
+    }
+    return state;
+  }
+
+  function qrClasses(state: {
+    checked: boolean;
+    disabled: boolean;
+    preStart: boolean;
+  }) {
+    const { checked, disabled, preStart } = state;
+    let bgClass = "bg-gray-200";
+    if (preStart || (!disabled && !checked)) {
+      bgClass =
+        "pattern-diagonal-lines pattern-transparent pattern-bg-gray-200 pattern-size-16 pattern-opacity-100";
+    } else if (disabled) {
+      bgClass = "bg-red-100 opacity-100";
+    }
+    return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
+  }
+
   const [selected, setSelected] = useState(presets[0]);
 
   const qrTypes = ["Workshop", "Challenge", "Volunteer", "Sponsor", "Personal"];
@@ -88,6 +121,7 @@ export default function Volunteer() {
       name: "Amazon Workshop",
       uuid: "abc-123",
       enabled: true,
+      publicised: true,
     },
     {
       creator: "Luca",
@@ -100,6 +134,7 @@ export default function Volunteer() {
       name: "Netcraft Workshop",
       uuid: "def-456",
       enabled: true,
+      publicised: true,
     },
     {
       creator: "Luca",
@@ -111,17 +146,10 @@ export default function Volunteer() {
       endDate: new Date("02/08/23 07:30"),
       name: "Waterstons Workshop",
       uuid: "ghi-789",
-      enabled: false,
+      enabled: true,
+      publicised: true,
     },
   ];
-
-  function qrClasses(enabled: boolean, startDate: Date, endDate: Date) {
-    let bgClass = "bg-gray-200";
-    let now = new Date();
-    if (!enabled || startDate > now) bgClass = "pattern-diagonal-lines pattern-transparent pattern-bg-gray-200 pattern-size-16 pattern-opacity-100";
-    if (endDate < now) bgClass = "bg-red-100 opacity-100";
-    return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
-  }
 
   const tabs = [
     {
@@ -236,85 +264,126 @@ export default function Volunteer() {
     },
     ...(isAdmin
       ? [
-        {
-          name: "Manage",
-          content: (
-            <>
-              <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
-                <div className="flex flex-row items-center">
-                  <input
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
-                    placeholder="Search for QRs..."
-                  />
-                  <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
-                </div>
-              </div>
-              {qrs.map(
-                (
-                  { creator, points, scans, type, limit, startDate, endDate, name, enabled, uuid },
-                  i
-                ) => (
-                  <div
-                    className={qrClasses(enabled, startDate, endDate)}
-                    key={i}
-                  >
-                    <p className="mb-2">{name}</p>
-                    <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
-                      <div className="col-span-1">
-                        <p className="flex items-center" title="QR Category/Type">
-                          <TagIcon className="w-4 h-4 mr-2" />
-                          {type}
-                        </p>
-                      </div>
-                      <div className="col-span-1">
-                        <p className="flex items-center" title="Current Scans/Use Limit">
-                          <CameraIcon className="w-4 h-4 mr-2" />
-                          {scans}/{limit} scans
-                        </p>
-                      </div>
-                      <div className="col-span-1">
-                        <p className="flex items-center" title="Creator">
-                          <UserIcon className="w-4 h-4 mr-2" />
-                          {creator}
-                        </p>
-                      </div>
-                      <div className="col-span-1">
-                        <p className="flex items-center" title="Point Value">
-                          <GiftIcon className="w-4 h-4 mr-2" />
-                          {points} points
-                        </p>
-                      </div>
-                      <div className="col-span-2">
-                        <p className="flex items-center" title="Valid From - Until">
-                          <ClockIcon className="w-4 h-4 mr-2" />
-                          {dateFormat(startDate, "hh:MM dd/mm")} - {dateFormat(endDate, "hh:MM dd/mm")}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <button className="rounded px-2 py-1 bg-accent text-white">
-                          View
-                      </button>
-                      <p className="ml-4" title="Can be scanned for points?">Enabled:</p>
-                      <input
-                        type="checkbox"
-                        checked={enabled}
-                        className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                      />
-                      <p className="ml-4" title="Shown on Challenge list?">Publicised:</p>
-                      <input
-                        type="checkbox"
-                        className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                      />
-                    </div>
+          {
+            name: "Manage",
+            content: (
+              <>
+                <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
+                  <div className="flex flex-row items-center">
+                    <input
+                      type="text"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
+                      placeholder="Search for QRs..."
+                    />
+                    <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
                   </div>
-                )
-              )}
-            </>
-          ),
-        },
-      ]
+                </div>
+                {qrs.map(
+                  (
+                    {
+                      creator,
+                      points,
+                      scans,
+                      type,
+                      limit,
+                      startDate,
+                      endDate,
+                      name,
+                      enabled,
+                      publicised,
+                      uuid,
+                    },
+                    i
+                  ) => {
+                    const qrState = getQRState(startDate, endDate, enabled);
+                    return (
+                      <div className={qrClasses(qrState)} key={i}>
+                        <p className="mb-2">{name}</p>
+                        <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
+                          <div className="col-span-1">
+                            <p
+                              className="flex items-center"
+                              title="QR Category/Type"
+                            >
+                              <TagIcon className="w-4 h-4 mr-2" />
+                              {type}
+                            </p>
+                          </div>
+                          <div className="col-span-1">
+                            <p
+                              className="flex items-center"
+                              title="Current Scans/Use Limit"
+                            >
+                              <CameraIcon className="w-4 h-4 mr-2" />
+                              {scans}/{limit} scans
+                            </p>
+                          </div>
+                          <div className="col-span-1">
+                            <p className="flex items-center" title="Creator">
+                              <UserIcon className="w-4 h-4 mr-2" />
+                              {creator}
+                            </p>
+                          </div>
+                          <div className="col-span-1">
+                            <p
+                              className="flex items-center"
+                              title="Point Value"
+                            >
+                              <GiftIcon className="w-4 h-4 mr-2" />
+                              {points} points
+                            </p>
+                          </div>
+                          <div className="col-span-2">
+                            <p
+                              className="flex items-center"
+                              title="Valid From - Until"
+                            >
+                              <ClockIcon className="w-4 h-4 mr-2" />
+                              {dateFormat(startDate, "hh:MM dd/mm")} -{" "}
+                              {dateFormat(endDate, "hh:MM dd/mm")}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <button
+                            className="rounded px-2 py-1 bg-accent text-white disabled:bg-gray-300"
+                            disabled={qrState.disabled}
+                          >
+                            View
+                          </button>
+                          <p
+                            className="ml-4"
+                            title="Can be scanned for points?"
+                          >
+                            Enabled:
+                          </p>
+                          <input
+                            type="checkbox"
+                            checked={qrState.checked}
+                            disabled={qrState.disabled}
+                            className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent disabled:text-gray-300 disabled:bg-gray-300"
+                          />
+                          <p className="ml-4" title="Shown on Challenge list?">
+                            Publicised:
+                          </p>
+                          <input
+                            type="checkbox"
+                            checked={
+                              (!qrState.disabled || qrState.preStart) &&
+                              publicised
+                            }
+                            disabled={qrState.disabled}
+                            className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent disabled:text-gray-300 disabled:bg-gray-300"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
+              </>
+            ),
+          },
+        ]
       : []),
   ];
 
