@@ -45,9 +45,9 @@ export default function TabbedPage({
             <ArrowRightOnRectangleIcon className="w-12 h-12" />
           </button>
         </div>
-        <div className="p-6 pt-0 grow overflow-auto">{children}</div>
+        <div className="p-6 pt-0 grow overflow-auto md:w-7/12 md:mx-auto">{children}</div>
         {showTabs && (
-          <div className="flex gap-1 border-t border-gray-200">
+          <div className="flex gap-1 border-t border-gray-200 md:justify-center md:gap-x-20">
             {tabs.map((tab) => {
               const active = tab.path === path;
 
@@ -56,7 +56,7 @@ export default function TabbedPage({
                   href={tab.path}
                   key={tab.path}
                   target={tab.openNewWindow ? "_blank" : undefined}
-                  className="w-full py-4 flex justify-center"
+                  className="w-full py-4 flex justify-center md:w-fit"
                 >
                   <tab.icon
                     className={"w-8 h-8 " + (active ? "stroke-accent" : "")}

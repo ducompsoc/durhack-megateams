@@ -78,9 +78,11 @@ export default function TeamsPage() {
             menuPortalTarget={document.body}
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          <button className="w-full rounded px-2 py-1 bg-accent text-white mt-2">
-            Save
-          </button>
+          <div className="md:flex md:justify-end">
+            <button className="w-full rounded px-2 py-1 bg-accent text-white mt-2 md:w-fit">
+              Save
+            </button>
+          </div>
         </div>
       ))}
     </div>

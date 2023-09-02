@@ -36,7 +36,7 @@ export default function Leaderboard() {
               <React.Fragment key={i}>
                 <p>{team.name}</p>
                 <p>{team.points} points</p>
-                <div className="flex items-center font-mono justify-center">
+                <div className="flex items-center font-mono justify-center md:justify-start">
                   <p>{i < 3 ? positionMedals[i+1] : "#" + (i+1)}</p>
                 </div>
               </React.Fragment>
