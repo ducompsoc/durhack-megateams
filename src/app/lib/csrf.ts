@@ -6,11 +6,9 @@ import { makeMegateamsApiRequest } from "@/app/lib/api";
  * The token should be attached to requests in an HTTP header 'x-csrf-token'.
  */
 export async function getCsrfToken(): Promise<string> {
-  const csrf_token_request = makeMegateamsApiRequest("/auth/csrf-token");
+  const csrf_token_result = await makeMegateamsApiRequest("/auth/csrf-token");
 
-  const result = await fetch(csrf_token_request); // can throw Error due to network problems
-  if (!result.ok) throw new Error("Couldn't get CSRF token");
-  return (await result.json()).token;
+  return csrf_token_result.token;
 }
 
 /**
