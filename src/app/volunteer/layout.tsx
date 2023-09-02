@@ -8,14 +8,18 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import TabbedPage from "../components/TabbedPage";
-import { useState } from "react";
+import useUser from "../lib/useUser";
+import { redirect } from "next/navigation";
 
 export default function VolunteerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isAdmin] = useState(true);
+  const { user, isLoading } = useUser();
+  if (isLoading) return <></>;
+  if (user.role === "hacker") return redirect("/hacker");
+  const isAdmin = user.role === "admin";
 
   const tabs = [
     { icon: QrCodeIcon, path: "/volunteer" },
