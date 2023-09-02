@@ -31,7 +31,10 @@ class TeamHandlers {
         {
           model: Team,
           include: [
-            User,
+            {
+              model: User,
+              include: [Point],
+            },
             {
               model: Area,
               include: [Megateam],
@@ -53,7 +56,11 @@ class TeamHandlers {
 
     const payload = {
       name: team.name,
-      members: team.members?.map((member) => member.id) || [],
+      members:
+        team.members?.map((member) => ({
+          name: member.preferred_name,
+          points: Point.getPointsTotal(member.points || []),
+        })) || [],
       megateam: team.area?.megateam.name || null,
       joinCode: team.join_code,
     };
@@ -249,7 +256,10 @@ class TeamHandlers {
         "name",
         "join_code",
         [sequelize.fn("sum", sequelize.col("members.points.value")), "points"],
-        [sequelize.fn("count", sequelize.col("members.user_id")), "member_count"],
+        [
+          sequelize.fn("count", sequelize.col("members.user_id")),
+          "member_count",
+        ],
       ],
       include: [
         {
