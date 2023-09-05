@@ -26,18 +26,18 @@ export default function Admin() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
+      <div className="dh-box p-4 mb-6">
         <div className="flex flex-row items-center">
           <input
             type="text"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
+            className="dh-input w-full pl-10"
             placeholder="Search for users..."
           />
           <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
         </div>
       </div>
       {users.map(({ name, email, points, megateam, team }, i) => (
-        <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4" key={i}>
+        <div className="dh-box p-4 mb-4" key={i}>
           <p className="mb-2">
             {name} - {email}
           </p>
@@ -45,8 +45,9 @@ export default function Admin() {
             {points} points | {megateam}
           </p>
           <Select
-            className="mb-4"
+            className="mb-4 dh-select"
             options={teams}
+            classNamePrefix="dh-select"
             menuPortalTarget={document.body}
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
             defaultValue={teams.filter((val) => val.value === team)[0]}
@@ -55,7 +56,7 @@ export default function Admin() {
             <div className="flex items-center">
               <input
                 type="number"
-                className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 w-20"
+                className="dh-input w-20"
               />
               <p className="ml-2">points</p>
               <button className="ml-4 rounded px-2 py-1 bg-accent text-white">

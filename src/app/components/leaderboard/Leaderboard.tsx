@@ -17,7 +17,7 @@ export default function Leaderboard() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-gray-200 drop-shadow-lg p-2 rounded">
+      <div className="dh-box p-2">
         <h2 className="font-semibold">Megateams Leaderboard</h2>
         <div className="bg-purple-200 border border-purple-500 mt-2 rounded p-4">
           <div className="md:w-[50%] md:ml-auto md:mr-auto">
@@ -25,10 +25,10 @@ export default function Leaderboard() {
           </div>
         </div>
       </div>
-      <div className="bg-gray-200 drop-shadow-lg p-2 rounded mt-6">
+      <div className="dh-box p-2 mt-6">
         <h2 className="font-semibold">Teams Leaderboard</h2>
         <div className="bg-purple-200 border border-purple-500 mt-2 rounded p-4">
-          <div className="grid grid-cols-[auto_auto_auto] mx-2 gap-y-2 gap-x-4">
+          <div className="grid grid-cols-[auto_auto_auto] mx-2 gap-y-2 gap-x-4 text-black">
             <p className="font-semibold mb-2">Team</p>
             <p className="font-semibold mb-2">Total Points</p>
             <p className="font-semibold mb-2">Ranking</p>
