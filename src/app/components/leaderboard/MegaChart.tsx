@@ -8,6 +8,10 @@ import {
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import annotationPlugin, { AnnotationOptions } from "chartjs-plugin-annotation";
 import { Options } from "chartjs-plugin-datalabels/types/options";
+import { useMediaQuery } from "react-responsive";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "tailwindcss/defaultConfig";
+import { useEffect } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -18,6 +22,12 @@ ChartJS.register(
 );
 
 export default function MegaChart() {
+  const isDark = useMediaQuery({
+    query: "(prefers-color-scheme: dark)",
+  });
+
+  const { theme } = resolveConfig(tailwindConfig);
+
   const megateams = [
     { id: 1, points: 450, name: "Team 1", image: new Image() },
     { id: 2, points: 500, name: "Team 2", image: new Image() },
@@ -35,14 +45,40 @@ export default function MegaChart() {
       {
         label: "Points",
         data: megateams.map((team) => team.points),
+        ...(isDark
+          ? {
+              // @ts-ignore
+              backgroundColor: theme.colors.neutral[700],
+            }
+          : {}),
       },
     ],
   };
 
-  const datalabels: Options = { anchor: "start", align: "end" };
+  const datalabels: Options = {
+    anchor: "start",
+    align: "end",
+    ...(isDark
+      ? {
+          // @ts-ignore
+          color: theme.colors.neutral[200],
+        }
+      : {}),
+  };
 
   const options = {
-    scales: { y: { display: false }, x: { grid: { display: false } } },
+    scales: {
+      y: { display: false },
+      x: {
+        grid: { display: false },
+        ...(isDark
+          ? {
+              // @ts-ignore
+              ticks: { color: theme.colors.neutral[200] },
+            }
+          : {}),
+      },
+    },
     plugins: {
       datalabels,
       annotation: {
@@ -67,5 +103,5 @@ export default function MegaChart() {
     },
   };
 
-  return <Bar data={dataset} options={options} />;
+  return <Bar data={dataset} options={options} key={`${isDark ? "dark" : "light"}`} />;
 }

@@ -268,7 +268,7 @@ export default function Register() {
                 id="hackathons"
                 name="hackathons"
                 type="checkbox"
-                className="text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent focus:ring-2"
+                className="dh-check"
               />
               <label
                 htmlFor="hackathons"
@@ -288,7 +288,7 @@ export default function Register() {
                 id="hackathons-marketing"
                 name="hackathons-marketing"
                 type="checkbox"
-                className="text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent focus:ring-2"
+                className="dh-check"
               />
               <label
                 htmlFor="hackathons-marketing"

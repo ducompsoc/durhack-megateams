@@ -100,7 +100,7 @@ export default function Volunteer() {
       bgClass =
         "pattern-diagonal-lines pattern-transparent pattern-bg-gray-200 dark:pattern-bg-neutral-700 pattern-size-16 pattern-opacity-100";
     } else if (disabled) {
-      bgClass = "text-black bg-red-100 opacity-100";
+      bgClass = "bg-red-100 opacity-100 dark:bg-red-400/50";
     }
     return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
   }
@@ -188,7 +188,7 @@ export default function Volunteer() {
             <p>Publicised:</p>
             <input
               type="checkbox"
-              className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+              className="ml-2 dh-check"
             />
             <button
               className="rounded px-2 py-1 bg-accent text-white ml-4"
@@ -253,7 +253,7 @@ export default function Volunteer() {
             <p>Publicised:</p>
             <input
               type="checkbox"
-              className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+              className="ml-2 dh-check"
             />
             <button className="rounded px-2 py-1 bg-accent text-white ml-4">
               Generate
@@ -346,7 +346,7 @@ export default function Volunteer() {
                         </div>
                         <div className="flex items-center">
                           <button
-                            className="rounded px-2 py-1 bg-accent text-white disabled:bg-gray-300"
+                            className="rounded px-2 py-1 bg-accent text-white disabled:bg-gray-300 dark:disabled:bg-neutral-500"
                             disabled={qrState.disabled}
                           >
                             View
@@ -361,7 +361,7 @@ export default function Volunteer() {
                             type="checkbox"
                             checked={qrState.checked}
                             disabled={qrState.disabled}
-                            className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent disabled:text-gray-300 disabled:bg-gray-300"
+                            className="ml-2 dh-check"
                           />
                           <p className="ml-4" title="Shown on Challenge list?">
                             Publicised:
@@ -373,7 +373,7 @@ export default function Volunteer() {
                               publicised
                             }
                             disabled={qrState.disabled}
-                            className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent disabled:text-gray-300 disabled:bg-gray-300"
+                            className="ml-2 dh-check"
                           />
                         </div>
                       </div>
