@@ -11,7 +11,6 @@ import { Options } from "chartjs-plugin-datalabels/types/options";
 import { useMediaQuery } from "react-responsive";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
-import { useEffect } from "react";
 
 ChartJS.register(
   CategoryScale,
