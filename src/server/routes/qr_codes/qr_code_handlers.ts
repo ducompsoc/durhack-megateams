@@ -14,6 +14,7 @@ import {
   requireUserIsAdmin,
   requireUserIsVolunteer,
   requireUserIsSponsor,
+  requireLoggedIn,
 } from "@server/common/decorators";
 import sequelize from "@server/database";
 
@@ -269,6 +270,7 @@ class QRHandlers {
     this.getPresets(request, response);
   }
 
+  @requireLoggedIn
   async redeemQR(request: Request, response: Response) {
     if (!request.body.hasOwnProperty("uuid")) {
       throw new createHttpError.BadRequest();
@@ -291,7 +293,7 @@ class QRHandlers {
       await Point.create({
         value: qr.points_value,
         origin_qrcode_id: qr.id,
-        redeemer_id: request.user?.id,
+        redeemer_id: request.user!.id,
         transaction: transaction,
       });
 
