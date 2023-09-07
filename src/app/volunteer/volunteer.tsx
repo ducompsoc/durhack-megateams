@@ -36,7 +36,7 @@ export default function Volunteer() {
       classes += " border-accent text-accent";
     } else {
       classes +=
-        " border-gray-200 text-gray-500 hover:text-accent hover:border-accent";
+        " border-gray-200 text-gray-500 hover:text-accent hover:border-accent dark:border-neutral-400 dark:text-neutral-400";
     }
     return classes;
   }
@@ -95,12 +95,12 @@ export default function Volunteer() {
     preStart: boolean;
   }) {
     const { checked, disabled, preStart } = state;
-    let bgClass = "bg-gray-200";
+    let bgClass = "dark:bg-neutral-700 bg-gray-200";
     if (preStart || (!disabled && !checked)) {
       bgClass =
-        "pattern-diagonal-lines pattern-transparent pattern-bg-gray-200 pattern-size-16 pattern-opacity-100";
+        "pattern-diagonal-lines pattern-transparent pattern-bg-gray-200 dark:pattern-bg-neutral-700 pattern-size-16 pattern-opacity-100";
     } else if (disabled) {
-      bgClass = "bg-red-100 opacity-100";
+      bgClass = "bg-red-100 opacity-100 dark:bg-red-400/50";
     }
     return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
   }
@@ -155,9 +155,9 @@ export default function Volunteer() {
     {
       name: "Preset",
       content: (
-        <div className="bg-gray-200 drop-shadow-lg p-4 rounded">
+        <div className="dh-box p-4">
           <select
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+            className="dh-input w-full"
             onChange={(e) =>
               setSelected(
                 presets.filter(({ name }) => name === e.target.value)[0]
@@ -188,7 +188,7 @@ export default function Volunteer() {
             <p>Publicised:</p>
             <input
               type="checkbox"
-              className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+              className="ml-2 dh-check"
             />
             <button
               className="rounded px-2 py-1 bg-accent text-white ml-4"
@@ -203,14 +203,14 @@ export default function Volunteer() {
     {
       name: "Custom",
       content: (
-        <div className="bg-gray-200 drop-shadow-lg p-4 rounded">
+        <div className="dh-box p-4">
           <p className="font-semibold mb-2">Generate Custom QR</p>
           <input
             type="text"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+            className="dh-input w-full"
             placeholder="Name/Description"
           />
-          <select className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6">
+          <select className="my-2 dh-input w-full">
             {qrTypes.map((qrType) => (
               <option key={qrType} value={qrType}>
                 {qrType}
@@ -220,12 +220,12 @@ export default function Volunteer() {
           <div className="flex items-center">
             <input
               type="number"
-              className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 md:w-fit"
+              className="my-2 dh-input w-full md:w-fit"
             />
             <p className="ml-1 mr-2">points</p>
             <input
               type="number"
-              className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 md:w-fit"
+              className="my-2 dh-input w-full md:w-fit"
             />
             <p className="ml-1 mr-2">uses</p>
           </div>
@@ -233,7 +233,7 @@ export default function Volunteer() {
           <div className="flex items-center">
             <input
               type="datetime-local"
-              className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+              className="my-2 dh-input w-full"
             />
             <button className="ml-2">
               <ClockIcon className="w-6 h-6" />
@@ -243,7 +243,7 @@ export default function Volunteer() {
           <div className="flex items-center">
             <input
               type="datetime-local"
-              className="my-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+              className="my-2 dh-input w-full"
             />
             <button className="ml-2">
               <ClockIcon className="w-6 h-6" />
@@ -253,7 +253,7 @@ export default function Volunteer() {
             <p>Publicised:</p>
             <input
               type="checkbox"
-              className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+              className="ml-2 dh-check"
             />
             <button className="rounded px-2 py-1 bg-accent text-white ml-4">
               Generate
@@ -268,11 +268,11 @@ export default function Volunteer() {
             name: "Manage",
             content: (
               <>
-                <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
+                <div className="dh-box p-4 mb-6">
                   <div className="flex flex-row items-center">
                     <input
                       type="text"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
+                      className="dh-input w-full pl-10"
                       placeholder="Search for QRs..."
                     />
                     <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
@@ -346,7 +346,7 @@ export default function Volunteer() {
                         </div>
                         <div className="flex items-center">
                           <button
-                            className="rounded px-2 py-1 bg-accent text-white disabled:bg-gray-300"
+                            className="rounded px-2 py-1 bg-accent text-white disabled:bg-gray-300 dark:disabled:bg-neutral-500"
                             disabled={qrState.disabled}
                           >
                             View
@@ -361,7 +361,7 @@ export default function Volunteer() {
                             type="checkbox"
                             checked={qrState.checked}
                             disabled={qrState.disabled}
-                            className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent disabled:text-gray-300 disabled:bg-gray-300"
+                            className="ml-2 dh-check"
                           />
                           <p className="ml-4" title="Shown on Challenge list?">
                             Publicised:
@@ -373,7 +373,7 @@ export default function Volunteer() {
                               publicised
                             }
                             disabled={qrState.disabled}
-                            className="ml-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent disabled:text-gray-300 disabled:bg-gray-300"
+                            className="ml-2 dh-check"
                           />
                         </div>
                       </div>

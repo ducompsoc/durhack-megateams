@@ -31,7 +31,7 @@ export default function TabbedPage({
 
   return (
     <>
-      <div className="h-full flex flex-col text-black">
+      <div className="h-full flex flex-col text-black dark:text-neutral-200">
         <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
           <object
             data="/logo.svg"
@@ -47,7 +47,7 @@ export default function TabbedPage({
         </div>
         <div className="p-6 pt-0 grow overflow-auto md:w-7/12 md:mx-auto">{children}</div>
         {showTabs && (
-          <div className="flex gap-1 border-t border-gray-200 md:justify-center md:gap-x-20">
+          <div className="flex gap-1 border-t border-gray-200 md:justify-center md:gap-x-20 dark:border-neutral-600">
             {tabs.map((tab) => {
               const active = tab.path === path;
 
@@ -59,7 +59,7 @@ export default function TabbedPage({
                   className="w-full py-4 flex justify-center md:w-fit"
                 >
                   <tab.icon
-                    className={"w-8 h-8 " + (active ? "stroke-accent" : "")}
+                    className={"w-8 h-8 " + (active ? "stroke-accent" : "dark:stroke-neutral-400")}
                   />
                 </Link>
               );

@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={inter.className + " h-full " + headings.variable}>
+      <body className={inter.className + " h-full dark:bg-neutral-900 " + headings.variable}>
         {children}
       </body>
     </html>

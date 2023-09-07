@@ -69,7 +69,7 @@ export default function Challenges() {
       <ul ref={animationParent}>
         {challenges.map(({ name, points, position, id }) => (
           <li
-            className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4"
+            className="dh-box p-4 mb-4"
             key={id}
             draggable
           >
@@ -82,7 +82,7 @@ export default function Challenges() {
                 onChange={(e) =>
                   updatePosition(position, parseInt(e.target.value))
                 }
-                className="ml-2 block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+                className="ml-2 dh-input"
               >
                 {challenges.map(({ position }) => (
                   <option key={position} value={position}>

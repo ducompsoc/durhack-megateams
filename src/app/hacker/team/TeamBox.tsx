@@ -6,7 +6,7 @@ export default function TeamBox({ grow=true }: { grow?: boolean }) {
 
   return (
     <div
-      className={`bg-gray-200 drop-shadow-lg p-2 text-center rounded md:min-w-[50%] min-w-[40%] ${
+      className={`dh-box p-2 text-center md:min-w-[50%] min-w-[40%] ${
         grow ? "grow" : ""
       }`}
     >
