@@ -9,14 +9,12 @@ import {
 
 const qr_codes_router = ExpressRouter();
 
-qr_codes_router
-  .route("/")
+qr_codes_router.route("/")
   .get(handlers.getQRCodeList, handlers.getPublicQRCodeList)
   .post(handlers.createQRCode, handleFailedAuthentication)
   .all(handleMethodNotAllowed);
 
-qr_codes_router
-  .route("/preset")
+qr_codes_router.route("/preset")
   .get(
     handlers.getPresetsAdmin,
     handlers.getPresetsVolunteer,
@@ -25,8 +23,7 @@ qr_codes_router
   )
   .all(handleMethodNotAllowed);
 
-qr_codes_router
-  .route("/preset/:preset")
+qr_codes_router.route("/preset/:preset")
   .post(
     handlers.usePresetAdmin,
     handlers.usePresetVolunteer,
@@ -35,13 +32,11 @@ qr_codes_router
   )
   .all(handleMethodNotAllowed);
 
-qr_codes_router
-  .route("/redeem")
+qr_codes_router.route("/redeem")
   .post(handlers.redeemQR)
   .all(handleMethodNotAllowed);
 
-qr_codes_router
-  .route("/challenges")
+qr_codes_router.route("/challenges")
   .get(
     handlers.getChallengeListAdmin,
     handlers.getChallengeListUser,
@@ -50,8 +45,7 @@ qr_codes_router
   .post(handlers.reorderChallengeList)
   .all(handleMethodNotAllowed);
 
-qr_codes_router
-  .route("/:qr_code_id")
+qr_codes_router.route("/:qr_code_id")
   .all(parseRouteId("qr_code_id"))
   .patch(
     handlers.patchQRAdmin,

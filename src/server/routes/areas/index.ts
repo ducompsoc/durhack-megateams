@@ -5,6 +5,8 @@ import { handleMethodNotAllowed } from "@server/common/middleware";
 
 const areas_router = ExpressRouter();
 
-areas_router.route("/").get(handlers.getAreas).all(handleMethodNotAllowed);
+areas_router.route("/")
+  .get(handlers.getAreas)
+  .all(handleMethodNotAllowed);
 
 export default areas_router;

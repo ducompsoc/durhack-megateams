@@ -5,8 +5,7 @@ import { handleMethodNotAllowed } from "@server/common/middleware";
 
 const megateams_router = ExpressRouter();
 
-megateams_router
-  .route("/")
+megateams_router.route("/")
   .get(handlers.getMegateams)
   .all(handleMethodNotAllowed);
 
