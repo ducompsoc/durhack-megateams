@@ -2,8 +2,14 @@
 
 import { useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import useUser from "@/app/lib/useUser";
+import { redirect } from "next/navigation";
 
 export default function Challenges() {
+  const { user, isLoading } = useUser({ redirectTo: "/volunteer" });
+  if (isLoading) return <></>;
+  if (user?.role !== "admin") return redirect("/");
+
   const [animationParent] = useAutoAnimate();
 
   const [challenges, setChallenges] = useState([
@@ -68,11 +74,7 @@ export default function Challenges() {
       <p className="font-bold text-center mb-4">Manage Challenge List</p>
       <ul ref={animationParent}>
         {challenges.map(({ name, points, position, id }) => (
-          <li
-            className="dh-box p-4 mb-4"
-            key={id}
-            draggable
-          >
+          <li className="dh-box p-4 mb-4" key={id} draggable>
             <p className="mb-2">{name}</p>
             <p className="mb-2">{points} points</p>
             <div className="flex items-center">

@@ -16,7 +16,7 @@ export default function Register() {
 
   return (
     <>
-      {isLoading && (
+      {!isLoading && (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="flex flex-row py-4 px-6 items-center justify-center justify-center mb-4 pt-0">
             <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />

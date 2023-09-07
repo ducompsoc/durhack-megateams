@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <>
-      {isLoading && (
+      {!isLoading && (
         <div className="h-full flex flex-col text-black dark:text-neutral-200 font-semibold justify-center px-6 py-12 lg:px-8">
           <div className="flex flex-row py-4 px-6 items-center justify-center justify-center mb-4">
             <Image src="/logo.png" alt="DurHack Logo" width={64} height={64} />

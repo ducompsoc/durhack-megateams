@@ -16,10 +16,12 @@ export default function VolunteerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useUser({ redirectTo: "/" });
   if (isLoading) return <></>;
-  if (user.role === "hacker") return redirect("/hacker");
-  const isAdmin = user.role === "admin";
+  if (!["volunteer", "sponsor", "admin"].includes(user?.role))
+    return redirect("/");
+  const isAdmin = user?.role === "admin";
+  const isVolunteer = user?.role === "admin" || user?.role === "volunteer";
 
   const tabs = [
     { icon: QrCodeIcon, path: "/volunteer" },
@@ -27,22 +29,26 @@ export default function VolunteerLayout({
       icon: ChartBarIcon,
       path: "/volunteer/leaderboard",
     },
-    {
-      icon: UserGroupIcon,
-      path: "/volunteer/teams",
-    },
-    ...(isAdmin
+    ...(isVolunteer
       ? [
           {
-            icon: NewspaperIcon,
-            path: "/volunteer/challenges",
+            icon: UserGroupIcon,
+            path: "/volunteer/teams",
+          },
+          ...(isAdmin
+            ? [
+                {
+                  icon: NewspaperIcon,
+                  path: "/volunteer/challenges",
+                },
+              ]
+            : []),
+          {
+            icon: ScaleIcon,
+            path: "/volunteer/admin",
           },
         ]
       : []),
-    {
-      icon: ScaleIcon,
-      path: "/volunteer/admin",
-    },
   ];
 
   return <TabbedPage tabs={tabs}>{children}</TabbedPage>;
