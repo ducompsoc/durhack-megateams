@@ -81,4 +81,15 @@ export default class QRCode extends Model {
     unique: true,
   })
     challenge_rank?: number;
+
+  canBeRedeemed() {
+    const now = new Date();
+
+    if (now < this.start_time) return false;
+    if (now >= this.expiry_time) return false;
+    if (!this.state) return false;
+
+    const numberOfUses = this.$count("uses");
+    return (numberOfUses) < this.max_uses;
+  }
 }

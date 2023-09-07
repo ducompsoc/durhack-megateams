@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 import { readFileSync } from "fs";
 import { v4 as uuid } from "uuid";
 import path from "path";
+import { z } from "zod";
+import { Op } from "sequelize";
+
 import { NullError, ValueError } from "@server/common/errors";
 import QRCode from "@server/database/qr_code";
 import Point from "@server/database/point";
@@ -12,9 +15,8 @@ import {
   requireUserIsVolunteer,
   requireUserIsSponsor,
 } from "@server/common/decorators";
-import { Op } from "sequelize";
 import sequelize from "@server/database";
-import { z } from "zod";
+
 
 const presets = JSON.parse(
   readFileSync(path.join(__dirname, "./QR_presets.json")).toString()
@@ -128,7 +130,36 @@ class QRHandlers {
       end: code.expiry_time,
       enabled: code.state,
       uuid: code.payload,
-      publicised: code.challenge_rank ? true : false,
+      publicised: !!code.challenge_rank,
+    }));
+
+    response.status(200);
+    response.json({
+      status: 200,
+      message: "OK",
+      codes: payload,
+    });
+  }
+
+  async getPublicQRCodeList(_request: Request, response: Response): Promise<void> {
+    const result = await QRCode.findAll({
+      include: [Point, User],
+      where: {
+        publicised: { [Op.not]: null }
+      }
+    });
+
+    const payload = result.map((code: QRCode) => ({
+      name: code.name,
+      category: code.category,
+      scans: code.uses?.length || 0,
+      max_scans: code.max_uses,
+      creator: code.creator.full_name,
+      value: code.points_value,
+      start: code.start_time,
+      end: code.expiry_time,
+      enabled: code.state,
+      publicised: !!code.challenge_rank,
     }));
 
     response.status(200);
@@ -243,35 +274,30 @@ class QRHandlers {
       throw new createHttpError.BadRequest();
     }
 
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
-    let qr;
+    let qr: QRCode;
     try {
+
       qr = await QRCode.findOne({
         where: { payload: request.body.uuid },
         include: [Point],
+        transaction: transaction,
         rejectOnEmpty: new createHttpError.BadRequest(),
       });
 
-      let now = new Date();
-      if (
-        now < qr.start_time ||
-        now > qr.expiry_time ||
-        !qr.state ||
-        (qr.uses?.length || 0) >= qr.max_uses
-      ) {
-        throw new createHttpError.BadRequest();
-      }
+      if (!qr.canBeRedeemed()) throw new createHttpError.BadRequest();
 
       await Point.create({
         value: qr.points_value,
         origin_qrcode_id: qr.id,
         redeemer_id: request.user?.id,
+        transaction: transaction,
       });
 
-      await t.commit();
+      await transaction.commit();
     } catch (error) {
-      await t.rollback();
+      await transaction.rollback();
       throw error;
     }
 

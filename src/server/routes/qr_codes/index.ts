@@ -11,7 +11,7 @@ const qr_codes_router = ExpressRouter();
 
 qr_codes_router
   .route("/")
-  .get(handlers.getQRCodeList, handleFailedAuthentication)
+  .get(handlers.getQRCodeList, handlers.getPublicQRCodeList)
   .post(handlers.createQRCode, handleFailedAuthentication)
   .all(handleMethodNotAllowed);
 
