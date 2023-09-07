@@ -5,11 +5,11 @@ import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidation
 
 import { NullError, ValueError } from "@server/common/errors";
 import { requireUserIsAdmin } from "@server/common/decorators";
+import { UserRole } from "@server/common/model_enums";
 import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
 import User from "@server/database/user";
 import Team from "@server/database/team";
 import Point from "@server/database/point";
-import { structuredClone } from "next/dist/compiled/@edge-runtime/primitives";
 import Megateam from "@server/database/megateam";
 import Area from "@server/database/area";
 
@@ -34,20 +34,26 @@ user_transform_factories.set("checked_in", (checked_in: string) => {
 const user_attributes = User.getAttributes();
 const allowed_create_fields = new Set(Object.keys(user_attributes));
 
-allowed_create_fields.delete("createdAt");
-allowed_create_fields.delete("updatedAt");
+const create_user_payload_schema = z.object({
+  team_id: z.number().optional(),
+  email: z.string().email(),
+  role: z.nativeEnum(UserRole).optional(),
+  full_name: z.string(),
+  preferred_name: z.string(),
+});
 
-const admin_patch_fields = new Set(Object.keys(user_attributes));
-[
-  "id", "hashed_password", "password_salt", "verify_code", "verify_sent_at",
-  "initially_logged_in_at", "last_logged_in_at", "createdAt", "updatedAt",
-].forEach((element) => admin_patch_fields.delete(element));
-const self_patch_fields = structuredClone(admin_patch_fields);
-[
-  "email", "role", "checkedIn", "team_id",
-].forEach((element) => self_patch_fields.delete(element));
+const patch_user_payload_schema = create_user_payload_schema.partial();
 
 class UserHandlers {
+  constructor() {
+    Object.getOwnPropertyNames(UserHandlers.prototype).forEach((key) => {
+      if (key !== "constructor") {
+        // @ts-ignore
+        this[key] = this[key].bind(this);
+      }
+    });
+  }
+
   /**
    * Handles an unauthenticated or non-admin GET request to /users.
    * Returns a list of user IDs and preferred names that cannot be filtered.
@@ -83,7 +89,18 @@ class UserHandlers {
   async getUsersListAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
     const query = buildQueryFromRequest(request, user_transform_factories);
     query.attributes = [["user_id", "id"], "preferred_name", "full_name", "email"];
-    query.include = [Point, Team];
+    query.include = [
+      { model: Point },
+      {
+        model: Team,
+        include: [
+          {
+            model: Area,
+            include: [ Megateam ],
+          },
+        ],
+      },
+    ];
     const result = await User.findAll(query);
 
     const payload = result.map((user: User) => ({
@@ -204,22 +221,19 @@ class UserHandlers {
     await this.doGetAllUserDetails(request, response);
   }
 
-  static getPatchHandler(allowed_fields_set: Set<string>) {
+  static getPatchHandler(payload_schema: z.Schema) {
     return async function(request: Request, response: Response): Promise<void> {
       const { user_id } = response.locals;
       if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.");
 
-      const invalid_fields = Object.keys(request.body).filter((key) => !allowed_fields_set.has(key));
-      if (invalid_fields.length > 0) {
-        throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
-      }
+      const parsed_payload = payload_schema.parse(request.body);
 
       const found_user = await User.findByPk(user_id, {
         rejectOnEmpty: new NullError(),
       });
 
       try {
-        await found_user.update(request.body);
+        await found_user.update(parsed_payload);
       } catch (error) {
         if (error instanceof SequelizeValidationError) {
           throw new createHttpError.BadRequest(error.message);
@@ -232,8 +246,8 @@ class UserHandlers {
     };
   }
 
-  doPatchAdmin = UserHandlers.getPatchHandler(admin_patch_fields);
-  doPatchSelf = UserHandlers.getPatchHandler(self_patch_fields);
+  doPatchAdmin = UserHandlers.getPatchHandler(patch_user_payload_schema);
+  //doPatchSelf = UserHandlers.getPatchHandler(self_patch_user_payload_schema);
 
   /**
    * Handles an authenticated admin POST request to /users/:id.
@@ -258,7 +272,7 @@ class UserHandlers {
    */
   @requireSelf
   async patchMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
-    await this.doPatchSelf(request, response);
+    next();
   }
 
   /**
