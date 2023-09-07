@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import { Request, Response, NextFunction } from "express";
+import { z } from "zod";
 
 import { NullError, ValueError } from "@server/common/errors";
 import Point from "@server/database/point";
@@ -17,6 +18,17 @@ const allowed_create_fields = new Set(Object.keys(point_attributes));
 const patchable_fields = new Set(Object.keys(point_attributes));
 ["id", "createdAt", "updatedAt"].forEach((key) => patchable_fields.delete(key));
 
+const create_point_payload_schema = z.object({
+  value: z.number().positive(),
+  origin_qrcode_id: z.number().positive().optional(),
+  redeemer_id: z.number().positive(),
+});
+
+const patch_point_payload_schema = z.object({
+  value: z.number().positive().optional(),
+  origin_qrcode_id: z.number().positive().optional(),
+  redeemer_id: z.number().positive().optional(),
+}).strict();
 
 const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
 point_transform_factories.set("redeemer_id", (value) => {
@@ -62,7 +74,9 @@ class PointHandlers {
       throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
     }
 
-    if ("origin_qrcode_id" in request.body) {
+    const parsed_payload = create_point_payload_schema.parse(request.body);
+
+    if (parsed_payload.origin_qrcode_id ) {
       throw new createHttpError.UnprocessableEntity("You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.");
     }
 
@@ -109,15 +123,12 @@ class PointHandlers {
     const {point_id} = response.locals;
     if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
 
-    const invalid_fields = Object.keys(request.body).filter((key) => !patchable_fields.has(key));
-    if (invalid_fields.length > 0) {
-      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
-    }
+    const parsed_payload = patch_point_payload_schema.parse(request.body);
 
     const found_point = await Point.findByPk(point_id, {
       rejectOnEmpty: new NullError(),
     });
-    await found_point.update(request.body);  // database/sequelize errors thrown to error_handling.ts
+    await found_point.update(parsed_payload);  // database/sequelize errors thrown to error_handling.ts
 
     response.status(200);
     response.json({status: response.statusCode, message: "OK", data: found_point});
