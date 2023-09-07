@@ -1,7 +1,8 @@
 import createHttpError from "http-errors";
 import { Request, Response, NextFunction } from "express";
+import { z } from "zod";
 
-import { NullError, ValueError } from "@server/common/errors";
+import { NullError } from "@server/common/errors";
 import Point from "@server/database/point";
 import User from "@server/database/user";
 import QRCode from "@server/database/qr_code";
@@ -9,14 +10,18 @@ import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/d
 import { strIsPositiveInteger } from "@server/common/validation";
 import { requireUserIsAdmin } from "@server/common/decorators";
 
-const point_attributes = Point.getAttributes();
 
-const allowed_create_fields = new Set(Object.keys(point_attributes));
-["id", "createdAt", "updatedAt"].forEach((key) => allowed_create_fields.delete(key));
+const create_point_payload_schema = z.object({
+  value: z.number().positive(),
+  origin_qrcode_id: z.number().positive().optional(),
+  redeemer_id: z.number().positive(),
+});
 
-const patchable_fields = new Set(Object.keys(point_attributes));
-["id", "createdAt", "updatedAt"].forEach((key) => patchable_fields.delete(key));
-
+const patch_point_payload_schema = z.object({
+  value: z.number().positive().optional(),
+  origin_qrcode_id: z.number().positive().optional(),
+  redeemer_id: z.number().positive().optional(),
+}).strict();
 
 const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
 point_transform_factories.set("redeemer_id", (value) => {
@@ -57,12 +62,9 @@ class PointHandlers {
    */
   @requireUserIsAdmin  // Point creation via QR code (for non-admins) is handled by a separate endpoint
   async createPoint(request: Request, response: Response, _next: NextFunction): Promise<void> {
-    const invalid_fields = Object.keys(request.body).filter((key) => !allowed_create_fields.has(key));
-    if (invalid_fields.length > 0) {
-      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
-    }
+    const parsed_payload = create_point_payload_schema.parse(request.body);
 
-    if ("origin_qrcode_id" in request.body) {
+    if (parsed_payload.origin_qrcode_id ) {
       throw new createHttpError.UnprocessableEntity("You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.");
     }
 
@@ -80,7 +82,7 @@ class PointHandlers {
    *   the latter two are their own objects with snapshots of QRCode and User attributes
    */
   async getPointDetails(_request: Request, response: Response): Promise<void> {
-    const {point_id} = response.locals;
+    const { point_id } = response.locals;
     if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
 
     const result = await Point.findByPk(point_id, {
@@ -109,15 +111,12 @@ class PointHandlers {
     const {point_id} = response.locals;
     if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
 
-    const invalid_fields = Object.keys(request.body).filter((key) => !patchable_fields.has(key));
-    if (invalid_fields.length > 0) {
-      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
-    }
+    const parsed_payload = patch_point_payload_schema.parse(request.body);
 
     const found_point = await Point.findByPk(point_id, {
       rejectOnEmpty: new NullError(),
     });
-    await found_point.update(request.body);  // database/sequelize errors thrown to error_handling.ts
+    await found_point.update(parsed_payload);  // database/sequelize errors thrown to error_handling.ts
 
     response.status(200);
     response.json({status: response.statusCode, message: "OK", data: found_point});
@@ -132,7 +131,7 @@ class PointHandlers {
    */
   @requireUserIsAdmin
   async deletePoint(_request: Request, response: Response, _next: NextFunction): Promise<void> {
-    const {point_id} = response.locals;
+    const { point_id } = response.locals;
     if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
 
     const result = await Point.findByPk(point_id, {
