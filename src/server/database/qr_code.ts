@@ -80,7 +80,7 @@ export default class QRCode extends Model {
     allowNull: true,
     unique: true,
   })
-    challenge_rank?: number;
+    challenge_rank!: number | null;
 
   canBeRedeemed() {
     const now = new Date();
