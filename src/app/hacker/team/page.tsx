@@ -18,7 +18,7 @@ export default function Team() {
     <>
       <div className="flex flex-col h-full">
         <TeamBox grow={false} />
-        <div className="mt-4 bg-gray-200 drop-shadow-lg p-2 rounded">
+        <div className="mt-4 dh-box p-2">
           <p className="font-semibold text-center">Team Members</p>
           <div className="grid grid-cols-[auto_auto] my-4 mx-4 gap-y-2 gap-x-2">
             {members.map(({ name, points }, i) => (
@@ -27,7 +27,7 @@ export default function Team() {
                   <UserIcon className="w-4 h-4 mr-2" />
                   <p>{name}</p>
                 </div>
-                <p className="text-gray-600">{points} points</p>
+                <p className="text-gray-600 dark:text-neutral-400">{points} points</p>
               </Fragment>
             ))}
           </div>

@@ -10,7 +10,6 @@ import {
 
 import Area from "./area";
 import User from "./user";
-import createHttpError from "http-errors";
 
 @Table
 export default class Team extends Model {
@@ -54,9 +53,4 @@ export default class Team extends Model {
 
   @HasMany(() => User)
   members?: User[];
-
-  async isJoinable() {
-    const team_members: number = await this.$count("members");
-    return (team_members < Number(process.env.MAX_TEAM_MEMBERS));
-  }
 }

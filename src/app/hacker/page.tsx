@@ -40,7 +40,7 @@ export default function HackerHome() {
           <div className="flex mt-4">
             <TeamBox />
             {hasMegateam && (
-              <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded grow ml-4">
+              <div className="dh-box p-2 text-center grow ml-4">
                 <h2 className="font-semibold mb-2">Megateam</h2>
                 <div className="flex items-center justify-center">
                   <p className="text-[#0000a5] font-bold">Megateam 1</p>
@@ -56,7 +56,7 @@ export default function HackerHome() {
           </div>
           {hasMegateam ? (
             <>
-              <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded flex mt-4">
+              <div className="dh-box p-2 text-center flex mt-4">
                 <div className="grow">
                   <h2 className="font-semibold mb-2">My Points</h2>
                   <p>14 {positionMedals[2]}</p>
@@ -72,7 +72,7 @@ export default function HackerHome() {
                   <p>6 {positionMedals[1]}</p>
                 </div>
               </div>
-              <div className="bg-gray-200 drop-shadow-lg p-2 text-center rounded mt-4">
+              <div className="dh-box p-2 text-center mt-4">
                 <h2 className="font-semibold mb-2">Challenges</h2>
                 <div className="grid grid-cols-[min-content_1fr_auto] mx-2 gap-y-2">
                   {challenges.map((challenge, i) => (
@@ -86,7 +86,7 @@ export default function HackerHome() {
               </div>
             </>
           ) : (
-            <div className="bg-gray-200 drop-shadow-lg p-4 text-center rounded flex flex-col items-center mt-4">
+            <div className="dh-box p-4 text-center flex flex-col items-center mt-4">
               <p className="flex items-center font-semibold mb-2">
                 <ExclamationTriangleIcon className="w-6 h-6 mr-2" />
                 No Megateam Assigned

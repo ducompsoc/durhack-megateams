@@ -46,24 +46,24 @@ export default function TeamsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-6">
+      <div className="dh-box p-4 mb-6">
         <div className="flex flex-row items-center">
           <input
             type="text"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6 pl-10"
+            className="dh-input w-full pl-10"
             placeholder="Search for teams..."
           />
           <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
         </div>
       </div>
       {teams.map(({ name, code, megateam }) => (
-        <div className="bg-gray-200 drop-shadow-lg p-4 rounded mb-4" key={code}>
+        <div className="dh-box p-4 mb-4" key={code}>
           <div className="flex mb-2">
             <p>{name}</p>
-            <p className="ml-2 text-gray-600">Join code: {code}</p>
+            <p className="ml-2 text-gray-600 dark:text-neutral-400">Join code: {code}</p>
           </div>
           <select
-            className="by-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent sm:text-sm sm:leading-6"
+            className="by-2 dh-input w-full"
             value={megateam}
           >
             {megateams.map(({ name }) => (
@@ -74,13 +74,16 @@ export default function TeamsPage() {
           </select>
           <Select
             options={megateams.filter(({ name }) => name === megateam)[0].areas}
-            className="mt-2"
+            className="mt-2 dh-select"
+            classNamePrefix="dh-select"
             menuPortalTarget={document.body}
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          <button className="w-full rounded px-2 py-1 bg-accent text-white mt-2">
-            Save
-          </button>
+          <div className="md:flex md:justify-end">
+            <button className="w-full rounded px-2 py-1 bg-accent text-white mt-2 md:w-fit">
+              Save
+            </button>
+          </div>
         </div>
       ))}
     </div>

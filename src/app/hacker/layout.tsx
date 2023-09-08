@@ -16,9 +16,9 @@ export default function HackerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useUser({ redirectTo: "/" });
   if (isLoading) return <></>;
-  if (user.role !== "hacker") return redirect("/");
+  if (user?.role !== "hacker") return redirect("/");
 
   const tabs = [
     {
