@@ -7,30 +7,21 @@ import { z } from "zod";
 import { Op } from "sequelize";
 
 import { NullError, ValueError } from "@server/common/errors";
+import { QRCategory, UserRole } from "@server/common/model_enums";
+import sequelize from "@server/database";
 import QRCode from "@server/database/qr_code";
 import Point from "@server/database/point";
 import User from "@server/database/user";
 import {
-  requireUserIsAdmin,
-  requireUserIsVolunteer,
-  requireUserIsSponsor,
   requireLoggedIn,
+  requireUserIsAdmin,
+  requireUserIsOneOf,
 } from "@server/common/decorators";
-import sequelize from "@server/database";
 
 
 const presets = JSON.parse(
   readFileSync(path.join(__dirname, "./QR_presets.json")).toString()
 );
-
-const qr_attributes = QRCode.getAttributes();
-
-const allowed_create_fields = new Set(Object.keys(qr_attributes));
-allowed_create_fields.delete("createdAt");
-allowed_create_fields.delete("updatedAt");
-allowed_create_fields.delete("payload");
-allowed_create_fields.delete("creator_id");
-allowed_create_fields.add("publicised");
 
 const patch_fields = new Set(["state", "publicised"]);
 
@@ -44,26 +35,44 @@ class QRHandlers {
     });
   }
 
-  private async handleQRCreation(request: Request, response: Response) {
-    const invalid_fields = Object.keys(request.body).filter(
-      (key) => !allowed_create_fields.has(key)
-    );
-    if (invalid_fields.length > 0) {
-      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
-    }
+  static createQRPayload = z.object({
+    name: z.string(),
+    category: z.nativeEnum(QRCategory),
+    points_value: z.number().nonnegative(),
+    max_uses: z.number().nonnegative(),
+    state: z.boolean(),
+    start_time: z.date().or(z.string().datetime().transform((val => new Date(val)))),
+    expiry_time: z.date().or(z.string().datetime().transform((val => new Date(val)))),
+  });
 
-    request.body.payload = uuid();
-    request.body.creator_id = request.user?.id;
-
+  private async buildAndSaveQRCodeFromCreateAttributes(
+    creator: User,
+    create_attributes: z.infer<typeof QRHandlers.createQRPayload>,
+    publicised: boolean,
+  ) {
     const publicisedFields = await this.getPublicisedFields(
       undefined,
-      request.body.publicised
+      publicised,
     );
 
-    let new_instance = await QRCode.create({
-      ...request.body,
+    return await QRCode.create({
+      payload: uuid(),
+      creator_id: creator.id,
+      ...create_attributes,
       ...publicisedFields,
     });
+  }
+
+  @requireUserIsAdmin
+  async createQRCode(request: Request, response: Response) {
+    const create_attributes = QRHandlers.createQRPayload.parse(request.body);
+    const publicised = z.boolean().parse(request.body.publicised);
+
+    const new_instance = await this.buildAndSaveQRCodeFromCreateAttributes(
+      (request.user as User),
+      create_attributes,
+      publicised,
+    );
 
     response.status(200);
     response.json({
@@ -73,46 +82,42 @@ class QRHandlers {
     });
   }
 
-  @requireUserIsAdmin
-  async createQRCode(request: Request, response: Response): Promise<void> {
-    await this.handleQRCreation(request, response);
-  }
+  @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
+  async usePreset(request: Request, response: Response) {
+    const { preset_id }: { preset_id: string } = request.params;
+    const name = z.string().parse(request.body.name);
 
-  private async handlePresetCreation(request: Request, response: Response) {
-    const presetName = request.params.preset;
-    const name = request.body.name;
-    if (!presetName || !presets.hasOwnProperty(presetName) || !name) {
-      throw new createHttpError.BadRequest();
+    if (!preset_id || !presets.hasOwnProperty(preset_id) || !name) {
+      throw new createHttpError.NotFound();
     }
-    const preset = presets[presetName];
-    let expiry = new Date();
+    const preset = presets[preset_id];
+
+    const publicised = z.boolean().parse(request.body.publicised);
+
+    const expiry = new Date();
     expiry.setMinutes(expiry.getMinutes() + preset.minutesValid);
-    request.body = {
+    const create_attributes = {
       name: name,
       points_value: preset.points,
       max_uses: preset.uses,
-      category: "preset",
+      category: QRCategory.preset,
       state: true,
       start_time: new Date(),
       expiry_time: expiry,
-      publicised: request.body.publicised,
     };
-    await this.handleQRCreation(request, response);
-  }
 
-  @requireUserIsAdmin
-  async usePresetAdmin(request: Request, response: Response) {
-    await this.handlePresetCreation(request, response);
-  }
+    const new_instance = await this.buildAndSaveQRCodeFromCreateAttributes(
+      (request.user as User),
+      create_attributes,
+      publicised,
+    );
 
-  @requireUserIsSponsor
-  async usePresetSponsor(request: Request, response: Response) {
-    await this.handlePresetCreation(request, response);
-  }
-
-  @requireUserIsVolunteer
-  async usePresetVolunteer(request: Request, response: Response) {
-    await this.handlePresetCreation(request, response);
+    response.status(200);
+    response.json({
+      status: response.statusCode,
+      message: "OK",
+      data: new_instance,
+    });
   }
 
   @requireUserIsAdmin
@@ -125,13 +130,13 @@ class QRHandlers {
       category: code.category,
       scans: code.uses?.length || 0,
       max_scans: code.max_uses,
-      creator: code.creator.full_name,
+      creator: code.creator.email,
       value: code.points_value,
       start: code.start_time,
       end: code.expiry_time,
       enabled: code.state,
       uuid: code.payload,
-      publicised: !!code.challenge_rank,
+      publicised: code.challenge_rank !== null,
     }));
 
     response.status(200);
@@ -142,43 +147,11 @@ class QRHandlers {
     });
   }
 
-  async getPublicQRCodeList(_request: Request, response: Response): Promise<void> {
-    const result = await QRCode.findAll({
-      include: [Point, User],
-      where: {
-        publicised: { [Op.not]: null }
-      }
-    });
-
-    const payload = result.map((code: QRCode) => ({
-      name: code.name,
-      category: code.category,
-      scans: code.uses?.length || 0,
-      max_scans: code.max_uses,
-      creator: code.creator.full_name,
-      value: code.points_value,
-      start: code.start_time,
-      end: code.expiry_time,
-      enabled: code.state,
-      publicised: !!code.challenge_rank,
-    }));
-
-    response.status(200);
-    response.json({
-      status: 200,
-      message: "OK",
-      codes: payload,
-    });
-  }
-
-  private async getPublicisedFields(
-    existing_rank: number | undefined,
-    publicised: boolean
-  ) {
+  private async getPublicisedFields(existing_rank: typeof QRCode.prototype.challenge_rank, publicised: boolean) {
     let fields = { challenge_rank: existing_rank };
 
     if (!publicised) {
-      fields.challenge_rank = undefined;
+      fields.challenge_rank = null;
     } else {
       if (!existing_rank) {
         let maxRank: number = await QRCode.max("challenge_rank");
@@ -193,10 +166,8 @@ class QRHandlers {
     return fields;
   }
 
-  private async patchQRCodeDetails(
-    request: Request,
-    response: Response
-  ): Promise<void> {
+  @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
+  async patchQRCodeDetails(request: Request, response: Response): Promise<void> {
     const { qr_code_id } = response.locals;
     if (typeof qr_code_id !== "number")
       throw new Error("Parsed `qr_code_id` not found.");
@@ -231,22 +202,8 @@ class QRHandlers {
     });
   }
 
-  @requireUserIsAdmin
-  async patchQRAdmin(request: Request, response: Response) {
-    await this.patchQRCodeDetails(request, response);
-  }
-
-  @requireUserIsSponsor
-  async patchQRSponsor(request: Request, response: Response) {
-    await this.patchQRCodeDetails(request, response);
-  }
-
-  @requireUserIsVolunteer
-  async patchQRVolunteer(request: Request, response: Response) {
-    await this.patchQRCodeDetails(request, response);
-  }
-
-  private getPresets(_request: Request, response: Response) {
+  @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
+  getPresetsList(_request: Request, response: Response) {
     response.status(200);
     response.json({
       status: 200,
@@ -256,18 +213,18 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  getPresetsAdmin(request: Request, response: Response) {
-    this.getPresets(request, response);
+  createPreset(request: Request, response: Response) {
+    throw new createHttpError.NotImplemented();
   }
 
-  @requireUserIsVolunteer
-  getPresetsVolunteer(request: Request, response: Response) {
-    this.getPresets(request, response);
+  @requireUserIsAdmin
+  getPresetDetails(request: Request, response: Response) {
+    throw new createHttpError.NotImplemented();
   }
 
-  @requireUserIsSponsor
-  getPresetsSponsor(request: Request, response: Response) {
-    this.getPresets(request, response);
+  @requireUserIsAdmin
+  deletePreset(request: Request, response: Response) {
+    throw new createHttpError.NotImplemented();
   }
 
   @requireLoggedIn
@@ -293,7 +250,7 @@ class QRHandlers {
       await Point.create({
         value: qr.points_value,
         origin_qrcode_id: qr.id,
-        redeemer_id: request.user!.id,
+        redeemer_id: (request.user as User).id,
         transaction: transaction,
       });
 
@@ -346,7 +303,7 @@ class QRHandlers {
     await this.getChallengeList(request, response, true);
   }
 
-  async getChallengeListUser(request: Request, response: Response) {
+  async getChallengeListAsAnonymous(request: Request, response: Response) {
     await this.getChallengeList(request, response, false);
   }
 
@@ -366,32 +323,50 @@ class QRHandlers {
       throw new createHttpError.BadRequest();
     }
 
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
       await QRCode.update(
         { challenge_rank: null },
-        { where: { challenge_rank: { [Op.ne]: null } } }
+        {
+          transaction: transaction,
+        }
       );
 
       for (let challenge of request.body.challenges) {
         let found_challenge = await QRCode.findByPk(challenge.id, {
           rejectOnEmpty: new NullError(),
         });
-        found_challenge.challenge_rank = challenge.rank;
-        await found_challenge.save();
+        await found_challenge.update({
+          challenge_rank: challenge.rank,
+        });
       }
 
-      await t.commit();
-
-      response.json({
-        status: 200,
-        message: "OK",
-      });
+      await transaction.commit();
     } catch (error) {
-      await t.rollback();
+      await transaction.rollback();
       throw error;
     }
+
+    response.json({
+      status: 200,
+      message: "OK",
+    });
+  }
+
+  @requireUserIsAdmin
+  async createChallenge(request: Request, response: Response) {
+    throw new createHttpError.NotImplemented();
+  }
+
+  @requireUserIsAdmin
+  getQRCodeDetails(request: Request, response: Response) {
+    throw new createHttpError.NotImplemented();
+  }
+
+  @requireUserIsAdmin
+  deleteQRCode(request: Request, response: Response) {
+    throw new createHttpError.NotImplemented();
   }
 }
 
