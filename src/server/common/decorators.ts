@@ -58,6 +58,15 @@ export const requireUserIsSponsor = requireCondition(userIsRole(UserRole.sponsor
 export const requireLoggedIn = requireCondition(userIsLoggedIn);
 
 /**
+ * Decorator that ensures `request.user.role` is one of the provided roles.
+ */
+export function requireUserIsOneOf(...roles: UserRole[]) {
+  return requireCondition(function (request: Request): boolean {
+    return !!request.user && roles.includes(request.user.role);
+  });
+}
+
+/**
  * Condition function that determines if the resource a user is trying to access/modify
  * is themselves.
  *
