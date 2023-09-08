@@ -41,6 +41,11 @@ export default class QRCode extends Model {
     points_value!: number;
 
   @Column({
+    type: DataType.INTEGER,
+  })
+    max_uses!: number;
+
+  @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
@@ -75,5 +80,16 @@ export default class QRCode extends Model {
     allowNull: true,
     unique: true,
   })
-    challenge_rank?: number;
+    challenge_rank!: number | null;
+
+  canBeRedeemed() {
+    const now = new Date();
+
+    if (now < this.start_time) return false;
+    if (now >= this.expiry_time) return false;
+    if (!this.state) return false;
+
+    const numberOfUses = this.$count("uses");
+    return (numberOfUses) < this.max_uses;
+  }
 }

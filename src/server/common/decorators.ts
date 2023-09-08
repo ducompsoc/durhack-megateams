@@ -56,3 +56,29 @@ export const requireUserIsSponsor = requireCondition(userIsRole(UserRole.sponsor
  * Decorator that ensures `request.user` is not null/undefined.
  */
 export const requireLoggedIn = requireCondition(userIsLoggedIn);
+
+/**
+ * Decorator that ensures `request.user.role` is one of the provided roles.
+ */
+export function requireUserIsOneOf(...roles: UserRole[]) {
+  return requireCondition(function (request: Request): boolean {
+    return !!request.user && roles.includes(request.user.role);
+  });
+}
+
+/**
+ * Condition function that determines if the resource a user is trying to access/modify
+ * is themselves.
+ *
+ * @param request
+ * @param response
+ * @private
+ */
+export function userIsSelf(request: Request, response: Response): boolean {
+  return (!!request.user && request.user.id === response.locals.user_id);
+}
+
+/**
+ * Decorator that ensures a user is trying to access/modify themselves, not some other person.
+ */
+export const requireSelf = requireCondition(userIsSelf);

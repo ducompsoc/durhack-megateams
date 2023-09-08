@@ -1,20 +1,26 @@
 import { Router as ExpressRouter } from "express";
 
-import * as handlers from "./area_handlers";
-import { handleMethodNotAllowed } from "@server/common/middleware";
+import {
+  handleFailedAuthentication,
+  handleMethodNotAllowed,
+  parseRouteId
+} from "@server/common/middleware";
+
+import handlers from "./area_handlers";
 
 
 const areas_router = ExpressRouter();
 
 areas_router.route("/")
-  .get(handlers.getAreasList)
-  .post(handlers.createArea)
+  .get(handlers.getAreasList, handleFailedAuthentication)
+  .post(handlers.createArea, handleFailedAuthentication)
   .all(handleMethodNotAllowed);
 
 areas_router.route("/:area_id")
-  .get(handlers.getAreaDetails)
-  .patch(handlers.patchAreaDetails)
-  .delete(handlers.deleteArea)
+  .all(parseRouteId("area_id"))
+  .get(handlers.getAreaDetails, handleFailedAuthentication)
+  .patch(handlers.patchAreaDetails, handleFailedAuthentication)
+  .delete(handlers.deleteArea, handleFailedAuthentication)
   .all(handleMethodNotAllowed);
 
 export default areas_router;

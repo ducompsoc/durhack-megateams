@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 import dateFormat from "dateformat";
 import presets from "../QR_presets.json";
+import useUser from "../lib/useUser";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
@@ -27,7 +28,9 @@ export default function Volunteer() {
   });
   const renderedQR = useRef(null);
 
-  const isAdmin = true;
+  const { user } = useUser();
+  const isAdmin = user?.role === "admin";
+  const isVolunteer = user?.role === "admin" || user?.role === "volunteer";
 
   function getClasses(name: string) {
     let classes =
@@ -156,6 +159,11 @@ export default function Volunteer() {
       name: "Preset",
       content: (
         <div className="dh-box p-4">
+          <input
+            type="text"
+            className="mb-2 dh-input w-full"
+            placeholder="Name/Description"
+          />
           <select
             className="dh-input w-full"
             onChange={(e) =>
@@ -186,10 +194,7 @@ export default function Volunteer() {
           </div>
           <div className="flex items-center">
             <p>Publicised:</p>
-            <input
-              type="checkbox"
-              className="ml-2 dh-check"
-            />
+            <input type="checkbox" className="ml-2 dh-check" />
             <button
               className="rounded px-2 py-1 bg-accent text-white ml-4"
               onClick={() => generate(selected.name, selected.uuid)}
@@ -200,68 +205,69 @@ export default function Volunteer() {
         </div>
       ),
     },
-    {
-      name: "Custom",
-      content: (
-        <div className="dh-box p-4">
-          <p className="font-semibold mb-2">Generate Custom QR</p>
-          <input
-            type="text"
-            className="dh-input w-full"
-            placeholder="Name/Description"
-          />
-          <select className="my-2 dh-input w-full">
-            {qrTypes.map((qrType) => (
-              <option key={qrType} value={qrType}>
-                {qrType}
-              </option>
-            ))}
-          </select>
-          <div className="flex items-center">
-            <input
-              type="number"
-              className="my-2 dh-input w-full md:w-fit"
-            />
-            <p className="ml-1 mr-2">points</p>
-            <input
-              type="number"
-              className="my-2 dh-input w-full md:w-fit"
-            />
-            <p className="ml-1 mr-2">uses</p>
-          </div>
-          <p className="pt-2">Start time</p>
-          <div className="flex items-center">
-            <input
-              type="datetime-local"
-              className="my-2 dh-input w-full"
-            />
-            <button className="ml-2">
-              <ClockIcon className="w-6 h-6" />
-            </button>
-          </div>
-          <p className="pt-2">End time</p>
-          <div className="flex items-center">
-            <input
-              type="datetime-local"
-              className="my-2 dh-input w-full"
-            />
-            <button className="ml-2">
-              <ClockIcon className="w-6 h-6" />
-            </button>
-          </div>
-          <div className="flex items-center mt-2">
-            <p>Publicised:</p>
-            <input
-              type="checkbox"
-              className="ml-2 dh-check"
-            />
-            <button className="rounded px-2 py-1 bg-accent text-white ml-4">
-              Generate
-            </button>
-          </div>
-        </div>
-      ),
-    },
+    ...(isVolunteer
+      ? [
+          {
+            name: "Custom",
+            content: (
+              <div className="dh-box p-4">
+                <p className="font-semibold mb-2">Generate Custom QR</p>
+                <input
+                  type="text"
+                  className="dh-input w-full"
+                  placeholder="Name/Description"
+                />
+                <select className="my-2 dh-input w-full">
+                  {qrTypes.map((qrType) => (
+                    <option key={qrType} value={qrType}>
+                      {qrType}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center">
+                  <input
+                    type="number"
+                    className="my-2 dh-input w-full md:w-fit"
+                  />
+                  <p className="ml-1 mr-2">points</p>
+                  <input
+                    type="number"
+                    className="my-2 dh-input w-full md:w-fit"
+                  />
+                  <p className="ml-1 mr-2">uses</p>
+                </div>
+                <p className="pt-2">Start time</p>
+                <div className="flex items-center">
+                  <input
+                    type="datetime-local"
+                    className="my-2 dh-input w-full"
+                  />
+                  <button className="ml-2">
+                    <ClockIcon className="w-6 h-6" />
+                  </button>
+                </div>
+                <p className="pt-2">End time</p>
+                <div className="flex items-center">
+                  <input
+                    type="datetime-local"
+                    className="my-2 dh-input w-full"
+                  />
+                  <button className="ml-2">
+                    <ClockIcon className="w-6 h-6" />
+                  </button>
+                </div>
+                <div className="flex items-center mt-2">
+                  <p>Publicised:</p>
+                  <input type="checkbox" className="ml-2 dh-check" />
+                  <button className="rounded px-2 py-1 bg-accent text-white ml-4">
+                    Generate
+                  </button>
+                </div>
+              </div>
+            ),
+          },
+        ]
+      : []),
     ...(isAdmin
       ? [
           {

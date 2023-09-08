@@ -8,10 +8,12 @@ import User from "@server/database/user";
 
 import { hashPasswordText, validatePassword } from "./auth_util";
 import * as process from "process";
-import {sendStandardResponse} from "@server/common/response";
+import { sendStandardResponse } from "@server/common/response";
 
-
-function ensureCorrectVerifyCode(user: User, verify_code_attempt: string): void {
+function ensureCorrectVerifyCode(
+  user: User,
+  verify_code_attempt: string
+): void {
   if (process.env.MEGATEAMS_SKIP_EMAIL_VERIFICATION === "true") {
     return;
   }
@@ -21,7 +23,7 @@ function ensureCorrectVerifyCode(user: User, verify_code_attempt: string): void 
   }
 
   // verification codes are valid for 5 minutes (in milliseconds)
-  if ((Date.now() - user.verify_sent_at) > 300_000) {
+  if (Date.now() - user.verify_sent_at > 300_000) {
     throw new createHttpError.BadRequest("Verify code expired.");
   }
 
@@ -31,7 +33,30 @@ function ensureCorrectVerifyCode(user: User, verify_code_attempt: string): void 
 }
 
 export async function handleLoginSuccess(request: Request, response: Response) {
-  throw new createHttpError.NotImplemented("Login success handler not implemented");
+  response.json({
+    status: 200,
+    message: "OK",
+    user: {
+      name: request.user?.preferred_name,
+      loggedIn: request.user ? true : false,
+      role: request.user?.role,
+    },
+  });
+}
+
+export async function handleGetCurrentUser(
+  request: Request,
+  response: Response
+) {
+  response.json({
+    status: 200,
+    message: "OK",
+    user: {
+      name: request.user?.preferred_name,
+      loggedIn: request.user ? true : false,
+      role: request.user?.role,
+    },
+  });
 }
 
 export async function handleSignUp(request: Request, response: Response) {
@@ -53,7 +78,9 @@ export async function handleSetPassword(request: Request, response: Response) {
   }
 
   if (typeof password !== "string" || !validatePassword(password)) {
-    throw new createHttpError.BadRequest("Password should be a string containing no illegal characters.");
+    throw new createHttpError.BadRequest(
+      "Password should be a string containing no illegal characters."
+    );
   }
 
   if (typeof verify_code !== "string") {
@@ -62,9 +89,15 @@ export async function handleSetPassword(request: Request, response: Response) {
 
   let found_user: User;
   try {
-    found_user = await User.findOne({ where: { email }, rejectOnEmpty: new NullError() });
+    found_user = await User.findOne({
+      where: { email },
+      rejectOnEmpty: new NullError(),
+    });
   } catch (error) {
-    if (error instanceof NullError) throw new createHttpError.NotFound("It looks like you didn't fill in the sign-up form - try another email address, or speak to a DurHack volunteer if you believe this is an error!");
+    if (error instanceof NullError)
+      throw new createHttpError.NotFound(
+        "It looks like you didn't fill in the sign-up form - try another email address, or speak to a DurHack volunteer if you believe this is an error!"
+      );
     throw error;
   }
 
