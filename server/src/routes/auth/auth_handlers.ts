@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { randomBytes as cryptoRandomBytes } from "crypto";
-import * as EmailValidator from "email-validator";
+import { z } from "zod";
 
 import { NullError } from "@server/common/errors";
-import User from "@server/database/tables/tables/user";
+import User from "@server/database/tables/user";
 
 import { hashPasswordText, validatePassword } from "./auth_util";
 import * as process from "process";
@@ -18,12 +18,12 @@ function ensureCorrectVerifyCode(
     return;
   }
 
-  if (user.verify_code === undefined || user.verify_sent_at === undefined) {
+  if (user.verify_code === null || user.verify_sent_at === null) {
     throw new createHttpError.BadRequest("Verify code not set.");
   }
 
   // verification codes are valid for 5 minutes (in milliseconds)
-  if (Date.now() - user.verify_sent_at > 300_000) {
+  if ((Date.now() - user.verify_sent_at.getSeconds()) > 300_000) {
     throw new createHttpError.BadRequest("Verify code expired.");
   }
 
@@ -63,29 +63,18 @@ export async function handleSignUp(request: Request, response: Response) {
   throw new createHttpError.NotImplemented("Sign up handler not implemented");
 }
 
+const setPasswordPayloadSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  verify_code: z.string().length(6),
+});
+
 export async function handleSetPassword(request: Request, response: Response) {
   if (request.user) {
     throw new createHttpError.BadRequest("You are already logged in!");
   }
 
-  let email: unknown;
-  let password: unknown;
-  let verify_code: unknown;
-  ({ email, password, verify_code } = request.body);
-
-  if (typeof email !== "string" || !EmailValidator.validate(email)) {
-    throw new createHttpError.BadRequest("Email address needs to be mailable.");
-  }
-
-  if (typeof password !== "string" || !validatePassword(password)) {
-    throw new createHttpError.BadRequest(
-      "Password should be a string containing no illegal characters."
-    );
-  }
-
-  if (typeof verify_code !== "string") {
-    throw new createHttpError.BadRequest("Verify code should be a string.");
-  }
+  const { email, password, verify_code } = setPasswordPayloadSchema.parse(request.body);
 
   let found_user: User;
   try {

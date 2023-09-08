@@ -7,12 +7,15 @@ import createHttpError from "http-errors";
 
 import { NullError } from "@server/common/errors";
 
-import User from "./user";
-import Team from "./team";
-import Area from "./area";
-import Megateam from "./megateam";
-import Point from "./point";
-import QRCode from "./qr_code";
+import {
+  User,
+  Team,
+  Area,
+  Megateam,
+  Point,
+  QRCode,
+} from "./tables";
+
 
 export interface SequelizeQueryTransform<M extends Model> {
   condition: WhereOptions<Attributes<M>>

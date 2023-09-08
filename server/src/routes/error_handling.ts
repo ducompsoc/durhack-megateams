@@ -1,12 +1,16 @@
 import createHttpError, { isHttpError } from "http-errors";
 import { Request, Response, NextFunction } from "express";
-
-import { sendHttpErrorResponse } from "@server/common/response";
-import {NullError, ValueError} from "@server/common/errors";
 import {
   ForeignKeyConstraintError as SequelizeForeignKeyConstraintError,
-  ValidationError as SequelizeValidationError
+  ValidationError as SequelizeValidationError,
 } from "sequelize";
+import { ZodError } from "zod";
+
+import {
+  sendHttpErrorResponse,
+  sendZodErrorResponse,
+} from "@server/common/response";
+import { NullError, ValueError } from "@server/common/errors";
 
 
 export default function api_error_handler(error: Error, _request: Request, response: Response, next: NextFunction) {
@@ -16,6 +20,10 @@ export default function api_error_handler(error: Error, _request: Request, respo
 
   if (isHttpError(error)) {
     return sendHttpErrorResponse(response, error);
+  }
+
+  if (error instanceof ZodError) {
+    return sendZodErrorResponse(response, error);
   }
 
   if (error instanceof ValueError) {

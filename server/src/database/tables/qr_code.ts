@@ -13,83 +13,84 @@ export default class QRCode extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-    id!: number;
+  declare id: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-    name!: string;
+  declare name: string;
 
   @Column({
     type: DataType.ENUM(...Object.values(QRCategory)),
     defaultValue: QRCategory.workshop,
     allowNull: false,
   })
-    category!: QRCategory;
+  declare category: QRCategory;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-    payload!: string;
+  declare payload: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-    points_value!: number;
+  declare points_value: number;
 
   @Column({
     type: DataType.INTEGER,
   })
-    max_uses!: number;
+  declare max_uses: number;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-    state!: boolean;
+  declare state: boolean;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-    start_time!: Date;
+  declare start_time: Date;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-    expiry_time!: Date;
+  declare expiry_time: Date;
 
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-    creator_id!: number;
+  declare creator_id: number;
+
   @BelongsTo(() => User, "creator_id")
-    creator!: User;
+  declare creator: User;
 
   @HasMany(() => Point)
-    uses?: Point[];
+  declare uses: Point[];
 
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
     unique: true,
   })
-    challenge_rank!: number | null;
+  declare challenge_rank: number | null;
 
-  canBeRedeemed() {
+  async canBeRedeemed() {
     const now = new Date();
 
     if (now < this.start_time) return false;
     if (now >= this.expiry_time) return false;
     if (!this.state) return false;
 
-    const numberOfUses = this.$count("uses");
+    const numberOfUses = await this.$count("uses");
     return (numberOfUses) < this.max_uses;
   }
 }

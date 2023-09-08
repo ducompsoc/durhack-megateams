@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { requireUserIsAdmin } from "@server/common/decorators";
-import Area from "@server/database/tables/tables/area";
+import Area from "@server/database/tables/area";
 import Megateam from "@server/database/tables/megateam";
 import createHttpError from "http-errors";
 

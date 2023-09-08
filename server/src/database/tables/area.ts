@@ -1,6 +1,6 @@
 import {DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey} from "sequelize-typescript";
 
-import Megateam from "@server/database/tables/tables/megateam";
+import Megateam from "./megateam";
 
 import Team from "./team";
 
@@ -13,31 +13,32 @@ export default class Area extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-    id!: number;
+  declare id: number;
 
   @ForeignKey(() => Megateam)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-    megateam_id!: number;
+  declare megateam_id: number;
+
   @BelongsTo(() => Megateam, "megateam_id")
-    megateam!: Megateam;
+  declare megateam: Megateam;
 
   @HasOne(() => Team, "area_id")
-    team?: Team;
+  declare team: Team;
 
   @Column({
     field: "area_name",
     type: DataType.STRING,
     allowNull: false,
   })
-    name!: string;
+  declare name: string;
 
   @Column({
     field: "area_location",
     type: DataType.STRING,
     allowNull: false,
   })
-    location!: string;
+  declare location: string;
 }

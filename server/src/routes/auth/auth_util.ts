@@ -2,7 +2,7 @@ import { promisify } from "util";
 import { pbkdf2, timingSafeEqual } from "crypto";
 import { VerifyFunction } from "passport-local";
 
-import User from "@server/database/tables/tables/user";
+import User from "@server/database/tables/user";
 import { NullError } from "@server/common/errors";
 
 

@@ -10,21 +10,21 @@ export default class Megateam extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-    id!: number;
+  declare id: number;
 
   @Column({
     field: "megateam_name",
     type: DataType.STRING,
     allowNull: false,
   })
-    name!: string;
+  declare name: string;
 
   @Column({
     field: "megateam_description",
     type: DataType.STRING,
     allowNull: true,
   })
-    description?: string;
+  declare description: string | null;
 
   @HasMany(() => Area, "megateam_id")
     areas!: Area[];

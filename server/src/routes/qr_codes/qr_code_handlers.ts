@@ -9,7 +9,7 @@ import { Op } from "sequelize";
 import { NullError, ValueError } from "@server/common/errors";
 import { QRCategory, UserRole } from "@server/common/model_enums";
 import sequelize from "@server/database";
-import QRCode from "@server/database/tables/tables/qr_code";
+import QRCode from "@server/database/tables/qr_code";
 import Point from "@server/database/tables/point";
 import User from "@server/database/tables/user";
 import {
@@ -51,7 +51,7 @@ class QRHandlers {
     publicised: boolean,
   ) {
     const publicisedFields = await this.getPublicisedFields(
-      undefined,
+      null,
       publicised,
     );
 
@@ -84,7 +84,7 @@ class QRHandlers {
 
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   async usePreset(request: Request, response: Response) {
-    const { preset_id }: { preset_id: string } = request.params;
+    const preset_id: string = request.params.preset_id;
     const name = z.string().parse(request.body.name);
 
     if (!preset_id || !presets.hasOwnProperty(preset_id) || !name) {
@@ -329,6 +329,7 @@ class QRHandlers {
       await QRCode.update(
         { challenge_rank: null },
         {
+          where: { challenge_rank: { [Op.not]: null } },
           transaction: transaction,
         }
       );

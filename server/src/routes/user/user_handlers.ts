@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
 
-import User from "@server/database/tables/tables/user";
+import User from "@server/database/tables/user";
 import Point from "@server/database/tables/point";
 import Area from "@server/database/tables/area";
 import Megateam from "@server/database/tables/megateam";

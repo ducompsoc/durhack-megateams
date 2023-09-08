@@ -19,7 +19,7 @@ export default class Team extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-  id!: number;
+  declare id: number;
 
   @Column({
     type: DataType.INTEGER,
@@ -32,7 +32,7 @@ export default class Team extends Model {
         .toUpperCase();
     },
   })
-  join_code!: number;
+  declare join_code: number;
 
   @Column({
     field: "team_name",
@@ -40,17 +40,23 @@ export default class Team extends Model {
     allowNull: false,
     unique: true,
   })
-  name!: string;
+  declare name: string;
 
   @ForeignKey(() => Area)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
-  area_id?: number;
+  declare area_id: number | null;
+
   @BelongsTo(() => Area, "area_id")
-  area?: Area;
+  declare area: Area;
 
   @HasMany(() => User)
-  members?: User[];
+  declare members: User[];
+
+  async isJoinable() {
+    const team_members: number = await this.$count("members");
+    return (team_members < Number(process.env.MAX_TEAM_MEMBERS));
+  }
 }

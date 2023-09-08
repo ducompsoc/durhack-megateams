@@ -14,153 +14,154 @@ export default class User extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-    id!: number;
+  declare id: number;
 
   @ForeignKey(() => Team)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
-    team_id?: number;
+  declare team_id: number | null;
+
   @BelongsTo(() => Team, "team_id")
-    team?: Team;
+  declare team: Team;
 
   @HasMany(() => QRCode, "creator_id")
-    createdQRCodes?: QRCode[];
+  declare createdQRCodes: QRCode[];
 
   @HasMany(() => Point, "redeemer_id")
-    points?: Point[];
+  declare points: Point[];
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
     unique: true,
   })
-    email!: string;
+  declare email: string;
 
   @Column({
     type: DataType.BLOB("tiny"),
     allowNull: true,
   })
-    hashed_password?: Buffer;
+  declare hashed_password: Buffer | null;
 
   @Column({
     type: DataType.BLOB("tiny"),
     allowNull: true,
   })
-    password_salt?: Buffer;
+  declare password_salt: Buffer | null;
 
   @Column({
     type: DataType.ENUM(...Object.values(UserRole)),
     defaultValue: UserRole.hacker,
     allowNull: false,
   })
-    role!: UserRole;
+  declare role: UserRole;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-    verify_code?: string;
+  declare verify_code: string | null;
 
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-    verify_sent_at?: number;
+  declare verify_sent_at: Date | null;
 
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-    initially_logged_in_at?: Date;
+  declare initially_logged_in_at: Date | null;
 
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-    last_logged_in_at?: Date;
+  declare last_logged_in_at: Date | null;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: true,
   })
-    h_UK_marketing?: boolean;
+  declare h_UK_marketing: boolean | null;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: true,
   })
-    h_UK_Consent?: boolean;
+  declare h_UK_Consent: boolean | null;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   })
-    checked_in!: boolean;
+  declare checked_in: boolean;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-    discord_id?: string;
+  declare discord_id: string | null;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-    discord_name?: string;
+  declare discord_name: string | null;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-    full_name!: string;
+  declare full_name: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-    preferred_name!: string;
+  declare preferred_name: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
-    age?: number;
+  declare age: number | null;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-    phone_number?: string;
+  declare phone_number: string | null;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-    university?: string;
+  declare university: string | null;
 
   @Column({
     type: DataType.CHAR(4),
     allowNull: true,
   })
-    graduation_year?: string;
+  declare graduation_year: string | null;
 
   @Column({
     type: DataType.ENUM(...Object.values(Ethnicity)),
     defaultValue: Ethnicity.pnts,
     allowNull: false,
   })
-    ethnicity!: Ethnicity;
+  declare ethnicity: Ethnicity | null;
 
   @Column({
     type: DataType.ENUM(...Object.values(Gender)),
     defaultValue: Gender.pnts,
     allowNull: false,
   })
-    gender!: Gender;
+  declare gender: Gender | null;
 
   static async listUsers(): Promise<Pick<User, "id" | "email" | "full_name">[]> {
     throw new Error("Not implemented.");

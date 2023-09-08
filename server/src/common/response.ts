@@ -1,11 +1,14 @@
 import { Response } from "express";
 import { HttpError } from "http-errors";
 import { STATUS_CODES } from "http";
+import { ZodError } from "zod";
+
 
 interface ResponseBody {
   status: number
   message: string
-  detail?: string
+  detail?: string | object
+  [key: string]: any
 }
 
 function makeHttpErrorResponseBody(error: HttpError): ResponseBody {
@@ -26,10 +29,23 @@ export function sendHttpErrorResponse(response: Response, error: HttpError): voi
   response.status(error.statusCode).json(response_body);
 }
 
+function makeZodErrorResponseBody(error: ZodError): ResponseBody {
+  return {
+    status: 400,
+    message: STATUS_CODES[400] as string,
+    detail: { issues: error.issues },
+  };
+}
+
+export function sendZodErrorResponse(response: Response, error: ZodError): void {
+  const response_body = makeZodErrorResponseBody(error);
+  response.status(400).json(response_body);
+}
+
 export function makeStandardResponseBody(status: number, message?: string): ResponseBody {
   const response_body: ResponseBody = {
     status: status,
-    message: STATUS_CODES[status] || "Unknown status"
+    message: STATUS_CODES[status] || "Unknown status",
   };
 
   if (message !== undefined) {
