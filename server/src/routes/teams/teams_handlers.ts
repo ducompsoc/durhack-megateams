@@ -15,11 +15,11 @@ import {
   requireLoggedIn
 } from "@server/common/decorators";
 import sequelize from "@server/database";
-import Team from "@server/database/team";
-import User from "@server/database/user";
-import Area from "@server/database/area";
-import Megateam from "@server/database/megateam";
-import Point from "@server/database/point";
+import Team from "@server/database/tables/tables/team";
+import User from "@server/database/tables/user";
+import Area from "@server/database/tables/area";
+import Megateam from "@server/database/tables/megateam";
+import Point from "@server/database/tables/point";
 
 
 class TeamHandlers {

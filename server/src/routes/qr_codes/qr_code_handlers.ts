@@ -9,9 +9,9 @@ import { Op } from "sequelize";
 import { NullError, ValueError } from "@server/common/errors";
 import { QRCategory, UserRole } from "@server/common/model_enums";
 import sequelize from "@server/database";
-import QRCode from "@server/database/qr_code";
-import Point from "@server/database/point";
-import User from "@server/database/user";
+import QRCode from "@server/database/tables/tables/qr_code";
+import Point from "@server/database/tables/point";
+import User from "@server/database/tables/user";
 import {
   requireLoggedIn,
   requireUserIsAdmin,

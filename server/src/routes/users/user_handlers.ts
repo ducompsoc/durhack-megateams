@@ -7,11 +7,11 @@ import { NullError, ValueError } from "@server/common/errors";
 import { requireUserIsAdmin } from "@server/common/decorators";
 import { UserRole } from "@server/common/model_enums";
 import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
-import User from "@server/database/user";
-import Team from "@server/database/team";
-import Point from "@server/database/point";
-import Megateam from "@server/database/megateam";
-import Area from "@server/database/area";
+import User from "@server/database/tables/tables/user";
+import Team from "@server/database/tables/team";
+import Point from "@server/database/tables/tables/point";
+import Megateam from "@server/database/tables/megateam";
+import Area from "@server/database/tables/area";
 
 import { requireSelf } from "./user_util";
 

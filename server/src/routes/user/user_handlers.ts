@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
 
-import User from "@server/database/user";
-import Point from "@server/database/point";
-import Area from "@server/database/area";
-import Megateam from "@server/database/megateam";
-import Team from "@server/database/team";
+import User from "@server/database/tables/tables/user";
+import Point from "@server/database/tables/point";
+import Area from "@server/database/tables/area";
+import Megateam from "@server/database/tables/megateam";
+import Team from "@server/database/tables/team";
 import {NullError} from "@server/common/errors";
 
 

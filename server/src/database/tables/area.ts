@@ -1,6 +1,6 @@
 import {DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey} from "sequelize-typescript";
 
-import Megateam from "@server/database/megateam";
+import Megateam from "@server/database/tables/tables/megateam";
 
 import Team from "./team";
 

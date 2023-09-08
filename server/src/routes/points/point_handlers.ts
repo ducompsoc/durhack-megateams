@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 
 import { NullError } from "@server/common/errors";
-import Point from "@server/database/point";
-import User from "@server/database/user";
-import QRCode from "@server/database/qr_code";
+import Point from "@server/database/tables/tables/point";
+import User from "@server/database/tables/user";
+import QRCode from "@server/database/tables/qr_code";
 import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
 import { strIsPositiveInteger } from "@server/common/validation";
 import { requireUserIsAdmin } from "@server/common/decorators";

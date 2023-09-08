@@ -2,7 +2,7 @@ import { Router as ExpressRouter } from "express";
 import passport from "passport";
 import Local from "passport-local";
 
-import SequelizeUser from "@server/database/user";
+import SequelizeUser from "@server/database/tables/tables/user";
 import { NullError } from "@server/common/errors";
 import { handleMethodNotAllowed } from "@server/common/middleware";
 

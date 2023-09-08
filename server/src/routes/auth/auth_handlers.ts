@@ -4,7 +4,7 @@ import { randomBytes as cryptoRandomBytes } from "crypto";
 import * as EmailValidator from "email-validator";
 
 import { NullError } from "@server/common/errors";
-import User from "@server/database/user";
+import User from "@server/database/tables/tables/user";
 
 import { hashPasswordText, validatePassword } from "./auth_util";
 import * as process from "process";

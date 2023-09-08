@@ -12,7 +12,6 @@ const dev = process.env.NODE_ENV !== "production";
 process.env.TZ = "Europe/London";
 
 async function main() {
-  await next_app.prepare();
   await ensureDatabaseExists();
 
   // Run with the force: true option to update your schema if your server's schema

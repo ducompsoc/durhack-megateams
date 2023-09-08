@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { Sequelize } from "sequelize";
 
-import Megateam from "@server/database/megateam";
-import Area from "@server/database/area";
-import Team from "@server/database/team";
-import User from "@server/database/user";
-import Point from "@server/database/point";
+import Megateam from "@server/database/tables/megateam";
+import Area from "@server/database/tables/area";
+import Team from "@server/database/tables/team";
+import User from "@server/database/tables/user";
+import Point from "@server/database/tables/point";
 
 
 class MegateamHandlers {
