@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { ValueError } from "@server/common/errors";
 
 export function handleMethodNotAllowed() {
+  // The endpoint does support this method: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
   throw new createHttpError.MethodNotAllowed();
 }
 
@@ -12,8 +13,11 @@ export function handleNotImplemented() {
 
 export function handleFailedAuthentication(request: Request) {
   if (request.user) {
+    // Re-authenticating will not allow access (i.e. you are not a high-enough privileged user):
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
     throw new createHttpError.Forbidden();
   }
+  // Lacking any credentials at all: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
   throw new createHttpError.Unauthorized();
 }
 
