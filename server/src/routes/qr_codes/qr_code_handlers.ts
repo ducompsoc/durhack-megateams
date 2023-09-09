@@ -148,13 +148,13 @@ class QRHandlers {
   }
 
   private async getPublicisedFields(existing_rank: typeof QRCode.prototype.challenge_rank, publicised: boolean) {
-    let fields = { challenge_rank: existing_rank };
+    const fields = { challenge_rank: existing_rank };
 
     if (!publicised) {
       fields.challenge_rank = null;
     } else {
       if (!existing_rank) {
-        let maxRank: number = await QRCode.max("challenge_rank");
+        const maxRank: number = await QRCode.max("challenge_rank");
         if (maxRank) {
           fields.challenge_rank = maxRank + 1;
         } else {
@@ -273,7 +273,7 @@ class QRHandlers {
     includeId: boolean
   ) {
     const now = new Date();
-    let challenges = await QRCode.findAll({
+    const challenges = await QRCode.findAll({
       where: {
         challenge_rank: { [Op.ne]: null },
         state: true,
@@ -284,7 +284,7 @@ class QRHandlers {
 
     challenges.sort((a, b) => a.challenge_rank! - b.challenge_rank!);
 
-    let data = challenges.map((challenge, i) => ({
+    const data = challenges.map((challenge, i) => ({
       title: challenge.name,
       points: challenge.points_value,
       rank: i,
@@ -334,8 +334,8 @@ class QRHandlers {
         }
       );
 
-      for (let challenge of request.body.challenges) {
-        let found_challenge = await QRCode.findByPk(challenge.id, {
+      for (const challenge of request.body.challenges) {
+        const found_challenge = await QRCode.findByPk(challenge.id, {
           rejectOnEmpty: new NullError(),
         });
         await found_challenge.update({

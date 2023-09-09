@@ -65,7 +65,7 @@ class TeamHandlers {
     });
 
     const payload = result.map((team) => {
-      let json = team.toJSON();
+      const json = team.toJSON();
       json.points = json.points || 0;
       return json;
     });
@@ -116,7 +116,7 @@ class TeamHandlers {
     });
 
     const payload = result.map((team) => {
-      let json = team.toJSON();
+      const json = team.toJSON();
       json.points = json.points || 0;
       json.member_count = json.member_count || 0;
       return json;
@@ -140,7 +140,7 @@ class TeamHandlers {
     const result = areaCode.safeParse(request.body.area_code);
     if (!result.success) throw new createHttpError.BadRequest();
 
-    let team = await Team.findByPk(team_id, { rejectOnEmpty: new NullError() });
+    const team = await Team.findByPk(team_id, { rejectOnEmpty: new NullError() });
     team.area_id = result.data;
     await team.save();
 

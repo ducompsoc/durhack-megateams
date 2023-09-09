@@ -33,7 +33,7 @@ export function buildQueryFromRequest<M extends Model>(request: Request, transfo
   };
 
   // https://stackoverflow.com/a/17385088
-  for (let parameterName in request.query) {
+  for (const parameterName in request.query) {
     // https://github.com/hapijs/hapi/issues/3280#issuecomment-237397365
     if (!Object.prototype.hasOwnProperty.call(request.query, parameterName)) {
       continue;
@@ -57,7 +57,7 @@ export function buildQueryFromRequest<M extends Model>(request: Request, transfo
     }
 
     if (transform.replacements) {
-      for (let [k,v] of transform.replacements.entries()) {
+      for (const [k,v] of transform.replacements.entries()) {
         options.replacements.set(k, v);
       }
     }
