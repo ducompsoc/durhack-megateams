@@ -1,14 +1,14 @@
-import "@server/common/config";
-
+import config from "config";
 import { Router as ExpressRouter, Request, Response } from "express";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";
 import createHttpError from "http-errors";
 import cookie_parser from "cookie-parser";
+import { z } from "zod";
 
 import { handleMethodNotAllowed } from "@server/common/middleware";
 
-import { doubleCsrfProtection } from "./auth/csrf";
+import { doubleCsrfProtection } from "@server/auth/csrf";
 import auth_router from "./auth";
 import areas_router from "./areas";
 import megateams_router from "./megateams";
@@ -21,11 +21,12 @@ import api_error_handler from "./error_handling";
 
 const api_router = ExpressRouter();
 
-api_router.use(cookie_parser("cookie_secret"));
+api_router.use(cookie_parser(config.get("cookie-parser.secret")));
 api_router.use(bodyParser.json());
 api_router.use(bodyParser.urlencoded({ extended: true }));
 
-if (process.env.MEGATEAMS_NO_MITIGATE_CSRF !== "true") {
+const mitigateCsrf = z.boolean().parse(config.get("csrf.enabled"));
+if (mitigateCsrf) {
   api_router.use(doubleCsrfProtection);
 }
 
