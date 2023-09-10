@@ -1,6 +1,5 @@
 import { promisify } from "util";
 import { pbkdf2, timingSafeEqual } from "crypto";
-import { VerifyFunction } from "passport-local";
 
 import User from "@server/database/tables/user";
 import { NullError } from "@server/common/errors";
@@ -46,32 +45,3 @@ export async function checkPassword(user: User, password_attempt: string): Promi
   const hashed_password_attempt = await hashPasswordText(password_attempt, user.password_salt);
   return timingSafeEqual(hashed_password_attempt, user.hashed_password);
 }
-
-export const localVerifyFunction: VerifyFunction = async function(username, password, callback) {
-  /**
-   * Verify function for Passport.js.
-   *
-   * @param username - email address to search for user with
-   * @param password - password to attempt to log in as user with
-   * @param callback - function to call with (error, user) when done
-   */
-  let user;
-  try {
-    user = await User.findOne({ where: { email: username }, rejectOnEmpty: new NullError() });
-  } catch (error) {
-    if (error instanceof NullError) {
-      return callback(null, false, { message: "Incorrect username or password." });
-    }
-    return callback(error);
-  }
-
-  try {
-    if (!await checkPassword(user, password)) {
-      return callback(null, false, { message: "Incorrect username or password." });
-    }
-  } catch (error) {
-    return callback(error);
-  }
-
-  return callback(null, user);
-};

@@ -1,57 +1,10 @@
 import { Router as ExpressRouter } from "express";
 import passport from "passport";
-import Local from "passport-local";
 
-import SequelizeUser from "@server/database/tables/user";
-import { NullError } from "@server/common/errors";
 import { handleMethodNotAllowed } from "@server/common/middleware";
+import { handleGetCsrfToken } from "@server/auth/csrf";
 
-import { localVerifyFunction } from "./auth_util";
-import {
-  handleSignUp,
-  handleSetPassword,
-  handleLoginSuccess,
-  handleGetCurrentUser,
-} from "./auth_handlers";
-import { handleGetCsrfToken } from "./csrf";
-
-declare global {
-  namespace Express {
-    interface User extends SequelizeUser {}
-  }
-}
-
-interface SerializedUser {
-  id: number;
-}
-
-const local_strategy = new Local.Strategy(localVerifyFunction);
-
-passport.use("local", local_strategy);
-
-passport.serializeUser<SerializedUser>(async function (
-  user: Express.User,
-  callback
-) {
-  return callback(null, { id: user.id });
-});
-
-passport.deserializeUser<SerializedUser>(async function (identifier, callback) {
-  if (typeof identifier?.id !== "number") {
-    return callback(null, null);
-  }
-  try {
-    return callback(
-      null,
-      await SequelizeUser.findByPk(identifier.id, {
-        rejectOnEmpty: new NullError(),
-      })
-    );
-  } catch (error) {
-    if (error instanceof NullError) return callback(null, null);
-    return callback(error);
-  }
-});
+import handlers from "./auth_handlers";
 
 const auth_router = ExpressRouter();
 
@@ -62,15 +15,17 @@ auth_router
       failureRedirect: "/login",
       failureMessage: true,
     }),
-    handleLoginSuccess
+    handlers.handleLoginSuccess
   )
   .all(handleMethodNotAllowed);
 
-auth_router.route("/signup").post(handleSignUp).all(handleMethodNotAllowed);
+auth_router.route("/signup")
+  .post(handlers.handleSignUp)
+  .all(handleMethodNotAllowed);
 
 auth_router
   .route("/setpassword")
-  .post(handleSetPassword)
+  .post(handlers.handleSetPassword)
   .all(handleMethodNotAllowed);
 
 auth_router
@@ -80,7 +35,7 @@ auth_router
 
 auth_router
   .route("/user")
-  .get(handleGetCurrentUser)
+  .get(handlers.handleGetCurrentUser)
   .all(handleMethodNotAllowed);
 
 export default auth_router;

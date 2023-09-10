@@ -1,6 +1,11 @@
-import session, { MemoryStore, Store, SessionOptions } from "express-session";
+import config from "config";
+import session, {MemoryStore, SessionOptions, Store} from "express-session";
 import * as constructor_session from "express-session";
 import MySQLStoreMeta, { MySQLStore as MySQLStoreType } from "express-mysql-session";
+import * as process from "process";
+
+import { mysql_options_schema, session_options_schema } from "@server/common/schema/config";
+
 
 // Augment express-session with a custom SessionData object
 declare module "express-session" {
@@ -11,15 +16,7 @@ declare module "express-session" {
 
 function get_mysql_session_store(): MySQLStoreType {
   const MySQLStore = MySQLStoreMeta(constructor_session);
-
-  const options  = {
-    host     : process.env.SESSION_DATABASE_HOST,
-    port     : Number(process.env.SESSION_DATABASE_PORT),
-    user     : process.env.SESSION_DATABASE_USER,
-    password : process.env.SESSION_DATABASE_PASSWORD,
-    database : process.env.SESSION_DATABASE_NAME
-  };
-
+  const options = mysql_options_schema.parse(config.get("mysql.session"));
   return new MySQLStore(options);
 }
 
@@ -37,19 +34,7 @@ function get_session_store(): Store {
 
 const sessionStore = get_session_store();
 
-const session_options: SessionOptions = {
-  name: "session_cookie_name",
-  secret: "session_cookie_secret",
-  store: sessionStore,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }
-};
-
-if (process.env.NODE_ENV === "production") {
-  if (session_options.cookie) {
-    session_options.cookie.secure = true;
-  }
-}
+const session_options = session_options_schema.parse(config.get("session")) as SessionOptions;
+session_options.store = sessionStore;
 
 export default session(session_options);
