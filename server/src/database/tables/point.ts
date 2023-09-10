@@ -1,4 +1,4 @@
-import {DataType, Table, Column, Model, BelongsTo, ForeignKey} from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, ForeignKey } from "sequelize-typescript";
 
 import QRCode from "./qr_code";
 import User from "./user";
@@ -28,7 +28,7 @@ export default class Point extends Model {
   declare origin_qrcode_id: number | null;
 
   @BelongsTo(() => QRCode, "origin_qrcode_id")
-  declare qrcode?: QRCode;
+  declare qrcode?: Awaited<QRCode>;
 
   @ForeignKey(() => User)
   @Column({
@@ -38,7 +38,7 @@ export default class Point extends Model {
   declare redeemer_id: number;
 
   @BelongsTo(() => User, "redeemer_id")
-  declare redeemer: User;
+  declare redeemer: Awaited<User>;
 
   static getPointsTotal(points: Point[]): number {
     return points.reduce((accumulator: number, currentPoint: Point) => accumulator + currentPoint.value, 0);

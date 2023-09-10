@@ -1,5 +1,7 @@
-import {DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey} from "sequelize-typescript";
+import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript";
+
 import { QRCategory } from "@server/common/model_enums";
+
 import User from "./user";
 import Point from "./point";
 
@@ -71,10 +73,10 @@ export default class QRCode extends Model {
   declare creator_id: number;
 
   @BelongsTo(() => User, "creator_id")
-  declare creator: User;
+  declare creator: Awaited<User>;
 
   @HasMany(() => Point)
-  declare uses: Point[];
+  declare uses: Awaited<Point>[];
 
   @Column({
     type: DataType.INTEGER,

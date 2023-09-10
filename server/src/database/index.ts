@@ -1,11 +1,11 @@
-import "../common/config";
-import mysql from "mysql2/promise";
-import { Sequelize } from "sequelize-typescript";
+import config from "config";
+import mysql, { ConnectionOptions as MySqlConnectionOptions } from "mysql2/promise";
+import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { Model, WhereOptions, Attributes, OrderItem, FindOptions } from "sequelize";
 import { Request } from "express";
 import createHttpError from "http-errors";
 
-import { NullError } from "@server/common/errors";
+import { mysql_options_schema, sequelize_options_schema } from "@server/common/schema/config";
 
 import {
   User,
@@ -86,28 +86,24 @@ export function buildQueryFromRequest<M extends Model>(request: Request, transfo
 
 
 export async function ensureDatabaseExists() {
-  const connection = await mysql.createConnection({
-    host    : process.env.DATABASE_HOST,
-    port    : Number(process.env.DATABASE_PORT),
-    user    : process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-  });
+  const initialConnectOptions = mysql_options_schema.parse(config.get("mysql.data")) as MySqlConnectionOptions;
+  const database_name = initialConnectOptions.database;
 
-  if (!process.env.DATABASE_NAME) {
-    throw new NullError("Database name cannot be null!");
+  if (!database_name) {
+    throw new Error("Database name cannot be falsy!");
   }
 
-  await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${process.env.DATABASE_NAME}\`;`);
+  delete initialConnectOptions.database;
+  const connection = await mysql.createConnection(initialConnectOptions);
+
+  await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${database_name}\`;`);
+
+  await connection.destroy();
 }
 
-const sequelize = new Sequelize({
-  host    : process.env.DATABASE_HOST,
-  port    : Number(process.env.DATABASE_PORT),
-  username: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_NAME,
-  dialect : "mysql",
-});
+const sequelizeConnectOptions = sequelize_options_schema.parse(config.get("mysql.data")) as SequelizeOptions;
+
+const sequelize = new Sequelize(sequelizeConnectOptions);
 
 sequelize.addModels([
   User,

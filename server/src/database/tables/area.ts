@@ -1,7 +1,6 @@
 import {DataType, Table, Column, Model, HasOne, BelongsTo, ForeignKey} from "sequelize-typescript";
 
 import Megateam from "./megateam";
-
 import Team from "./team";
 
 
@@ -23,10 +22,10 @@ export default class Area extends Model {
   declare megateam_id: number;
 
   @BelongsTo(() => Megateam, "megateam_id")
-  declare megateam: Megateam;
+  declare megateam: Awaited<Megateam>;
 
   @HasOne(() => Team, "area_id")
-  declare team: Team;
+  declare team: Awaited<Team>;
 
   @Column({
     field: "area_name",

@@ -1,3 +1,5 @@
+import config from "config";
+import { z } from "zod";
 import {
   DataType,
   Table,
@@ -8,8 +10,13 @@ import {
   ForeignKey,
 } from "sequelize-typescript";
 
+import { config_schema } from "@server/common/schema/config";
+
 import Area from "./area";
 import User from "./user";
+
+
+const maxTeamMembers = config_schema.shape.megateams.shape.maxTeamMembers.parse(config.get("megateams.maxTeamMembers"));
 
 @Table
 export default class Team extends Model {
@@ -50,13 +57,13 @@ export default class Team extends Model {
   declare area_id: number | null;
 
   @BelongsTo(() => Area, "area_id")
-  declare area: Area;
+  declare area: Awaited<Area>;
 
   @HasMany(() => User)
-  declare members: User[];
+  declare members: Awaited<User>[];
 
   async isJoinable() {
     const team_members: number = await this.$count("members");
-    return (team_members < Number(process.env.MAX_TEAM_MEMBERS));
+    return (team_members < maxTeamMembers);
   }
 }

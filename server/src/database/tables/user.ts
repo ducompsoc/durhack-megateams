@@ -24,13 +24,13 @@ export default class User extends Model {
   declare team_id: number | null;
 
   @BelongsTo(() => Team, "team_id")
-  declare team: Team;
+  declare team: Awaited<Team>;
 
   @HasMany(() => QRCode, "creator_id")
-  declare createdQRCodes: QRCode[];
+  declare createdQRCodes: Awaited<QRCode>[];
 
   @HasMany(() => Point, "redeemer_id")
-  declare points: Point[];
+  declare points: Awaited<Point>[];
 
   @Column({
     type: DataType.STRING,

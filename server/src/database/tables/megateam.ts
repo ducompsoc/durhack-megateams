@@ -1,4 +1,5 @@
 import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
+
 import Area from "./area";
 
 
@@ -27,5 +28,5 @@ export default class Megateam extends Model {
   declare description: string | null;
 
   @HasMany(() => Area, "megateam_id")
-    areas!: Area[];
+    areas!: Awaited<Area>[];
 }
