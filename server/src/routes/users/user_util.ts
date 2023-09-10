@@ -1,15 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import createHttpError from "http-errors";
+import { Request, Response } from "express";
 import { requireCondition } from "@server/common/decorators";
-
-export function useSelfId(request: Request, response: Response, next: NextFunction): void {
-  if (!request.user) {
-    throw new createHttpError.Unauthorized();
-  }
-
-  response.locals.user_id = request.user.id;
-  next();
-}
 
 /**
  * Condition function that determines if the resource a user is trying to access/modify

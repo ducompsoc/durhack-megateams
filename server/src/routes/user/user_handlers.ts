@@ -7,12 +7,34 @@ import Point from "@server/database/tables/point";
 import Area from "@server/database/tables/area";
 import Megateam from "@server/database/tables/megateam";
 import Team from "@server/database/tables/team";
-import {NullError} from "@server/common/errors";
+import { NullError } from "@server/common/errors";
+import { patch_user_payload_schema } from "@server/routes/users/user_handlers";
+import {ValidationError as SequelizeValidationError} from "sequelize/types/errors";
 
 
 class UserHandlers {
   async getUser(request: Request, response: Response) {
-    throw new createHttpError.NotImplemented();
+    const payload: User | { points: number } = request.user!.toJSON();
+    payload.points = Point.getPointsTotal(request.user!.points);
+
+    response.status(200);
+    response.json({ "status": response.statusCode, "message": "OK", "data": payload });
+  }
+
+  async patchUserDetails(request: Request, response: Response) {
+    const parsed_payload = patch_user_payload_schema.parse(request.body);
+
+    try {
+      await request.user!.update(parsed_payload);
+    } catch (error) {
+      if (error instanceof SequelizeValidationError) {
+        throw new createHttpError.BadRequest(error.message);
+      }
+      throw error;
+    }
+
+    response.status(200);
+    response.json({ status: response.statusCode, message: "OK" });
   }
 
   async getTeam(request: Request, response: Response) {

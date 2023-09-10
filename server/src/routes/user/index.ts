@@ -17,6 +17,7 @@ users_router.use((request: Request, response: Response, next: NextFunction) => {
 
 users_router.route("/")
   .get(handlers.getUser)
+  .patch(handlers.patchUserDetails)
   .all(handleMethodNotAllowed);
 
 users_router.route("/team")
