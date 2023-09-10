@@ -1,0 +1,66 @@
+{
+  "listen": {
+    "host": "127.0.0.1",
+    "port": 3001
+  },
+  "flags": {
+    "skipEmailVerification": false
+  },
+  "passport": {
+    "local": {
+      "usernameField": "email",
+      "passwordField": "password",
+      "session": true,
+      "passReqToCallback": false
+    },
+    "oauth2": {
+      "authorizationURL": "",
+      "tokenURL": "",
+      "clientID": "",
+      "clientSecret": "",
+      "callbackURL": "",
+      "profileURL": ""
+    }
+  },
+  "mysql": {
+    "data": {
+      "host": "127.0.0.1",
+      "port": 3306,
+      "database": "durhack",
+      "user": "root",
+      "password": "strongexamplepassword"
+    },
+    "session": {
+      "host": "127.0.0.1",
+      "port": 3306,
+      "database": "durhack-session",
+      "user": "root",
+      "password": "strongexamplepassword"
+    }
+  },
+  "csrf": {
+    "enabled": true,
+    "secret": "csrfisoverrated",
+    "options": {
+      "cookieName": "psifi.x-csrf-token",
+      "cookieOptions": {
+        "sameSite": "strict",
+        "path": "/",
+        "secure": false
+      }
+    }
+  },
+  "cookie-parser": {
+    "secret": "thebestsecretforcookies"
+  },
+  "session": {
+    "name": "durhack-megateams-session",
+    "secret": "session_cookie_secret",
+    "resave": false,
+    "saveUninitialized": false,
+    "cookie": { "secure": false }
+  },
+  "megateams": {
+    "maxTeamMembers": 4
+  }
+}
