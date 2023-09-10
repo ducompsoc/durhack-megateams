@@ -7,7 +7,6 @@ import Point from "@server/database/tables/point";
 import User from "@server/database/tables/user";
 import QRCode from "@server/database/tables/qr_code";
 import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
-import { strIsPositiveInteger } from "@server/common/validation";
 import { requireUserIsAdmin } from "@server/common/decorators";
 
 
@@ -25,8 +24,8 @@ const patch_point_payload_schema = z.object({
 
 const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
 point_transform_factories.set("redeemer_id", (value) => {
-  if (strIsPositiveInteger(value)) return { condition: { redeemer_id: value } };
-  throw new createHttpError.BadRequest("Malformed query parameter value for `redeemer_id`. Should be a positive integer.");
+  const parsed_value = z.coerce.number().positive().parse(value);
+  return { condition: { redeemer_id: parsed_value } };
 });
 
 
