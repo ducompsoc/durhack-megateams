@@ -1,8 +1,7 @@
 import createHttpError from "http-errors";
+import config from "config";
 import { Request, Response } from "express";
-import { readFileSync } from "fs";
 import { v4 as uuid } from "uuid";
-import path from "path";
 import { z } from "zod";
 import { Op } from "sequelize";
 
@@ -17,10 +16,12 @@ import {
   requireUserIsAdmin,
   requireUserIsOneOf,
 } from "@server/common/decorators";
+import { config_schema, qr_preset_schema } from "@server/common/schema/config";
 
 
-const presets = JSON.parse(
-  readFileSync(path.join(__dirname, "./QR_presets.json")).toString()
+const presets_schema = config_schema.shape.megateams.shape.QRPresets;
+const presets = new Map<string, z.infer<typeof qr_preset_schema>>(
+  Object.entries(presets_schema.parse(config.get("megateams.QRPresets")))
 );
 
 const patch_fields = new Set(["state", "publicised"]);
@@ -87,10 +88,10 @@ class QRHandlers {
     const preset_id: string = request.params.preset_id;
     const name = z.string().parse(request.body.name);
 
-    if (!preset_id || !presets.hasOwnProperty(preset_id) || !name) {
+    if (!preset_id || !presets.has(preset_id) || !name) {
       throw new createHttpError.NotFound();
     }
-    const preset = presets[preset_id];
+    const preset = presets.get(preset_id);
 
     const publicised = z.boolean().parse(request.body.publicised);
 
@@ -208,7 +209,7 @@ class QRHandlers {
     response.json({
       status: 200,
       message: "OK",
-      presets,
+      presets: Object.fromEntries(presets),
     });
   }
 
