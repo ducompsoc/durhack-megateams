@@ -59,6 +59,14 @@ export const session_options_schema = z.object({
   cookie: cookie_options_schema,
 });
 
+export const qr_preset_schema = z.object({
+  name: z.string(),
+  description: z.string(),
+  points: z.number().nonnegative(),
+  uses: z.number().nonnegative(),
+  minutesValid: z.number().nonnegative(),
+});
+
 export const config_schema = z.object({
   listen: listen_options_schema,
   flags: z.object({
@@ -83,5 +91,6 @@ export const config_schema = z.object({
   session: session_options_schema,
   megateams: z.object({
     maxTeamMembers: z.number().positive(),
+    QRPresets: z.object({}).catchall(qr_preset_schema),
   }),
 });
