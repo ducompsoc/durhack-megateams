@@ -1,7 +1,7 @@
 {
   "listen": {
     "host": "127.0.0.1",
-    "port": 3001
+    "port": 3101
   },
   "flags": {
     "skipEmailVerification": false
@@ -14,12 +14,15 @@
       "passReqToCallback": false
     },
     "oauth2": {
-      "authorizationURL": "",
-      "tokenURL": "",
-      "clientID": "",
-      "clientSecret": "",
-      "callbackURL": "",
-      "profileURL": ""
+      "authorizationURL": "https://live.durhack.com/login/authorize",
+      "tokenURL": "https://live.durhack.com/api/auth/token",
+      "clientID": "megateams",
+      "clientSecret": "this-is-not-a-real-client-secret",
+      "callbackURL": "https://megateams.durhack.com/api/auth/durhack-live/callback",
+      "state": true,
+      "scope": ["api"],
+      "pkce": true,
+      "profileURL": "https://live.durhack.com/api/user"
     }
   },
   "mysql": {
