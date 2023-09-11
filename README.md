@@ -45,22 +45,32 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-## Example `.env.local`
+## Nginx Configuration
+```
+server {
+    server_name megateams.durhack.com www.megateams.durhack.com;
+    
+    location /api {
+        proxy_pass http://127.0.0.1:3101$request_uri;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
 
-```dotenv
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DATABASE_USER=durhack
-DATABASE_PASSWORD=durhack
-DATABASE_NAME=durhack2023megateams
-SESSION_DATABASE_HOST=localhost
-SESSION_DATABASE_PORT=3306
-SESSION_DATABASE_USER=durhack
-SESSION_DATABASE_PASSWORD=durhack
-SESSION_DATABASE_NAME=durhack2023megateamssession
-MEGATEAMS_SKIP_EMAIL_VERIFICATION=false
-MEGATEAMS_NO_MITIGATE_CSRF=false
-MAX_TEAM_MEMBERS=4
+    location / {
+        proxy_pass http://127.0.0.1:3100$request_uri;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    listen [::]:8090 ipv6only=on;
+    listen 8090;
+}
 ```
 
 ## mysql server
