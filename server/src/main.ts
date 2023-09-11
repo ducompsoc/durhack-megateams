@@ -8,6 +8,7 @@ import { listen_options_schema } from "@server/common/schema/config";
 import session from "./auth/session";
 import sequelize, { ensureDatabaseExists } from "./database";
 import api_router from "./routes";
+import "./auth";
 
 
 const environment = process.env.NODE_ENV;
