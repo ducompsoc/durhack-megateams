@@ -19,6 +19,9 @@ export const oauth2_client_options_schema = z.object({
   clientSecret: z.string(),
   callbackURL: z.string().url(),
   profileURL: z.string().url(),
+  state: z.boolean(),
+  scope: z.string().or(z.string().array()).optional(),
+  pkce: z.boolean(),
 });
 
 export const mysql_options_schema = z.object({
