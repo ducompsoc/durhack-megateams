@@ -1,4 +1,4 @@
-import { makeMegateamsApiRequest } from "@/app/lib/api";
+import { fetchMegateamsApi } from "@/app/lib/api";
 
 /**
  * Gets a CSRF token and saves the token hash to a cookie.
@@ -6,7 +6,7 @@ import { makeMegateamsApiRequest } from "@/app/lib/api";
  * The token should be attached to requests in an HTTP header 'x-csrf-token'.
  */
 export async function getCsrfToken(): Promise<string> {
-  const csrf_token_result = await makeMegateamsApiRequest("/auth/csrf-token");
+  const csrf_token_result = await fetchMegateamsApi("/auth/csrf-token");
 
   return csrf_token_result.token;
 }
