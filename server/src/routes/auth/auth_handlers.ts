@@ -45,21 +45,6 @@ class AuthHandlers {
     });
   }
 
-  async handleGetCurrentUser(
-    request: Request,
-    response: Response
-  ) {
-    response.json({
-      status: 200,
-      message: "OK",
-      user: {
-        name: request.user?.preferred_name,
-        loggedIn: !!request.user,
-        role: request.user?.role,
-      },
-    });
-  }
-
   async handleSignUp(request: Request, response: Response) {
     throw new createHttpError.NotImplemented("Sign up handler not implemented");
   }
