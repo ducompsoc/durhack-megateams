@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
+import { ValidationError as SequelizeValidationError } from "sequelize";
 
 import User from "@server/database/tables/user";
 import Point from "@server/database/tables/point";
@@ -9,7 +10,7 @@ import Megateam from "@server/database/tables/megateam";
 import Team from "@server/database/tables/team";
 import { NullError } from "@server/common/errors";
 import { patch_user_payload_schema } from "@server/routes/users/user_handlers";
-import {ValidationError as SequelizeValidationError} from "sequelize/types/errors";
+
 
 
 class UserHandlers {
