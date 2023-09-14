@@ -4,7 +4,7 @@
     "port": 3101
   },
   "flags": {
-    "skipEmailVerification": false
+
   },
   "passport": {
     "local": {

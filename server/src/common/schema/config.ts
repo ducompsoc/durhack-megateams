@@ -72,9 +72,7 @@ export const qr_preset_schema = z.object({
 
 export const config_schema = z.object({
   listen: listen_options_schema,
-  flags: z.object({
-    skipEmailVerification: z.boolean(),
-  }),
+  flags: z.object({}),
   passport: z.object({
     local: passport_local_options_schema,
     oauth2: oauth2_client_options_schema,
