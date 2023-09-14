@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response, Router as ExpressRouter } from "express";
+import createHttpError from "http-errors";
+
+import { handleMethodNotAllowed } from "@server/common/middleware";
 
 import handlers from "./user_handlers";
-import { handleMethodNotAllowed } from "@server/common/middleware";
-import createHttpError from "http-errors";
 
 
 const users_router = ExpressRouter();
