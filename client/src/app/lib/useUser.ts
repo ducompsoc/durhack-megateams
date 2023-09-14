@@ -34,7 +34,7 @@ export default function useUser({redirectTo = "", redirectIfFound = false} = {})
     }
     // If redirectIfFound is set, redirect if the user was found
     if (redirectIfFound && user) {
-      if (user.role === "volunteer") {
+      if (user.role !== "hacker") {
         return redirect("/volunteer");
       }
       return redirect("/hacker");
