@@ -17,6 +17,8 @@ export default function HackerLayout({
   children: React.ReactNode;
 }) {
   const { user, isLoading } = useUser({ redirectTo: "/" });
+  const [hasTeam] = useState(true);
+
   if (isLoading) return <></>;
   if (user?.role !== "hacker") return redirect("/");
 
@@ -39,8 +41,6 @@ export default function HackerLayout({
       openNewWindow: true,
     },
   ];
-
-  const [hasTeam] = useState(true);
 
   return (
     <TabbedPage tabs={tabs} showTabs={hasTeam}>

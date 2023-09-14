@@ -1,6 +1,6 @@
 "use client";
 
-import { makeMegateamsApiRequest } from "@/app/lib/api";
+import { fetchMegateamsApi } from "@/app/lib/api";
 import { FormEvent } from "react";
 
 async function send_login_request(event: FormEvent<HTMLFormElement>) {
@@ -8,7 +8,7 @@ async function send_login_request(event: FormEvent<HTMLFormElement>) {
   const form_data = new FormData(event.currentTarget);
   // @ts-ignore (see https://github.com/microsoft/TypeScript/issues/30584)
   const encoded_form_data = new URLSearchParams(form_data);
-  await makeMegateamsApiRequest("/auth/login", {
+  await fetchMegateamsApi("/auth/login", {
     method: "POST",
     body: encoded_form_data,
   });
@@ -19,7 +19,7 @@ async function send_set_password_request(event: FormEvent<HTMLFormElement>) {
   const form_data = new FormData(event.currentTarget);
   // @ts-ignore (same as above)
   const encoded_form_data = new URLSearchParams(form_data);
-  await makeMegateamsApiRequest("/auth/setpassword", {
+  await fetchMegateamsApi("/auth/setpassword", {
     method: "POST",
     body: encoded_form_data,
   });

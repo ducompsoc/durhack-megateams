@@ -42,7 +42,7 @@ const create_user_payload_schema = z.object({
   preferred_name: z.string(),
 });
 
-const patch_user_payload_schema = create_user_payload_schema.partial();
+export const patch_user_payload_schema = create_user_payload_schema.partial();
 
 class UserHandlers {
   constructor() {
@@ -171,8 +171,8 @@ class UserHandlers {
       rejectOnEmpty: new NullError(),
     });
 
-    const payload: any = result.toJSON();
-    payload.points = Point.getPointsTotal(payload.points);
+    const payload: User | { points: number } = result.toJSON();
+    payload.points = Point.getPointsTotal(result.points);
 
     response.status(200);
     response.json({ "status": response.statusCode, "message": "OK", "data": payload });
@@ -188,8 +188,8 @@ class UserHandlers {
       rejectOnEmpty: new NullError(),
     });
 
-    const payload: any = result.toJSON();
-    payload.points = Point.getPointsTotal(payload.points);
+    const payload: User | { points: number } = result.toJSON();
+    payload.points = Point.getPointsTotal(result.points);
 
     response.status(200);
     response.json({ "status": response.statusCode, "message": "OK", "data": payload });
@@ -242,7 +242,7 @@ class UserHandlers {
       }
 
       response.status(200);
-      response.json({ status: response.statusCode, message: "OK", data: found_user });
+      response.json({ status: response.statusCode, message: "OK" });
     };
   }
 

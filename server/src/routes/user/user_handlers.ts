@@ -1,18 +1,40 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
+import { ValidationError as SequelizeValidationError } from "sequelize";
 
 import User from "@server/database/tables/user";
 import Point from "@server/database/tables/point";
 import Area from "@server/database/tables/area";
 import Megateam from "@server/database/tables/megateam";
 import Team from "@server/database/tables/team";
-import {NullError} from "@server/common/errors";
+import { NullError } from "@server/common/errors";
+import { patch_user_payload_schema } from "@server/routes/users/user_handlers";
 
 
 class UserHandlers {
   async getUser(request: Request, response: Response) {
-    throw new createHttpError.NotImplemented();
+    const payload: User | { points: number } = request.user!.toJSON();
+    payload.points = Point.getPointsTotal(await request.user!.$get("points"));
+
+    response.status(200);
+    response.json({ "status": response.statusCode, "message": "OK", "data": payload });
+  }
+
+  async patchUserDetails(request: Request, response: Response) {
+    const parsed_payload = patch_user_payload_schema.parse(request.body);
+
+    try {
+      await request.user!.update(parsed_payload);
+    } catch (error) {
+      if (error instanceof SequelizeValidationError) {
+        throw new createHttpError.BadRequest(error.message);
+      }
+      throw error;
+    }
+
+    response.status(200);
+    response.json({ status: response.statusCode, message: "OK" });
   }
 
   async getTeam(request: Request, response: Response) {

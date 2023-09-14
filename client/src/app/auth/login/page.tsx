@@ -1,6 +1,6 @@
 "use client";
 
-import { makeMegateamsApiRequest } from "@/app/lib/api";
+import { fetchMegateamsApi } from "@/app/lib/api";
 import useUser from "@/app/lib/useUser";
 import Image from "next/image";
 import { FormEvent } from "react";
@@ -13,7 +13,7 @@ export default function Login() {
     const form_data = new FormData(event.currentTarget);
     // @ts-ignore (see https://github.com/microsoft/TypeScript/issues/30584)
     const encoded_form_data = new URLSearchParams(form_data);
-    const user = await makeMegateamsApiRequest("/auth/login", {
+    const user = await fetchMegateamsApi("/auth/login", {
       method: "POST",
       body: encoded_form_data,
     });

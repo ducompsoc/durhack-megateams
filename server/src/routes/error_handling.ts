@@ -34,10 +34,6 @@ export default function api_error_handler(error: Error, _request: Request, respo
     return sendHttpErrorResponse(response, new createHttpError.NotFound(error.message));
   }
 
-  if (error instanceof TypeError) {
-    return sendHttpErrorResponse(response, new createHttpError.BadRequest(error.message));
-  }
-
   if (error instanceof SequelizeValidationError) {
     const httpError = new createHttpError.BadRequest(
       `${error.message} with fields: ${error.errors.map((e) => `* ${e.path} - ${e.message}`).join("; ")}`
@@ -56,7 +52,6 @@ export default function api_error_handler(error: Error, _request: Request, respo
   }
 
   console.error("Unexpected API error:");
-  Error.captureStackTrace(error);
   console.error(error.stack);
   return sendHttpErrorResponse(response, new createHttpError.InternalServerError());
 }
