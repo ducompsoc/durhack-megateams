@@ -3,7 +3,7 @@ import passport from "passport";
 import SequelizeUser from "@server/database/tables/user";
 import { NullError } from "@server/common/errors";
 
-import "./strategy/local";
+//import "./strategy/local";
 import "./strategy/oauth2";
 
 declare global {
