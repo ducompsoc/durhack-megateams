@@ -12,7 +12,7 @@ async function userFetcher(url: string) {
   if (response.status === 401) return null;
   if (!response.ok) throw new Error("Couldn't fetch user!");
 
-  return (await response.json()).user;
+  return (await response.json()).data;
 }
 
 export default function useUser({redirectTo = "", redirectIfFound = false} = {}) {
