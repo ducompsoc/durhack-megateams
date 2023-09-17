@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
+import { fetchMegateamsApi } from "../lib/api";
+import useUser from "../lib/useUser";
 
 interface Tab {
   path: string;
@@ -28,16 +30,18 @@ export default function TabbedPage({
 }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { mutateUser } = useUser();
+
+  async function signOut() {
+    await fetchMegateamsApi("/auth/logout", { method: "POST" });
+    mutateUser(null);
+  }
 
   return (
     <>
       <div className="h-full flex flex-col text-black dark:text-neutral-200">
         <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
-          <object
-            data="/logo.svg"
-            type="image/svg+xml"
-            className="w-16 h-16"
-          >
+          <object data="/logo.svg" type="image/svg+xml" className="w-16 h-16">
             <img src="/logo.png" />
           </object>
           <h1 className="text-3xl font-bold font-heading">DURHACK</h1>
@@ -45,7 +49,9 @@ export default function TabbedPage({
             <ArrowRightOnRectangleIcon className="w-12 h-12" />
           </button>
         </div>
-        <div className="p-6 pt-0 grow overflow-auto md:w-7/12 md:mx-auto">{children}</div>
+        <div className="p-6 pt-0 grow overflow-auto md:w-7/12 md:mx-auto">
+          {children}
+        </div>
         {showTabs && (
           <div className="flex gap-1 border-t border-gray-200 md:justify-center md:gap-x-20 dark:border-neutral-600">
             {tabs.map((tab) => {
@@ -59,7 +65,10 @@ export default function TabbedPage({
                   className="w-full py-4 flex justify-center md:w-fit"
                 >
                   <tab.icon
-                    className={"w-8 h-8 " + (active ? "stroke-accent" : "dark:stroke-neutral-400")}
+                    className={
+                      "w-8 h-8 " +
+                      (active ? "stroke-accent" : "dark:stroke-neutral-400")
+                    }
                   />
                 </Link>
               );
@@ -120,7 +129,7 @@ export default function TabbedPage({
                     <button
                       type="button"
                       className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                      onClick={() => setOpen(false)}
+                      onClick={() => signOut()}
                     >
                       Sign Out
                     </button>
