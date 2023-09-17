@@ -40,7 +40,7 @@
     "eslint-config-next": "13.4.5",
     "next": "13.4.5",
     "postcss": "8.4.24",
-    "qrcode-scanner-react": "^0.2.2",
+    "qrcode-scanner-react": "^0.2.3",
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-component-export-image": "^1.0.6",
