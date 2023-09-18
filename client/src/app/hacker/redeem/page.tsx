@@ -1,19 +1,35 @@
 "use client";
 
 import { fetchMegateamsApi } from "@/app/lib/api";
+import useUser from "@/app/lib/useUser";
 import {
   ArrowPathIcon,
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function RedeemPage() {
   const [qrPoints, setQrPoints] = useState<number | null>(null);
   const [qrChecked, setQrChecked] = useState(false);
   const searchParams = useSearchParams();
+  const { user, isLoading } = useUser();
+
+  if (!isLoading && user?.role !== "hacker") {
+    if (qrChecked) {
+      return redirect("/");
+    } else {
+      return redirect(
+        "/api/auth/durhack-live?redirect_to=" +
+          encodeURIComponent(
+            "/hacker/redeem?qr_id=" +
+              encodeURIComponent(searchParams.get("qr_id") ?? "")
+          )
+      );
+    }
+  }
 
   async function tryRedeemQR() {
     const uuid = searchParams.get("qr_id");
