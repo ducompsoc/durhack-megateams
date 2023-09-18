@@ -24,7 +24,7 @@ export default function TeamSetup() {
             <ArrowPathRoundedSquareIcon className="w-6 h-6" />
           </button>
         </div>
-        <button className="rounded px-2 py-1 bg-accent text-white">
+        <button className="dh-btn">
           Create
         </button>
       </div>
@@ -36,7 +36,7 @@ export default function TeamSetup() {
           className="dh-input w-full my-2"
           placeholder="Join code..."
         />
-        <button className="rounded px-2 py-1 bg-accent text-white">Join</button>
+        <button className="dh-btn">Join</button>
       </div>
     </div>
   );

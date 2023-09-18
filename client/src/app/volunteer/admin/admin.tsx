@@ -59,10 +59,10 @@ export default function Admin() {
                 className="dh-input w-20"
               />
               <p className="ml-2">points</p>
-              <button className="ml-4 rounded px-2 py-1 bg-accent text-white">
+              <button className="ml-4 dh-btn">
                 Add
               </button>
-              <button className="ml-2 rounded px-2 py-1 bg-accent text-white">
+              <button className="ml-2 dh-btn">
                 Remove
               </button>
             </div>

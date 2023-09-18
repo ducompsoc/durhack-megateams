@@ -91,7 +91,7 @@ class QRHandlers {
     if (!preset_id || !presets.has(preset_id) || !name) {
       throw new createHttpError.NotFound();
     }
-    const preset = presets.get(preset_id);
+    const preset = presets.get(preset_id)!;
 
     const publicised = z.boolean().parse(request.body.publicised);
 
