@@ -8,5 +8,8 @@
       "callbackURL": "http://localhost:8090/api/auth/durhack-live/callback",
       "profileURL": "http://localhost:8080/api/user"
     }
+  },
+  "megateams": {
+    "QRCodeRedemptionURL": "http://localhost:8080/hacker/redeem?qr_id="
   }
 }

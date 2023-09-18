@@ -65,6 +65,7 @@
   },
   "megateams": {
     "maxTeamMembers": 4,
+    "QRCodeRedemptionURL": "https://megateams.durhack.com/hacker/redeem?qr_id=",
     "QRPresets": {
       "sponsor": {
         "name": "Sponsor",
