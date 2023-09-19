@@ -92,7 +92,7 @@ export const config_schema = z.object({
   session: session_options_schema,
   megateams: z.object({
     maxTeamMembers: z.number().positive(),
-    QRCodeRedemptionURL: z.string(),
+    QRCodeRedemptionURL: z.string().url(),
     QRPresets: z.object({}).catchall(qr_preset_schema),
   }),
 });

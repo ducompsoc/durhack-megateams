@@ -23,11 +23,6 @@ const presets = new Map<string, z.infer<typeof qr_preset_schema>>(
   Object.entries(presets_schema.parse(config.get("megateams.QRPresets")))
 );
 
-const redemption_url =
-  config_schema.shape.megateams.shape.QRCodeRedemptionURL.parse(
-    config.get("megateams.QRCodeRedemptionURL")
-  );
-
 const patch_fields = new Set(["state", "publicised"]);
 
 class QRHandlers {
@@ -74,7 +69,6 @@ class QRHandlers {
       creator_id: creator.id,
       ...create_attributes,
       ...publicisedFields,
-      redemption_url: redemption_url + encodeURIComponent(payload),
     });
   }
 
@@ -93,7 +87,10 @@ class QRHandlers {
     response.json({
       status: response.statusCode,
       message: "OK",
-      data: new_instance,
+      data: {
+        ...new_instance,
+        redemption_url: new_instance.getRedemptionURL(),
+      },
     });
   }
 
@@ -131,7 +128,10 @@ class QRHandlers {
     response.json({
       status: response.statusCode,
       message: "OK",
-      data: new_instance,
+      data: {
+        ...new_instance,
+        redemption_url: new_instance.getRedemptionURL(),
+      },
     });
   }
 
@@ -152,7 +152,7 @@ class QRHandlers {
       enabled: code.state,
       uuid: code.payload,
       publicised: code.challenge_rank !== null,
-      redemption_url: redemption_url + encodeURIComponent(code.payload),
+      redemption_url: code.getRedemptionURL(),
     }));
 
     response.status(200);

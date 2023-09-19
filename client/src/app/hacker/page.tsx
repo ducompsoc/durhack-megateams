@@ -11,22 +11,27 @@ import { Dialog, Transition } from "@headlessui/react";
 import { positionMedals } from "@/app/constants";
 import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
 
 export default function HackerHome() {
   const [scanning, setScanning] = useState(false);
-  const { push } = useRouter();
+  const router = useRouter();
 
   function scanSuccess(result: string) {
-    let qr_id = "";
+    let qr_id;
     try {
       const url = new URL(result);
-      qr_id = url.searchParams.get("qr_id") ?? "";
-    } catch {}
-    push("/hacker/redeem?qr_id=" + encodeURIComponent(qr_id));
+      qr_id =
+        window.location.origin === url.origin
+          ? url.searchParams.get("qr_id") ?? "invalid"
+          : "invalid";
+    } catch {
+      qr_id = "invalid";
+    }
+    router.push("/hacker/redeem?" + new URLSearchParams({ qr_id }).toString());
   }
 
   const challenges = [
