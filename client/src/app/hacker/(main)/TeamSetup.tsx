@@ -41,7 +41,7 @@ export default function TeamSetup() {
       setCreateError("");
       mutate("/user/team", { team: true });
     } catch {
-      setCreateError("Failed to join team!");
+      setCreateError("Failed to create team!");
     }
   }
 

@@ -1,8 +1,11 @@
+import { fetchMegateamsApi } from "@/app/lib/api";
 import { ShareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import useSWR from "swr";
 
-export default function TeamBox({ grow=true }: { grow?: boolean }) {
+export default function TeamBox({ grow = true }: { grow?: boolean }) {
   const [showTeamCode, setShowTeamCode] = useState(false);
+  const { data: { team } = { team: null } } = useSWR("/user/team");
 
   return (
     <div
@@ -13,7 +16,7 @@ export default function TeamBox({ grow=true }: { grow?: boolean }) {
       <h2 className="font-semibold mb-2">Team</h2>
       {!showTeamCode ? (
         <>
-          <p>Team 1</p>
+          <p>{team?.name}</p>
           <div className="flex items-center">
             <span className="grow"></span>
             <ShareIcon
@@ -24,7 +27,7 @@ export default function TeamBox({ grow=true }: { grow?: boolean }) {
         </>
       ) : (
         <>
-          <p>1234</p>
+          <p>{team?.join_code}</p>
           <div className="flex items-center">
             <span className="grow"></span>
             <XMarkIcon
