@@ -13,6 +13,9 @@ import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
 import ButtonModal from "@/app/components/ButtonModal";
+import useUser from "@/app/lib/useUser";
+import useSWR from "swr";
+import { fetchMegateamsApi } from "@/app/lib/api";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
@@ -20,6 +23,14 @@ const Scanner = dynamic(() => import("qrcode-scanner-react"), {
 export default function HackerHome() {
   const [scanning, setScanning] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
+  const { data: { team } = { team: null } } = useSWR(
+    "/user/team",
+    fetchMegateamsApi
+  );
+
+  const hasTeam = user?.team_id !== null;
+  const hasMegateam = team?.megateam_name !== null;
 
   function scanSuccess(result: string) {
     let qr_id;
@@ -40,9 +51,6 @@ export default function HackerHome() {
     { details: "Details of challenge 2", points: 2 },
     { details: "Details of challenge 3", points: 4 },
   ];
-
-  const hasMegateam = true;
-  const hasTeam = true;
 
   return (
     <>

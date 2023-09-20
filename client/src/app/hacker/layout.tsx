@@ -16,7 +16,7 @@ export default function HackerLayout({
   children: React.ReactNode;
 }) {
   const { user, isLoading } = useUser({ redirectTo: "/" });
-  const [hasTeam] = useState(true);
+  const hasTeam = user?.team_id !== null;
 
   if (isLoading) return <></>;
 
