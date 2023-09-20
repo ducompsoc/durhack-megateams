@@ -115,7 +115,7 @@ class UserHandlers {
       throw new createHttpError.NotFound("You are not in a team!");
     }
 
-    await user.$remove("team", team);
+    await user.$set("team", null);
 
     response.json({
       status: 200,
