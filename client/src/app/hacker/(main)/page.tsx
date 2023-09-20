@@ -12,6 +12,7 @@ import { positionMedals } from "@/app/constants";
 import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
+import ButtonModal from "@/app/components/ButtonModal";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
@@ -118,54 +119,27 @@ export default function HackerHome() {
       >
         <QrCodeIcon className="w-10 h-10" />
       </button>
-      <Transition.Root show={scanning} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={setScanning}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+      <ButtonModal
+        show={scanning}
+        onClose={(bool) => setScanning(bool)}
+        itemsClass="items-center"
+        content={
+          <Scanner
+            scanning={scanning}
+            scanSuccess={scanSuccess}
+            className="h-96"
+          />
+        }
+        buttons={
+          <button
+            type="button"
+            className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:text-neutral-200 dark:bg-neutral-500"
+            onClick={() => setScanning(false)}
           >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                  <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <Scanner
-                      scanning={scanning}
-                      scanSuccess={scanSuccess}
-                      className="h-96"
-                    />
-                  </div>
-                  <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button
-                      type="button"
-                      className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={() => setScanning(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition.Root>
+            Cancel
+          </button>
+        }
+      />
     </>
   );
 }

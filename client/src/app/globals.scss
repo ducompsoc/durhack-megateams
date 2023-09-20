@@ -18,6 +18,14 @@
   @apply rounded px-2 py-1 bg-accent text-white;
 }
 
+#qrcode-scanner-react-div {
+  @apply dark:text-neutral-200;
+
+  video {
+    @apply dark:border-neutral-200;
+  }
+}
+
 .dh-select .dh-select__control {
   @apply bg-white dark:bg-neutral-800/50 rounded-md shadow-sm;
 }
