@@ -3,11 +3,25 @@
 import { Fragment, useState } from "react";
 import TeamBox from "./TeamBox";
 import { ExclamationTriangleIcon, UserIcon } from "@heroicons/react/24/outline";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import ButtonModal from "@/app/components/ButtonModal";
+import { mutate } from "swr";
+import { fetchMegateamsApi } from "@/app/lib/api";
 
 export default function Team() {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
+
+  async function leaveTeam() {
+    try {
+      await fetchMegateamsApi("/user/team", { method: "DELETE" });
+      setError("");
+      mutate("/user/team", { team: null });
+    } catch {
+      setError("Failed to leave team!");
+    }
+    setOpen(false);
+  }
 
   const members = [
     { name: "Jony Ive", points: 10 },
@@ -42,6 +56,7 @@ export default function Team() {
         >
           Leave Team
         </button>
+        {error && <p className="dh-err text-center">{error}</p>}
       </div>
       <ButtonModal
         show={open}
@@ -75,7 +90,7 @@ export default function Team() {
             <button
               type="button"
               className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-              onClick={() => setOpen(false)}
+              onClick={leaveTeam}
             >
               Leave
             </button>

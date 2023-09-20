@@ -5,7 +5,7 @@ import {
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Dialog, Transition } from "@headlessui/react";
 import { positionMedals } from "@/app/constants";
@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 import ButtonModal from "@/app/components/ButtonModal";
 import useUser from "@/app/lib/useUser";
 import useSWR from "swr";
-import { fetchMegateamsApi } from "@/app/lib/api";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
@@ -24,12 +23,9 @@ export default function HackerHome() {
   const [scanning, setScanning] = useState(false);
   const router = useRouter();
   const { user } = useUser();
-  const { data: { team } = { team: null } } = useSWR(
-    "/user/team",
-    fetchMegateamsApi
-  );
+  const { data: { team } = { team: null } } = useSWR("/user/team");
 
-  const hasTeam = user?.team_id !== null;
+  const hasTeam = team !== null;
   const hasMegateam = team?.megateam_name !== null;
 
   function scanSuccess(result: string) {
