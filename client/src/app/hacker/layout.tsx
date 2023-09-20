@@ -6,10 +6,9 @@ import {
   HomeIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import TabbedPage from "../components/TabbedPage";
+import TabbedPage from "@/app/components/TabbedPage";
 import { useState } from "react";
-import useUser from "../lib/useUser";
-import { redirect } from "next/navigation";
+import useUser from "@/app/lib/useUser";
 
 export default function HackerLayout({
   children,
@@ -20,7 +19,6 @@ export default function HackerLayout({
   const [hasTeam] = useState(true);
 
   if (isLoading) return <></>;
-  if (user?.role !== "hacker") return redirect("/");
 
   const tabs = [
     {

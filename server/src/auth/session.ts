@@ -10,7 +10,8 @@ import { mysql_options_schema, session_options_schema } from "@server/common/sch
 // Augment express-session with a custom SessionData object
 declare module "express-session" {
   interface SessionData {
-    generatedTeamName?: string
+    generatedTeamName?: string;
+    redirect_to?: string;
   }
 }
 

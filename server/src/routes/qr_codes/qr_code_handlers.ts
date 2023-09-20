@@ -18,7 +18,6 @@ import {
 } from "@server/common/decorators";
 import { config_schema, qr_preset_schema } from "@server/common/schema/config";
 
-
 const presets_schema = config_schema.shape.megateams.shape.QRPresets;
 const presets = new Map<string, z.infer<typeof qr_preset_schema>>(
   Object.entries(presets_schema.parse(config.get("megateams.QRPresets")))
@@ -42,22 +41,31 @@ class QRHandlers {
     points_value: z.number().nonnegative(),
     max_uses: z.number().nonnegative(),
     state: z.boolean(),
-    start_time: z.date().or(z.string().datetime().transform((val => new Date(val)))),
-    expiry_time: z.date().or(z.string().datetime().transform((val => new Date(val)))),
+    start_time: z.date().or(
+      z
+        .string()
+        .datetime()
+        .transform((val) => new Date(val))
+    ),
+    expiry_time: z.date().or(
+      z
+        .string()
+        .datetime()
+        .transform((val) => new Date(val))
+    ),
   });
 
   private async buildAndSaveQRCodeFromCreateAttributes(
     creator: User,
     create_attributes: z.infer<typeof QRHandlers.createQRPayload>,
-    publicised: boolean,
+    publicised: boolean
   ) {
-    const publicisedFields = await this.getPublicisedFields(
-      null,
-      publicised,
-    );
+    const publicisedFields = await this.getPublicisedFields(null, publicised);
+
+    const payload = uuid();
 
     return await QRCode.create({
-      payload: uuid(),
+      payload,
       creator_id: creator.id,
       ...create_attributes,
       ...publicisedFields,
@@ -70,16 +78,19 @@ class QRHandlers {
     const publicised = z.boolean().parse(request.body.publicised);
 
     const new_instance = await this.buildAndSaveQRCodeFromCreateAttributes(
-      (request.user as User),
+      request.user as User,
       create_attributes,
-      publicised,
+      publicised
     );
 
     response.status(200);
     response.json({
       status: response.statusCode,
       message: "OK",
-      data: new_instance,
+      data: {
+        ...new_instance,
+        redemption_url: new_instance.getRedemptionURL(),
+      },
     });
   }
 
@@ -91,7 +102,7 @@ class QRHandlers {
     if (!preset_id || !presets.has(preset_id) || !name) {
       throw new createHttpError.NotFound();
     }
-    const preset = presets.get(preset_id);
+    const preset = presets.get(preset_id)!;
 
     const publicised = z.boolean().parse(request.body.publicised);
 
@@ -108,16 +119,19 @@ class QRHandlers {
     };
 
     const new_instance = await this.buildAndSaveQRCodeFromCreateAttributes(
-      (request.user as User),
+      request.user as User,
       create_attributes,
-      publicised,
+      publicised
     );
 
     response.status(200);
     response.json({
       status: response.statusCode,
       message: "OK",
-      data: new_instance,
+      data: {
+        ...new_instance,
+        redemption_url: new_instance.getRedemptionURL(),
+      },
     });
   }
 
@@ -138,6 +152,7 @@ class QRHandlers {
       enabled: code.state,
       uuid: code.payload,
       publicised: code.challenge_rank !== null,
+      redemption_url: code.getRedemptionURL(),
     }));
 
     response.status(200);
@@ -148,7 +163,10 @@ class QRHandlers {
     });
   }
 
-  private async getPublicisedFields(existing_rank: typeof QRCode.prototype.challenge_rank, publicised: boolean) {
+  private async getPublicisedFields(
+    existing_rank: typeof QRCode.prototype.challenge_rank,
+    publicised: boolean
+  ) {
     const fields = { challenge_rank: existing_rank };
 
     if (!publicised) {
@@ -168,7 +186,10 @@ class QRHandlers {
   }
 
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
-  async patchQRCodeDetails(request: Request, response: Response): Promise<void> {
+  async patchQRCodeDetails(
+    request: Request,
+    response: Response
+  ): Promise<void> {
     const { qr_code_id } = response.locals;
     if (typeof qr_code_id !== "number")
       throw new Error("Parsed `qr_code_id` not found.");
@@ -238,7 +259,6 @@ class QRHandlers {
 
     let qr: QRCode;
     try {
-
       qr = await QRCode.findOne({
         where: { payload: request.body.uuid },
         include: [Point],

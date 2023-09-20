@@ -92,7 +92,7 @@ export default function Challenges() {
                   </option>
                 ))}
               </select>
-              <button className="ml-4 rounded px-2 py-1 bg-accent text-white">
+              <button className="ml-4 dh-btn">
                 Unpublicise
               </button>
             </div>

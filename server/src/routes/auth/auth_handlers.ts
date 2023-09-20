@@ -5,7 +5,13 @@ import { UserRole } from "@server/common/model_enums";
 class AuthHandlers {
   async handleLoginSuccess(request: Request, response: Response) {
     if (!request.user) {
-      return response.redirect("/login");
+      return response.redirect("/");
+    }
+
+    if (request.session.redirect_to) {
+      const redirect_to = request.session.redirect_to;
+      request.session.redirect_to = undefined;
+      return response.redirect(redirect_to);
     }
 
     if (request.user.role !== UserRole.hacker) {

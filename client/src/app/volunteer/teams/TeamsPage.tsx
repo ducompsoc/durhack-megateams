@@ -80,7 +80,7 @@ export default function TeamsPage() {
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
           <div className="md:flex md:justify-end">
-            <button className="w-full rounded px-2 py-1 bg-accent text-white mt-2 md:w-fit">
+            <button className="w-full dh-btn mt-2 md:w-fit">
               Save
             </button>
           </div>

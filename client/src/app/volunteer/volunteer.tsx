@@ -196,7 +196,7 @@ export default function Volunteer() {
             <p>Publicised:</p>
             <input type="checkbox" className="ml-2 dh-check" />
             <button
-              className="rounded px-2 py-1 bg-accent text-white ml-4"
+              className="dh-btn ml-4"
               onClick={() => generate(selected.name, selected.uuid)}
             >
               Generate
@@ -259,7 +259,7 @@ export default function Volunteer() {
                 <div className="flex items-center mt-2">
                   <p>Publicised:</p>
                   <input type="checkbox" className="ml-2 dh-check" />
-                  <button className="rounded px-2 py-1 bg-accent text-white ml-4">
+                  <button className="dh-btn ml-4">
                     Generate
                   </button>
                 </div>
@@ -352,7 +352,7 @@ export default function Volunteer() {
                         </div>
                         <div className="flex items-center">
                           <button
-                            className="rounded px-2 py-1 bg-accent text-white disabled:bg-gray-300 dark:disabled:bg-neutral-500"
+                            className="dh-btn disabled:bg-gray-300 dark:disabled:bg-neutral-500"
                             disabled={qrState.disabled}
                           >
                             View

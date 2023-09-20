@@ -5,11 +5,13 @@ import { handleGetCsrfToken } from "@server/auth/csrf";
 import { handleMethodNotAllowed } from "@server/common/middleware";
 
 import handlers from "./auth_handlers";
+import rememberUserReferrerForRedirect from "./rememberUserReferrerForRedirect";
 
 const auth_router = ExpressRouter();
 
 auth_router
   .route("/durhack-live")
+  .all(rememberUserReferrerForRedirect)
   .get(passport.authenticate("oauth2"))
   .all(handleMethodNotAllowed);
 

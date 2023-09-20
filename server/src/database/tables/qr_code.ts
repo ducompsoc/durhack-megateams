@@ -1,9 +1,16 @@
 import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript";
+import config from "config";
 
 import { QRCategory } from "@server/common/model_enums";
+import { config_schema } from "@server/common/schema/config";
 
 import User from "./user";
 import Point from "./point";
+
+const redemption_url =
+  config_schema.shape.megateams.shape.QRCodeRedemptionURL.parse(
+    config.get("megateams.QRCodeRedemptionURL")
+  );
 
 
 @Table
@@ -94,5 +101,10 @@ export default class QRCode extends Model {
 
     const numberOfUses = await this.$count("uses");
     return (numberOfUses) < this.max_uses;
+  }
+
+  getRedemptionURL() {
+    const redemptionUrlSearchParams = new URLSearchParams({ qr_id: this.payload });
+    return `${redemption_url}?${redemptionUrlSearchParams.toString()}`;
   }
 }
