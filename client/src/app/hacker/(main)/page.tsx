@@ -56,7 +56,7 @@ export default function HackerHome() {
     <>
       {hasTeam ? (
         <div className="flex flex-col h-full">
-          <p>Hello Hacker_name,</p>
+          <p>Hello {user?.preferred_name},</p>
           <div className="flex mt-4">
             <TeamBox />
             {hasMegateam && (

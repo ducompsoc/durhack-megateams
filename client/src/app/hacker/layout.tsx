@@ -7,7 +7,6 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import TabbedPage from "@/app/components/TabbedPage";
-import { useState } from "react";
 import useUser from "@/app/lib/useUser";
 
 export default function HackerLayout({
