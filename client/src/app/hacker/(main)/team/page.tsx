@@ -5,29 +5,28 @@ import TeamBox from "./TeamBox";
 import { ExclamationTriangleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
 import ButtonModal from "@/app/components/ButtonModal";
-import { mutate } from "swr";
+import useSWR from "swr";
 import { fetchMegateamsApi } from "@/app/lib/api";
 
 export default function Team() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
+  const { data: { team } = { team: null }, mutate: mutateTeam } =
+    useSWR("/user/team");
+
+  const members: [{ name: string; points: number }] = team?.members ?? [];
+  members.sort((a, b) => b.points - a.points);
 
   async function leaveTeam() {
     try {
       await fetchMegateamsApi("/user/team", { method: "DELETE" });
       setError("");
-      mutate("/user/team", { team: null });
+      mutateTeam({ team: null });
     } catch {
       setError("Failed to leave team!");
     }
     setOpen(false);
   }
-
-  const members = [
-    { name: "Jony Ive", points: 10 },
-    { name: "Steve Jobs", points: 20 },
-    { name: "Tim Cook", points: 5 },
-  ];
 
   return (
     <>
