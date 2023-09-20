@@ -17,16 +17,21 @@ export default function RedeemPage() {
   const searchParams = useSearchParams();
   const { user, isLoading } = useUser();
 
+  function makeSearchParams(params: Record<string, string>) {
+    return new URLSearchParams(params).toString();
+  }
+
   if (!isLoading && user?.role !== "hacker") {
     if (qrChecked) {
       return redirect("/");
     } else {
+      const qr_id = searchParams.get("qr_id");
       return redirect(
-        "/api/auth/durhack-live?referrer=" +
-          encodeURIComponent(
-            "/hacker/redeem?qr_id=" +
-              encodeURIComponent(searchParams.get("qr_id") ?? "")
-          )
+        "/api/auth/durhack-live?" +
+          makeSearchParams({
+            referrer:
+              "/hacker/redeem?" + makeSearchParams({ qr_id: qr_id ?? "" }),
+          })
       );
     }
   }
@@ -110,9 +115,9 @@ export default function RedeemPage() {
     );
   }
 
-  if (!qrChecked) return <RedeemPending />
-  
-  if (!qrPoints) return <RedeemFailure />
-  
-  return <RedeemSuccess />
+  if (!qrChecked) return <RedeemPending />;
+
+  if (!qrPoints) return <RedeemFailure />;
+
+  return <RedeemSuccess />;
 }
