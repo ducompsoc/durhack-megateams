@@ -9,11 +9,12 @@ export default function HackerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useUser({ redirectTo: "/" });
-  const { data: { team } = { team: null } } = useSWR("/user/team");
+  const { user, isLoading: userIsLoading } = useUser({ redirectTo: "/" });
+  const { data: { team } = { team: null }, isLoading: teamIsLoading } =
+    useSWR("/user/team");
   const pathname = usePathname();
 
-  if (isLoading) return <></>;
+  if (userIsLoading || teamIsLoading) return <></>;
   if (user?.role !== "hacker") return redirect("/");
   if (team === null && pathname !== "/hacker") return redirect("/hacker");
 
