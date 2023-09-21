@@ -44,7 +44,7 @@ class MegateamHandlers {
           ],
         },
       ],
-      group: "megateam.megateam_id",
+      group: "Megateam.megateam_id",
     });
 
     const payload = result.map((megateam) => {

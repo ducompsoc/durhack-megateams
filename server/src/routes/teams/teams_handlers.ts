@@ -61,7 +61,7 @@ class TeamHandlers {
           attributes: [],
         },
       ],
-      group: "team.team_id",
+      group: "Team.team_id",
     });
 
     const payload = result.map((team) => {
@@ -112,7 +112,7 @@ class TeamHandlers {
           attributes: ["area_id", "area_name"],
         },
       ],
-      group: "team.team_id",
+      group: "Team.team_id",
     });
 
     const payload = result.map((team) => {
