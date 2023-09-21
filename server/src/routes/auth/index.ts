@@ -19,7 +19,7 @@ auth_router
   .route("/durhack-live/callback")
   .get(
     passport.authenticate("oauth2", {
-      failureRedirect: "/auth/login",
+      failureRedirect: "/",
       keepSessionInfo: true,
       session: true,
     }),
