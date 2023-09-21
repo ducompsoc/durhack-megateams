@@ -5,9 +5,8 @@ import {
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { Dialog, Transition } from "@headlessui/react";
 import { positionMedals } from "@/app/constants";
 import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
@@ -58,14 +57,18 @@ export default function HackerHome() {
             {hasMegateam && (
               <div className="dh-box p-2 text-center grow ml-4">
                 <h2 className="font-semibold mb-2">Megateam</h2>
-                <div className="flex items-center justify-center">
-                  <p className="text-[#0000a5] font-bold">Megateam 1</p>
-                  <Image
-                    src="/1.png"
-                    alt="Megateam 1 Logo"
-                    width={50}
-                    height={50}
-                  />
+                <div className="flex items-center justify-evenly">
+                  <object
+                    data={`/${team?.megateam_name}.svg`}
+                    type="image/svg+xml"
+                    className="w-12"
+                  >
+                    <img
+                      src={`/${team?.megateam_name}.png`}
+                      alt={`${team?.megateam_name} Logo`}
+                    />
+                  </object>
+                  <p className="font-heading text-lg">{team?.megateam_name}</p>
                 </div>
               </div>
             )}
