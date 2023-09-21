@@ -58,12 +58,12 @@ export default function HackerHome() {
                 <h2 className="font-semibold mb-2">Megateam</h2>
                 <div className="flex items-center justify-evenly">
                   <object
-                    data={`/${team?.megateam_name}.svg`}
+                    data={`/${team?.megateam_name}/icon.svg`}
                     type="image/svg+xml"
                     className="w-12"
                   >
                     <img
-                      src={`/${team?.megateam_name}.png`}
+                      src={`/${team?.megateam_name}/icon.png`}
                       alt={`${team?.megateam_name} Logo`}
                     />
                   </object>

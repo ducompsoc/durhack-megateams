@@ -28,14 +28,14 @@ export default function MegaChart() {
   const { theme } = resolveConfig(tailwindConfig);
 
   const megateams = [
-    { id: 1, points: 450, name: "Team 1", image: new Image() },
-    { id: 2, points: 500, name: "Team 2", image: new Image() },
-    { id: 3, points: 400, name: "Team 3", image: new Image() },
-    { id: 4, points: 200, name: "Team 4", image: new Image() },
+    { id: 1, points: 450, name: "Orion", image: new Image() },
+    { id: 2, points: 500, name: "Pegasus", image: new Image() },
+    { id: 3, points: 400, name: "Cygnus", image: new Image() },
+    { id: 4, points: 200, name: "Lyra", image: new Image() },
   ];
 
   for (let team of megateams) {
-    team.image.src = `/${team.id}.png`;
+    team.image.src = `/${team.name}/icon.png`;
   }
 
   const dataset = {
@@ -84,8 +84,8 @@ export default function MegaChart() {
         annotations: megateams.map((team, i) => {
           const options: AnnotationOptions = {
             type: "box",
-            yMin: Math.max(team.points - 100, 250),
-            yMax: Math.max(team.points - 100, 250),
+            yMin: Math.max(team.points - 130, 250),
+            yMax: Math.max(team.points - 130, 250),
             xMax: i,
             xMin: i,
             label: {
