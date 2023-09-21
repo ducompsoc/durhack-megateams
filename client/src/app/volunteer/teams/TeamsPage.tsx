@@ -9,10 +9,10 @@ import Select from "react-select";
 import useSWR from "swr";
 
 export default function TeamsPage() {
-  const { data: teamsData = { teams: [] } } = useSWR<{ teams: any[] }>(
-    "/teams"
-  );
-  const [teams, setTeams] = useFormState(teamsData.teams);
+  const { mutate: mutateTeams, data: teamsData = { teams: [] } } = useSWR<{
+    teams: any[];
+  }>("/teams");
+  const [teams, setTeams, resetForm] = useFormState(teamsData.teams);
   const { data: { megateams } = { megateams: [] } } = useSWR<{
     megateams: any[];
   }>("/areas");
@@ -66,6 +66,8 @@ export default function TeamsPage() {
           headers: { "Content-Type": "application/json" },
         });
         setMessage("Successfully updated team!");
+        mutateTeams();
+        resetForm();
       } catch {
         setMessage("Failed to update team!");
       }
