@@ -4,7 +4,6 @@ import {
   QrCodeIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { positionMedals } from "@/app/constants";
