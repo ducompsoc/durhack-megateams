@@ -1,6 +1,5 @@
 "use client";
 
-import { fetchMegateamsApi } from "@/app/lib/api";
 import useUser from "@/app/lib/useUser";
 import { redirect, usePathname } from "next/navigation";
 import useSWR from "swr";
