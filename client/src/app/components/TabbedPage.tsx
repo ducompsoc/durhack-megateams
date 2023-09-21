@@ -44,7 +44,7 @@ export default function TabbedPage({
       <div className="h-full flex flex-col text-black dark:text-neutral-200">
         <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
           <object data="/logo.svg" type="image/svg+xml" className="w-16 h-16">
-            <img src="/logo.png" />
+            <img src="/logo.png" alt="DurHack Logo" />
           </object>
           <h1 className="text-3xl font-bold font-heading">DURHACK</h1>
           <button onClick={() => setOpen(true)}>

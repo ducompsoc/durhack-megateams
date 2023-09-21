@@ -21,6 +21,26 @@ export default function RedeemPage() {
     return new URLSearchParams(params).toString();
   }
 
+  useEffect(() => {
+    async function tryRedeemQR() {
+      const uuid = searchParams.get("qr_id");
+      if (uuid && uuid !== "invalid") {
+        try {
+          const result = await fetchMegateamsApi("/qr_codes/redeem", {
+            method: "POST",
+            body: JSON.stringify({ uuid }),
+            headers: { "Content-Type": "application/json" },
+          });
+          setQrPoints(result.points);
+        } catch {
+          setQrChecked(true);
+        }
+      }
+      setQrChecked(true);
+    }
+    tryRedeemQR();
+  }, [searchParams]);
+
   if (!isLoading && user?.role !== "hacker") {
     if (qrChecked) {
       return redirect("/");
@@ -35,27 +55,6 @@ export default function RedeemPage() {
       );
     }
   }
-
-  async function tryRedeemQR() {
-    const uuid = searchParams.get("qr_id");
-    if (uuid && uuid !== "invalid") {
-      try {
-        const result = await fetchMegateamsApi("/qr_codes/redeem", {
-          method: "POST",
-          body: JSON.stringify({ uuid }),
-          headers: { "Content-Type": "application/json" },
-        });
-        setQrPoints(result.points);
-      } catch {
-        setQrChecked(true);
-      }
-    }
-    setQrChecked(true);
-  }
-
-  useEffect(() => {
-    tryRedeemQR();
-  }, [searchParams]);
 
   function RedeemContainer({ children }: { children: ReactNode }) {
     return (
@@ -73,7 +72,7 @@ export default function RedeemPage() {
         </div>
         <p className="text-lg">QR Redeemed Successfully!</p>
         <p>
-          You've gained
+          You&apos;ve gained
           <span className="font-bold">
             {" " + qrPoints + (qrPoints ?? 0 > 1 ? " points " : " point ")}
           </span>

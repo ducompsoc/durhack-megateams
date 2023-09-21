@@ -7,8 +7,6 @@ import { redirect } from "next/navigation";
 
 export default function Challenges() {
   const { user, isLoading } = useUser({ redirectTo: "/volunteer" });
-  if (isLoading) return <></>;
-  if (user?.role !== "admin") return redirect("/");
 
   const [animationParent] = useAutoAnimate();
 
@@ -38,6 +36,9 @@ export default function Challenges() {
       id: 4,
     },
   ]);
+
+  if (isLoading) return <></>;
+  if (user?.role !== "admin") return redirect("/");
 
   function updatePosition(oldPos: number, newPos: number) {
     let newList = [...challenges];
@@ -92,9 +93,7 @@ export default function Challenges() {
                   </option>
                 ))}
               </select>
-              <button className="ml-4 dh-btn">
-                Unpublicise
-              </button>
+              <button className="ml-4 dh-btn">Unpublicise</button>
             </div>
           </li>
         ))}
