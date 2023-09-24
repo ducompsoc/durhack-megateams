@@ -4,15 +4,15 @@ import {
   QrCodeIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import Image from "next/image";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { Dialog, Transition } from "@headlessui/react";
 import { positionMedals } from "@/app/constants";
 import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
 import ButtonModal from "@/app/components/ButtonModal";
+import useUser from "@/app/lib/useUser";
+import useSWR from "swr";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
@@ -20,6 +20,11 @@ const Scanner = dynamic(() => import("qrcode-scanner-react"), {
 export default function HackerHome() {
   const [scanning, setScanning] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
+  const { data: { team } = { team: null } } = useSWR("/user/team");
+
+  const hasTeam = team !== null;
+  const hasMegateam = team?.megateam_name !== null;
 
   function scanSuccess(result: string) {
     let qr_id;
@@ -41,27 +46,28 @@ export default function HackerHome() {
     { details: "Details of challenge 3", points: 4 },
   ];
 
-  const hasMegateam = true;
-  const hasTeam = true;
-
   return (
     <>
       {hasTeam ? (
         <div className="flex flex-col h-full">
-          <p>Hello Hacker_name,</p>
+          <p>Hello {user?.preferred_name},</p>
           <div className="flex mt-4">
             <TeamBox />
             {hasMegateam && (
               <div className="dh-box p-2 text-center grow ml-4">
                 <h2 className="font-semibold mb-2">Megateam</h2>
-                <div className="flex items-center justify-center">
-                  <p className="text-[#0000a5] font-bold">Megateam 1</p>
-                  <Image
-                    src="/1.png"
-                    alt="Megateam 1 Logo"
-                    width={50}
-                    height={50}
-                  />
+                <div className="flex items-center justify-evenly">
+                  <object
+                    data={`/${team?.megateam_name}/icon.svg`}
+                    type="image/svg+xml"
+                    className="w-12"
+                  >
+                    <img
+                      src={`/${team?.megateam_name}/icon.png`}
+                      alt={`${team?.megateam_name} Logo`}
+                    />
+                  </object>
+                  <p className="font-heading text-lg">{team?.megateam_name}</p>
                 </div>
               </div>
             )}

@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Dialog } from "@headlessui/react";
+import { useState } from "react";
 import { fetchMegateamsApi } from "../lib/api";
 import useUser from "../lib/useUser";
 import ButtonModal from "./ButtonModal";
+import { SWRConfig } from "swr";
 
 interface Tab {
   path: string;
@@ -39,11 +40,11 @@ export default function TabbedPage({
   }
 
   return (
-    <>
+    <SWRConfig value={{ fetcher: fetchMegateamsApi }}>
       <div className="h-full flex flex-col text-black dark:text-neutral-200">
         <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
           <object data="/logo.svg" type="image/svg+xml" className="w-16 h-16">
-            <img src="/logo.png" />
+            <img src="/logo.png" alt="DurHack Logo" />
           </object>
           <h1 className="text-3xl font-bold font-heading">DURHACK</h1>
           <button onClick={() => setOpen(true)}>
@@ -123,6 +124,6 @@ export default function TabbedPage({
           </>
         }
       />
-    </>
+    </SWRConfig>
   );
 }
