@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { positionMedals } from "@/app/constants";
+import getPositionMedals from "@/app/lib/positionMedals";
 import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
@@ -22,9 +22,23 @@ export default function HackerHome() {
   const router = useRouter();
   const { user } = useUser();
   const { data: { team } = { team: null } } = useSWR("/user/team");
+  const { data: { megateams } = { megateams: null } } = useSWR("/megateams");
 
   const hasTeam = team !== null;
   const hasMegateam = team?.megateam_name !== null;
+
+  let megateam_points = 0;
+  let megateam_rank = 0;
+
+  megateams?.sort((a: any, b: any) => {
+    return b.points - a.points;
+  })
+  megateams?.forEach((megateam: any, index: number) => {
+    if (megateam.megateam_name === team?.megateam_name) {
+      megateam_points = megateam.points;
+      megateam_rank = index;
+    }
+  })
 
   function scanSuccess(result: string) {
     let qr_id;
@@ -77,7 +91,7 @@ export default function HackerHome() {
               <div className="dh-box p-2 text-center flex mt-4">
                 <div className="grow">
                   <h2 className="font-semibold mb-2">My Points</h2>
-                  <p>14 {positionMedals[2]}</p>
+                  <p>14 {getPositionMedals(2)}</p>
                 </div>
                 <div className="grow px-4">
                   <h2 className="font-semibold mb-2">Team Points</h2>
@@ -87,7 +101,7 @@ export default function HackerHome() {
                 </div>
                 <div className="grow">
                   <h2 className="font-semibold mb-2">Megateam Points</h2>
-                  <p>6 {positionMedals[1]}</p>
+                  <p>{megateam_points} {getPositionMedals(megateam_rank)}</p>
                 </div>
               </div>
               <div className="dh-box p-2 text-center mt-4">

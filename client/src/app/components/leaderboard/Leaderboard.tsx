@@ -2,7 +2,7 @@
 
 import React from "react";
 import MegaChart from "./MegaChart";
-import {positionMedals} from "@/app/constants";
+import getPositionMedals from "@/app/lib/positionMedals";
 
 export default function Leaderboard() {
   const teams = [
@@ -37,7 +37,7 @@ export default function Leaderboard() {
                 <p>{team.name}</p>
                 <p>{team.points} points</p>
                 <div className="flex items-center font-mono justify-center md:justify-start">
-                  <p>{i < 3 ? positionMedals[i+1] : "#" + (i+1)}</p>
+                  <p>{getPositionMedals(i)}</p>
                 </div>
               </React.Fragment>
             ))}
