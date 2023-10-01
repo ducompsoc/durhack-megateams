@@ -66,7 +66,7 @@ class TeamHandlers {
 
     const payload = result.map((team) => {
       const json = team.toJSON();
-      json.points = json.points || 0;
+      json.points = (!Number.isNaN(json.points) ? parseInt(json.points) : 0) || 0;
       return json;
     });
 
@@ -117,8 +117,8 @@ class TeamHandlers {
 
     const payload = result.map((team) => {
       const json = team.toJSON();
-      json.points = json.points || 0;
-      json.member_count = json.member_count || 0;
+      json.points = (!Number.isNaN(json.points) ? parseInt(json.points) : 0) || 0;
+      json.member_count = (!Number.isNaN(json.member_count) ? parseInt(json.member_count) : 0) || 0;
       return json;
     });
 
