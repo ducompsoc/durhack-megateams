@@ -54,9 +54,9 @@ export default function HackerHome() {
           <div className="flex mt-4">
             <TeamBox />
             {hasMegateam && (
-              <div className="dh-box p-2 text-center grow ml-4">
+              <div className="dh-box p-2 text-center grow basis-0 ml-4 flex flex-col">
                 <h2 className="font-semibold mb-2">Megateam</h2>
-                <div className="flex items-center justify-evenly">
+                <div className="flex flex-col md:flex-row items-center justify-evenly md:justify-center md:gap-x-4 grow">
                   <object
                     data={`/${team?.megateam_name}/icon.svg`}
                     type="image/svg+xml"
