@@ -91,7 +91,7 @@ export default function HackerHome() {
               <div className="dh-box p-2 text-center flex mt-4">
                 <div className="grow">
                   <h2 className="font-semibold mb-2">My Points</h2>
-                  <p>14 {getPositionMedals(2)}</p>
+                  <p>{user?.points} {getPositionMedals(2)}</p>
                 </div>
                 <div className="grow px-4">
                   <h2 className="font-semibold mb-2">Team Points</h2>
