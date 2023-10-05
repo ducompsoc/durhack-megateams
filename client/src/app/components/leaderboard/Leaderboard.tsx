@@ -5,6 +5,7 @@ import MegaChart from "./MegaChart";
 import getPositionMedals from "@/app/lib/positionMedals";
 
 export default function Leaderboard() {
+  // Change this
   const teams = [
     { name: "Team 4", points: 140 },
     { name: "Team 8", points: 132 },
