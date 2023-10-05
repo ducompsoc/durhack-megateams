@@ -23,6 +23,7 @@ export default function HackerHome() {
   const { user } = useUser();
   const { data: { team } = { team: null } } = useSWR("/user/team");
   const { data: { megateams } = { megateams: null } } = useSWR("/megateams");
+  const { data: { teams } = { teams: null } } = useSWR("/teams");
 
   const hasTeam = team !== null;
   const hasMegateam = team?.megateam_name !== null;
@@ -37,6 +38,19 @@ export default function HackerHome() {
     if (megateam.megateam_name === team?.megateam_name) {
       megateam_points = megateam.points;
       megateam_rank = index;
+    }
+  })
+
+  let team_points = 0;
+  let team_rank = 0;
+
+  teams?.sort((a: any, b: any) => {
+    return b.points - a.points;
+  })
+  teams?.forEach((current_team: any, index: number) => {
+    if (current_team.name === team?.name) {
+      team_points = current_team.points;
+      team_rank = index;
     }
   })
 
@@ -96,7 +110,7 @@ export default function HackerHome() {
                 <div className="grow px-4">
                   <h2 className="font-semibold mb-2">Team Points</h2>
                   <div className="flex justify-center items-center">
-                    <p>8 (#5)</p>
+                    <p>{team_points} {getPositionMedals(team_rank)}</p>
                   </div>
                 </div>
                 <div className="grow">
