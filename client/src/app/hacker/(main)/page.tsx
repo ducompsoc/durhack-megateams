@@ -95,6 +95,7 @@ export default function HackerHome() {
                       <p>{challenge.points} points</p>
                     </React.Fragment>
                   ))}
+                  {!challenges && <p>No challenges have been published yet. Check back soon!</p>}
                 </div>
               </div>
             </>
