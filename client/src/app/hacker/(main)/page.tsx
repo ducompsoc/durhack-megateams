@@ -22,7 +22,7 @@ export default function HackerHome() {
   const router = useRouter();
   const { user } = useUser();
   const { data: { team } = { team: null } } = useSWR("/user/team");
-  const { data: { challenges } = { challenges: null } } = useSWR("/challenges");
+  const { data: { challenges } = { challenges: null } } = useSWR("/qr_codes/challenges");
 
   const hasTeam = team !== null;
   const hasMegateam = team?.megateam_name !== null;
