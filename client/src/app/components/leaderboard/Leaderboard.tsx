@@ -2,18 +2,15 @@
 
 import React from "react";
 import MegaChart from "./MegaChart";
-import {positionMedals} from "@/app/constants";
+import { getPositionMedal } from "@/app/lib/rankEmojis";
+import useSWR from "swr";
 
 export default function Leaderboard() {
-  const teams = [
-    { name: "Team 4", points: 140 },
-    { name: "Team 8", points: 132 },
-    { name: "Team 1", points: 124 },
-    { name: "Team 2", points: 120 },
-    { name: "Team 5", points: 100 },
-    { name: "Team 6", points: 93 },
-    { name: "Team 7", points: 84 },
-  ];
+  const { data: { teams } = { teams: null } } = useSWR("/teams");
+
+  teams?.sort((a: any, b: any) => {
+    return b.points - a.points;
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -32,12 +29,12 @@ export default function Leaderboard() {
             <p className="font-semibold mb-2">Team</p>
             <p className="font-semibold mb-2">Total Points</p>
             <p className="font-semibold mb-2">Ranking</p>
-            {teams.map((team, i) => (
+            {teams?.map((team: any, i: number) => (
               <React.Fragment key={i}>
                 <p>{team.name}</p>
                 <p>{team.points} points</p>
                 <div className="flex items-center font-mono justify-center md:justify-start">
-                  <p>{i < 3 ? positionMedals[i+1] : "#" + (i+1)}</p>
+                  <p>{getPositionMedal(i)}</p>
                 </div>
               </React.Fragment>
             ))}

@@ -11,6 +11,7 @@ import { Options } from "chartjs-plugin-datalabels/types/options";
 import { useMediaQuery } from "react-responsive";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
+import useSWR from "swr";
 
 ChartJS.register(
   CategoryScale,
@@ -21,29 +22,34 @@ ChartJS.register(
 );
 
 export default function MegaChart() {
+  const { data: { megateams } = { megateams: null } } = useSWR("/megateams");
+
+  megateams?.sort((a: any, b: any) => {
+    return a.megateam_name.localeCompare(b.megateam_name);
+  })
+
   const isDark = useMediaQuery({
     query: "(prefers-color-scheme: dark)",
   });
 
   const { theme } = resolveConfig(tailwindConfig);
 
-  const megateams = [
-    { id: 1, points: 450, name: "Orion", image: new Image() },
-    { id: 2, points: 500, name: "Pegasus", image: new Image() },
-    { id: 3, points: 400, name: "Cygnus", image: new Image() },
-    { id: 4, points: 200, name: "Lyra", image: new Image() },
-  ];
+  let largestPoints = 0;
 
-  for (let team of megateams) {
-    team.image.src = `/${team.name}/icon.png`;
-  }
+  megateams?.forEach((megateam: any) => {
+    megateam.image = new Image();
+    megateam.image.src = `/${megateam.megateam_name}/icon.png`;
+    if (megateam.points > largestPoints) {
+      largestPoints = megateam.points;
+    }
+  })
 
   const dataset = {
-    labels: megateams.map((team) => team.name),
+    labels: megateams?.map((team: any) => team.megateam_name),
     datasets: [
       {
         label: "Points",
-        data: megateams.map((team) => team.points),
+        data: megateams?.map((team: any) => team.points),
         ...(isDark
           ? {
               // @ts-ignore
@@ -81,11 +87,11 @@ export default function MegaChart() {
     plugins: {
       datalabels,
       annotation: {
-        annotations: megateams.map((team, i) => {
+        annotations: megateams?.map((team: any, i: number) => {
           const options: AnnotationOptions = {
             type: "box",
-            yMin: Math.max(team.points - 130, 250),
-            yMax: Math.max(team.points - 130, 250),
+            yMin: Math.max((largestPoints * 0.6), (team.points * 0.8)),
+            yMax: Math.max((largestPoints * 0.6), (team.points * 0.8)),
             xMax: i,
             xMin: i,
             label: {
