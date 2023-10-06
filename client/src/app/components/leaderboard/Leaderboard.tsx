@@ -2,7 +2,7 @@
 
 import React from "react";
 import MegaChart from "./MegaChart";
-import getPositionMedals from "@/app/lib/positionMedals";
+import { getPositionMedal } from "@/app/lib/rankEmojis";
 import useSWR from "swr";
 
 export default function Leaderboard() {
@@ -10,7 +10,7 @@ export default function Leaderboard() {
 
   teams?.sort((a: any, b: any) => {
     return b.points - a.points;
-  })
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -34,7 +34,7 @@ export default function Leaderboard() {
                 <p>{team.name}</p>
                 <p>{team.points} points</p>
                 <div className="flex items-center font-mono justify-center md:justify-start">
-                  <p>{getPositionMedals(i)}</p>
+                  <p>{getPositionMedal(i)}</p>
                 </div>
               </React.Fragment>
             ))}

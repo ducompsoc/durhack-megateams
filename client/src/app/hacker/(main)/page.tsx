@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import getPositionMedals from "@/app/lib/positionMedals";
+import { getHackerEmoji, getPositionMedal } from "@/app/lib/rankEmojis";
 import TeamBox from "./team/TeamBox";
 import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
@@ -33,26 +33,26 @@ export default function HackerHome() {
 
   megateams?.sort((a: any, b: any) => {
     return b.points - a.points;
-  })
+  });
   megateams?.forEach((megateam: any, index: number) => {
     if (megateam.megateam_name === team?.megateam_name) {
       megateam_points = megateam.points;
       megateam_rank = index;
     }
-  })
+  });
 
   let team_points = 0;
   let team_rank = 0;
 
   teams?.sort((a: any, b: any) => {
     return b.points - a.points;
-  })
+  });
   teams?.forEach((current_team: any, index: number) => {
     if (current_team.name === team?.name) {
       team_points = current_team.points;
       team_rank = index;
     }
-  })
+  });
 
   function scanSuccess(result: string) {
     let qr_id;
@@ -105,17 +105,23 @@ export default function HackerHome() {
               <div className="dh-box p-2 text-center flex mt-4">
                 <div className="grow">
                   <h2 className="font-semibold mb-2">My Points</h2>
-                  <p>{user?.points} {getPositionMedals(2)}</p>
+                  <p>
+                    {user?.points} {getHackerEmoji(user?.points ?? 0)}
+                  </p>
                 </div>
                 <div className="grow px-4">
                   <h2 className="font-semibold mb-2">Team Points</h2>
                   <div className="flex justify-center items-center">
-                    <p>{team_points} {getPositionMedals(team_rank)}</p>
+                    <p>
+                      {team_points} {getPositionMedal(team_rank)}
+                    </p>
                   </div>
                 </div>
                 <div className="grow">
                   <h2 className="font-semibold mb-2">Megateam Points</h2>
-                  <p>{megateam_points} {getPositionMedals(megateam_rank)}</p>
+                  <p>
+                    {megateam_points} {getPositionMedal(megateam_rank)}
+                  </p>
                 </div>
               </div>
               <div className="dh-box p-2 text-center mt-4">
