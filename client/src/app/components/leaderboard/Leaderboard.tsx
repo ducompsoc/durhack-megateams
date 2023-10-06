@@ -4,6 +4,7 @@ import React from "react";
 import MegaChart from "./MegaChart";
 import { getPositionMedal } from "@/app/lib/rankEmojis";
 import useSWR from "swr";
+import TeamName from "../TeamName";
 
 export default function Leaderboard() {
   const { data: { teams } = { teams: null } } = useSWR("/teams");
@@ -27,15 +28,13 @@ export default function Leaderboard() {
         <div className="bg-purple-200 border border-accent mt-2 rounded p-4 dark:bg-purple-500/30">
           <div className="grid grid-cols-[auto_auto_auto] mx-2 gap-y-2 gap-x-4">
             <p className="font-semibold mb-2">Team</p>
-            <p className="font-semibold mb-2">Total Points</p>
-            <p className="font-semibold mb-2">Ranking</p>
+            <p className="font-semibold mb-2">Points</p>
+            <p className="font-semibold mb-2">Rank</p>
             {teams?.map((team: any, i: number) => (
               <React.Fragment key={i}>
-                <p>{team.name}</p>
-                <p>{team.points} points</p>
-                <div className="flex items-center font-mono justify-center md:justify-start">
-                  <p>{getPositionMedal(i)}</p>
-                </div>
+                <TeamName teamName={team.name} />
+                <p>{team.points}</p>
+                <p>{getPositionMedal(i)}</p>
               </React.Fragment>
             ))}
           </div>

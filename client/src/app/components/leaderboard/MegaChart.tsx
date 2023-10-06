@@ -90,8 +90,8 @@ export default function MegaChart() {
         annotations: megateams?.map((team: any, i: number) => {
           const options: AnnotationOptions = {
             type: "box",
-            yMin: Math.max((largestPoints * 0.6), (team.points * 0.8)),
-            yMax: Math.max((largestPoints * 0.6), (team.points * 0.8)),
+            yMin: Math.max((largestPoints * 0.6), (team.points * 0.75)),
+            yMax: Math.max((largestPoints * 0.6), (team.points * 0.75)),
             xMax: i,
             xMin: i,
             label: {
