@@ -22,6 +22,7 @@ export default function HackerHome() {
   const router = useRouter();
   const { user } = useUser();
   const { data: { team } = { team: null } } = useSWR("/user/team");
+  const { data: { challenges } = { challenges: null } } = useSWR("/challenges");
 
   const hasTeam = team !== null;
   const hasMegateam = team?.megateam_name !== null;
@@ -39,12 +40,6 @@ export default function HackerHome() {
     }
     router.push("/hacker/redeem?" + new URLSearchParams({ qr_id }).toString());
   }
-
-  const challenges = [
-    { details: "Details of challenge 1", points: 2 },
-    { details: "Details of challenge 2", points: 2 },
-    { details: "Details of challenge 3", points: 4 },
-  ];
 
   return (
     <>
@@ -93,10 +88,10 @@ export default function HackerHome() {
               <div className="dh-box p-2 text-center mt-4">
                 <h2 className="font-semibold mb-2">Challenges</h2>
                 <div className="grid grid-cols-[min-content_1fr_auto] mx-2 gap-y-2">
-                  {challenges.map((challenge, i) => (
+                  {challenges?.map((challenge: any, i: number) => (
                     <React.Fragment key={i}>
                       <p className="mr-2">{i + 1}.</p>
-                      <p>{challenge.details}</p>
+                      <p>{challenge.title}</p>
                       <p>{challenge.points} points</p>
                     </React.Fragment>
                   ))}
