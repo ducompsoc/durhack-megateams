@@ -96,12 +96,10 @@ export default function TeamsPage() {
           const area = getArea(megateam, team.area?.area_id);
           return (
             <div className="dh-box p-4 mb-4" key={team.join_code}>
-              <div className="flex mb-2">
-                <p>{team.name}</p>
-                <p className="ml-2 text-gray-600 dark:text-neutral-400">
-                  Join code: {team.join_code}
-                </p>
-              </div>
+              <p className="mb-1">{team.name}</p>
+              <p className="mb-2 text-gray-600 dark:text-neutral-400">
+                Join code: {team.join_code}
+              </p>
               <select
                 className="by-2 dh-input w-full"
                 value={megateam?.name ?? ""}
