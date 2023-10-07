@@ -88,7 +88,7 @@ class QRHandlers {
       status: response.statusCode,
       message: "OK",
       data: {
-        ...new_instance,
+        ...new_instance.toJSON(),
         redemption_url: new_instance.getRedemptionURL(),
       },
     });
@@ -129,7 +129,7 @@ class QRHandlers {
       status: response.statusCode,
       message: "OK",
       data: {
-        ...new_instance,
+        ...new_instance.toJSON(),
         redemption_url: new_instance.getRedemptionURL(),
       },
     });

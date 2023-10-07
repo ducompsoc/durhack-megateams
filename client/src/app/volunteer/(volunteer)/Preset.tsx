@@ -1,3 +1,4 @@
+import { fetchMegateamsApi } from "@/app/lib/api";
 import { ClockIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -7,7 +8,7 @@ export default function Preset({
 }: {
   displayQR: (
     name: string,
-    uuid: string,
+    url: string,
     category: string,
     preset: boolean
   ) => void;
@@ -15,6 +16,9 @@ export default function Preset({
   const { data: { presets } = { presets: {} }, isLoading } =
     useSWR("/qr_codes/presets");
   const [selected, setSelected] = useState<any>(null);
+  const [publicised, setPublicised] = useState(false);
+  const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const keys = Object.keys(presets);
@@ -22,7 +26,12 @@ export default function Preset({
     if (keys.length && !selected) setSelected(presets[keys[0]]);
   }, [presets]);
 
-  let presetsList: any[] = Object.entries(presets).map(([_, preset]) => preset);
+  let presetsList: any[] = Object.entries(presets).map(
+    ([id, preset]: [string, any]) => {
+      preset.id = id;
+      return preset;
+    }
+  );
   presetsList.sort((a, b) => a.name.localeCompare(b.name));
 
   function getExpiryDate(minutesValid: number) {
@@ -34,6 +43,34 @@ export default function Preset({
     });
   }
 
+  async function generateQR() {
+    if (!name) return setError("Please provide a name/description!");
+    try {
+      const { data: qr } = await fetchMegateamsApi(
+        "/qr_codes/presets/" + encodeURIComponent(selected.id),
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name,
+            publicised,
+          }),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setError(null);
+      setName("");
+      setPublicised(false);
+      displayQR(
+        qr.name,
+        qr.redemption_url,
+        qr.category,
+        qr.category === "preset"
+      );
+    } catch {
+      setError("Failed to generate QR!");
+    }
+  }
+
   if (isLoading || !selected) return <></>;
 
   return (
@@ -42,6 +79,8 @@ export default function Preset({
         type="text"
         className="mb-2 dh-input w-full"
         placeholder="Name/Description"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
       <select
         className="dh-input w-full"
@@ -73,14 +112,17 @@ export default function Preset({
       </div>
       <div className="flex items-center">
         <p>Publicised:</p>
-        <input type="checkbox" className="ml-2 dh-check" />
-        <button
-          className="dh-btn ml-4"
-          onClick={() => displayQR("Test QR", "abc-123", "", true)}
-        >
+        <input
+          type="checkbox"
+          className="ml-2 dh-check"
+          checked={publicised}
+          onChange={(e) => setPublicised(e.target.checked)}
+        />
+        <button className="dh-btn ml-4" onClick={generateQR}>
           Generate
         </button>
       </div>
+      {error && <p className="dh-err">{error}</p>}
     </div>
   );
 }

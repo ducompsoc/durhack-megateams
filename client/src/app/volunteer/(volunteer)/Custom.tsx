@@ -6,7 +6,7 @@ export default function Custom({
 }: {
   displayQR: (
     name: string,
-    uuid: string,
+    url: string,
     category: string,
     preset: boolean
   ) => void;

@@ -119,15 +119,15 @@ export default function HackerHome() {
                   </p>
                 </div>
               </div>
-              <div className="dh-box p-2 text-center mt-4">
-                <h2 className="font-semibold mb-2">Challenges</h2>
+              <div className="dh-box p-2 mt-4">
+                <h2 className="font-semibold mb-2 text-center">Challenges</h2>
                 {!challenges ? (
-                  <p>No challenges have been published yet. Check back soon!</p>
+                  <p className="text-center">No challenges have been published yet. Check back soon!</p>
                 ) : (
                   <div className="grid grid-cols-[min-content_1fr_auto] mx-2 gap-y-2">
                     {challenges?.map((challenge: any, i: number) => (
                       <React.Fragment key={i}>
-                        <p className="mr-2">{i + 1}.</p>
+                        <p className="mr-2 text-right">{i + 1}.</p>
                         <p>{challenge.title}</p>
                         <p>{challenge.points} points</p>
                       </React.Fragment>

@@ -13,7 +13,7 @@ export default function Manage({
 }: {
   displayQR: (
     name: string,
-    uuid: string,
+    url: string,
     category: string,
     preset: boolean
   ) => void;

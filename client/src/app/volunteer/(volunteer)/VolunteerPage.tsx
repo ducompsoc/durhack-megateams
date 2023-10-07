@@ -18,7 +18,7 @@ export default function Volunteer() {
   const [open, setOpen] = useState(false);
   const [qr, setQR] = useState({
     name: "",
-    uuid: "",
+    url: "",
     category: "",
     preset: false,
   });
@@ -58,11 +58,11 @@ export default function Volunteer() {
 
   function displayQR(
     name: string,
-    uuid: string,
+    url: string,
     category: string,
     preset: boolean
   ) {
-    setQR({ name, uuid, category, preset });
+    setQR({ name, url, category, preset });
     setOpen(true);
   }
 
@@ -141,7 +141,7 @@ export default function Volunteer() {
                   <div className="bg-white dark:bg-neutral-700 px-4 py-5 sm:p-6 text-center flex flex-col items-center justify-center">
                     <div ref={renderedQR} className="p-4">
                       <QRCode
-                        value={qr.uuid}
+                        value={qr.url}
                         fgColor={isDark ? "#fff" : "#7d6399"}
                         /* @ts-ignore */
                         bgColor={isDark ? theme.colors.neutral[700] : "#fff"}
@@ -162,7 +162,7 @@ export default function Volunteer() {
                       className="mt-2 sm:mr-2 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                       onClick={() => setOpen(false)}
                     >
-                      Cancel
+                      Close
                     </button>
                   </div>
                 </Dialog.Panel>
