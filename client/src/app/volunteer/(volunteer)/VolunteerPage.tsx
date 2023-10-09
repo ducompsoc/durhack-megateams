@@ -56,13 +56,8 @@ export default function Volunteer() {
     });
   }
 
-  function displayQR(
-    name: string,
-    url: string,
-    category: string,
-    preset: boolean
-  ) {
-    setQR({ name, url, category, preset });
+  function displayQR(name: string, url: string, category: string) {
+    setQR({ name, url, category, preset: category === "preset" });
     setOpen(true);
   }
 

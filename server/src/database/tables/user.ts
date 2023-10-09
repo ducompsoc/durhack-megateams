@@ -64,7 +64,7 @@ export default class User extends Model {
   })
   declare last_logged_in_at: Date | null;
 
-  static async listUsers(): Promise<Pick<User, "id" | "email" | "full_name">[]> {
+  static async listUsers(): Promise<Pick<User, "id" | "email">[]> {
     throw new Error("Not implemented.");
   }
 }

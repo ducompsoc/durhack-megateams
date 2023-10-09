@@ -6,12 +6,7 @@ import useSWR from "swr";
 export default function Preset({
   displayQR,
 }: {
-  displayQR: (
-    name: string,
-    url: string,
-    category: string,
-    preset: boolean
-  ) => void;
+  displayQR: (name: string, url: string, category: string) => void;
 }) {
   const { data: { presets } = { presets: {} }, isLoading } =
     useSWR("/qr_codes/presets");
@@ -60,12 +55,7 @@ export default function Preset({
       setError(null);
       setName("");
       setPublicised(false);
-      displayQR(
-        qr.name,
-        qr.redemption_url,
-        qr.category,
-        qr.category === "preset"
-      );
+      displayQR(qr.name, qr.redemption_url, qr.category);
     } catch {
       setError("Failed to generate QR!");
     }

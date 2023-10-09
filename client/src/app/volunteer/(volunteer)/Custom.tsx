@@ -7,8 +7,7 @@ export default function Custom({
   displayQR: (
     name: string,
     url: string,
-    category: string,
-    preset: boolean
+    category: string
   ) => void;
 }) {
   const now = currentDate();
@@ -16,7 +15,7 @@ export default function Custom({
   const [startDate, setStartDate] = useState(now);
   const [endDate, setEndDate] = useState(nowPlusFive);
 
-  const qrTypes = ["Workshop", "Challenge", "Volunteer", "Sponsor", "Personal"];
+  const qrTypes = ["Challenge", "Sponsor", "Workshop"];
 
   function currentDate(addMinutes?: number) {
     let now = new Date();

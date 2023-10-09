@@ -137,7 +137,10 @@ class QRHandlers {
 
   @requireUserIsAdmin
   async getQRCodeList(_request: Request, response: Response): Promise<void> {
-    const result = await QRCode.findAll({ include: [Point, User] });
+    const result = await QRCode.findAll({
+      include: [Point, User],
+      order: [["createdAt", "DESC"]],
+    });
 
     const payload = result.map((code: QRCode) => ({
       id: code.id,
@@ -145,7 +148,7 @@ class QRHandlers {
       category: code.category,
       scans: code.uses?.length || 0,
       max_scans: code.max_uses,
-      creator: code.creator.email,
+      creator: code.creator.preferred_name,
       value: code.points_value,
       start: code.start_time,
       end: code.expiry_time,

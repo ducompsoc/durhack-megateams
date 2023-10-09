@@ -7,17 +7,32 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import dateFormat from "dateformat";
+import { useFormState } from "react-hooks-use-form-state";
+import useSWR from "swr";
 
 export default function Manage({
   displayQR,
 }: {
-  displayQR: (
-    name: string,
-    url: string,
-    category: string,
-    preset: boolean
-  ) => void;
+  displayQR: (name: string, url: string, category: string) => void;
 }) {
+  const { mutate: mutateCodes, data: codesData = { codes: [] } } = useSWR<{
+    codes: any[];
+  }>("/qr_codes");
+  const [codes, setCodes, resetForm] = useFormState(codesData.codes);
+
+  const filteredCodes = codes.filter((code) => !code.hidden);
+
+  function filterCodes(searchText: string) {
+    const lowerSearch = searchText.toLowerCase();
+    setCodes(
+      codes.map((code) => {
+        code.hidden = true;
+        if (code.name.toLowerCase().includes(lowerSearch)) code.hidden = false;
+        return code;
+      })
+    );
+  }
+
   function getQRState(
     start: Date,
     end: Date,
@@ -51,47 +66,9 @@ export default function Manage({
     return `${bgClass} drop-shadow-lg p-4 rounded mb-4`;
   }
 
-  const qrs = [
-    {
-      creator: "Luca",
-      points: 10,
-      scans: 25,
-      type: "Sponsor",
-      limit: 30,
-      startDate: new Date("10/10/23 06:30"),
-      endDate: new Date("10/10/23 07:30"),
-      name: "Amazon Workshop",
-      uuid: "abc-123",
-      enabled: true,
-      publicised: true,
-    },
-    {
-      creator: "Luca",
-      points: 10,
-      scans: 25,
-      type: "Sponsor",
-      limit: 30,
-      startDate: new Date("02/08/23 06:30"),
-      endDate: new Date("10/10/23 07:30"),
-      name: "Netcraft Workshop",
-      uuid: "def-456",
-      enabled: true,
-      publicised: true,
-    },
-    {
-      creator: "Luca",
-      points: 10,
-      scans: 25,
-      type: "Sponsor",
-      limit: 30,
-      startDate: new Date("02/08/23 06:30"),
-      endDate: new Date("02/08/23 07:30"),
-      name: "Waterstons Workshop",
-      uuid: "ghi-789",
-      enabled: true,
-      publicised: true,
-    },
-  ];
+  function capitalizeFirstLetter(text: string) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
 
   return (
     <>
@@ -101,99 +78,86 @@ export default function Manage({
             type="text"
             className="dh-input w-full pl-10"
             placeholder="Search for QRs..."
+            onChange={(e) => filterCodes(e.target.value)}
           />
           <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
         </div>
       </div>
-      {qrs.map(
-        (
-          {
-            creator,
-            points,
-            scans,
-            type,
-            limit,
-            startDate,
-            endDate,
-            name,
-            enabled,
-            publicised,
-            uuid,
-          },
-          i
-        ) => {
-          const qrState = getQRState(startDate, endDate, enabled);
-          return (
-            <div className={qrClasses(qrState)} key={i}>
-              <p className="mb-2">{name}</p>
-              <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
-                <div className="col-span-1">
-                  <p className="flex items-center" title="QR Category/Type">
-                    <TagIcon className="w-4 h-4 mr-2" />
-                    {type}
-                  </p>
-                </div>
-                <div className="col-span-1">
-                  <p
-                    className="flex items-center"
-                    title="Current Scans/Use Limit"
-                  >
-                    <CameraIcon className="w-4 h-4 mr-2" />
-                    {scans}/{limit} scans
-                  </p>
-                </div>
-                <div className="col-span-1">
-                  <p className="flex items-center" title="Creator">
-                    <UserIcon className="w-4 h-4 mr-2" />
-                    {creator}
-                  </p>
-                </div>
-                <div className="col-span-1">
-                  <p className="flex items-center" title="Point Value">
-                    <GiftIcon className="w-4 h-4 mr-2" />
-                    {points} points
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <p className="flex items-center" title="Valid From - Until">
-                    <ClockIcon className="w-4 h-4 mr-2" />
-                    {dateFormat(startDate, "hh:MM dd/mm")} -{" "}
-                    {dateFormat(endDate, "hh:MM dd/mm")}
-                  </p>
-                </div>
+      {filteredCodes.map((code, i) => {
+        const qrState = getQRState(code.start, code.end, code.enabled);
+        return (
+          <div className={qrClasses(qrState)} key={i}>
+            <p className="mb-2">{code.name}</p>
+            <div className="mb-4 grid grid-cols-2 gap-x-2 gap-y-2">
+              <div className="col-span-1">
+                <p className="flex items-center" title="QR Category/Type">
+                  <TagIcon className="w-4 h-4 mr-2" />
+                  {capitalizeFirstLetter(code.category)}
+                </p>
               </div>
-              <div className="flex items-center">
-                <button
-                  className="dh-btn disabled:bg-gray-300 dark:disabled:bg-neutral-500"
-                  disabled={qrState.disabled}
+              <div className="col-span-1">
+                <p
+                  className="flex items-center"
+                  title="Current Scans/Use Limit"
                 >
-                  View
-                </button>
-                <p className="ml-4" title="Can be scanned for points?">
-                  Enabled:
+                  <CameraIcon className="w-4 h-4 mr-2" />
+                  {code.scans}/{code.max_scans} scans
                 </p>
-                <input
-                  type="checkbox"
-                  checked={qrState.checked}
-                  disabled={qrState.disabled}
-                  className="ml-2 dh-check"
-                />
-                <p className="ml-4" title="Shown on Challenge list?">
-                  Publicised:
+              </div>
+              <div className="col-span-1">
+                <p className="flex items-center" title="Creator">
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  {code.creator}
                 </p>
-                <input
-                  type="checkbox"
-                  checked={
-                    (!qrState.disabled || qrState.preStart) && publicised
-                  }
-                  disabled={qrState.disabled}
-                  className="ml-2 dh-check"
-                />
+              </div>
+              <div className="col-span-1">
+                <p className="flex items-center" title="Point Value">
+                  <GiftIcon className="w-4 h-4 mr-2" />
+                  {code.value} points
+                </p>
+              </div>
+              <div className="col-span-2">
+                <p className="flex items-center" title="Valid From - Until">
+                  <ClockIcon className="w-4 h-4 mr-2" />
+                  {dateFormat(code.start, "hh:MM dd/mm")} -{" "}
+                  {dateFormat(code.end, "hh:MM dd/mm")}
+                </p>
               </div>
             </div>
-          );
-        }
-      )}
+            <div className="flex items-center">
+              <button
+                className="dh-btn disabled:bg-gray-300 dark:disabled:bg-neutral-500"
+                disabled={qrState.disabled}
+                onClick={() =>
+                  displayQR(code.name, code.redemption_url, code.category)
+                }
+              >
+                View
+              </button>
+              <p className="ml-4" title="Can be scanned for points?">
+                Enabled:
+              </p>
+              <input
+                type="checkbox"
+                checked={qrState.checked}
+                disabled={qrState.disabled}
+                className="ml-2 dh-check"
+              />
+              <p className="ml-4" title="Shown on Challenge list?">
+                Publicised:
+              </p>
+              <input
+                type="checkbox"
+                checked={
+                  (!qrState.disabled || qrState.preStart) && code.publicised
+                }
+                disabled={qrState.disabled}
+                className="ml-2 dh-check"
+              />
+            </div>
+          </div>
+        );
+      })}
     </>
   );
 }
