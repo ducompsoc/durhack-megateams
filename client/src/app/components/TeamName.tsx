@@ -6,7 +6,7 @@ export default function TeamName(props: { className?: string, teamName: string }
   return (
     <div className={"flex flex-wrap " + props.className || ""}>
       {split?.map((text: string, i: number) => (
-        <p>{capitals[i] + text}</p>
+        <p key={i}>{capitals[i] + text}</p>
       ))}
     </div>
   );
