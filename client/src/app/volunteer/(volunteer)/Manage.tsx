@@ -1,3 +1,5 @@
+import ButtonModal from "@/app/components/ButtonModal";
+import { fetchMegateamsApi } from "@/app/lib/api";
 import {
   ClockIcon,
   MagnifyingGlassIcon,
@@ -7,8 +9,11 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import dateFormat from "dateformat";
+import { useState } from "react";
 import { useFormState } from "react-hooks-use-form-state";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import useSWR from "swr";
+import { Dialog } from "@headlessui/react";
 
 export default function Manage({
   displayQR,
@@ -19,8 +24,29 @@ export default function Manage({
     codes: any[];
   }>("/qr_codes");
   const [codes, setCodes, resetForm] = useFormState(codesData.codes);
+  const [error, setError] = useState(false);
 
   const filteredCodes = codes.filter((code) => !code.hidden);
+
+  async function patchQR(id: number, field: string, value: boolean) {
+    try {
+      let body: Record<string, boolean> = {};
+      body[field] = value;
+      await fetchMegateamsApi("/qr_codes/" + encodeURIComponent(id), {
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      await mutateCodes();
+      resetForm();
+      setError(false);
+    } catch {
+      resetForm();
+      setError(true);
+    }
+  }
 
   function filterCodes(searchText: string) {
     const lowerSearch = searchText.toLowerCase();
@@ -34,16 +60,18 @@ export default function Manage({
   }
 
   function getQRState(
-    start: Date,
-    end: Date,
+    start: string,
+    end: string,
     enabled: boolean
   ): { checked: boolean; disabled: boolean; preStart: boolean } {
     let state = { checked: enabled, disabled: false, preStart: false };
     let now = new Date();
-    if (now > end) {
+    let startDate = new Date(start);
+    let endDate = new Date(end);
+    if (now > endDate) {
       state.checked = false;
       state.disabled = true;
-    } else if (now < start) {
+    } else if (now < startDate) {
       state.disabled = true;
       state.preStart = true;
     }
@@ -127,7 +155,7 @@ export default function Manage({
             <div className="flex items-center">
               <button
                 className="dh-btn disabled:bg-gray-300 dark:disabled:bg-neutral-500"
-                disabled={qrState.disabled}
+                disabled={!code.enabled || qrState.disabled}
                 onClick={() =>
                   displayQR(code.name, code.redemption_url, code.category)
                 }
@@ -142,6 +170,7 @@ export default function Manage({
                 checked={qrState.checked}
                 disabled={qrState.disabled}
                 className="ml-2 dh-check"
+                onChange={(e) => patchQR(code.id, "state", e.target.checked)}
               />
               <p className="ml-4" title="Shown on Challenge list?">
                 Publicised:
@@ -153,11 +182,51 @@ export default function Manage({
                 }
                 disabled={qrState.disabled}
                 className="ml-2 dh-check"
+                onChange={(e) =>
+                  patchQR(code.id, "publicised", e.target.checked)
+                }
               />
             </div>
           </div>
         );
       })}
+      <ButtonModal
+        show={error}
+        onClose={(val) => setError(val)}
+        itemsClass="items-end sm:items-center"
+        content={
+          <div className="sm:flex sm:items-start">
+            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <ExclamationTriangleIcon
+                className="h-6 w-6 text-red-600"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+              <Dialog.Title
+                as="h3"
+                className="text-base font-semibold leading-6 text-gray-900 dark:text-neutral-200"
+              >
+                Failed to update QR Code!
+              </Dialog.Title>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500 dark:text-neutral-300">
+                  Please try again.
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+        buttons={
+          <button
+            type="button"
+            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:text-neutral-200 dark:bg-neutral-500"
+            onClick={() => setError(false)}
+          >
+            Close
+          </button>
+        }
+      />
     </>
   );
 }
