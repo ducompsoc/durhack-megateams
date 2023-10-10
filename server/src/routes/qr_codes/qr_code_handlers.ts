@@ -180,7 +180,7 @@ class QRHandlers {
         if (maxRank) {
           fields.challenge_rank = maxRank + 1;
         } else {
-          fields.challenge_rank = 0;
+          fields.challenge_rank = 1;
         }
       }
     }
