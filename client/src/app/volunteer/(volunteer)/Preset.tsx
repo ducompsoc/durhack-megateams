@@ -11,15 +11,7 @@ export default function Preset({
   const { data: { presets } = { presets: {} }, isLoading } =
     useSWR("/qr_codes/presets");
   const [selected, setSelected] = useState<any>(null);
-  const [publicised, setPublicised] = useState(false);
-  const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const keys = Object.keys(presets);
-    keys.sort();
-    if (keys.length && !selected) setSelected(presets[keys[0]]);
-  }, [presets]);
 
   let presetsList: any[] = Object.entries(presets).map(
     ([id, preset]: [string, any]) => {
@@ -27,7 +19,11 @@ export default function Preset({
       return preset;
     }
   );
-  presetsList.sort((a, b) => a.name.localeCompare(b.name));
+  presetsList.sort((a, b) => b.name.localeCompare(a.name));
+
+  useEffect(() => {
+    if (presetsList.length && !selected) setSelected(presetsList[0]);
+  }, [presets]);
 
   function getExpiryDate(minutesValid: number) {
     let now = new Date();
@@ -39,22 +35,19 @@ export default function Preset({
   }
 
   async function generateQR() {
-    if (!name) return setError("Please provide a name/description!");
     try {
       const { data: qr } = await fetchMegateamsApi(
         "/qr_codes/presets/" + encodeURIComponent(selected.id),
         {
           method: "POST",
           body: JSON.stringify({
-            name,
-            publicised,
+            name: selected.name,
+            publicised: false,
           }),
           headers: { "Content-Type": "application/json" },
         }
       );
       setError(null);
-      setName("");
-      setPublicised(false);
       displayQR(qr.name, qr.redemption_url, qr.category);
     } catch {
       setError("Failed to generate QR!");
@@ -65,13 +58,6 @@ export default function Preset({
 
   return (
     <div className="dh-box p-4">
-      <input
-        type="text"
-        className="mb-2 dh-input w-full"
-        placeholder="Name/Description"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
       <select
         className="dh-input w-full"
         onChange={(e) =>
@@ -100,18 +86,9 @@ export default function Preset({
           <b>{selected.uses}</b> use{selected.uses !== 1 ? "s" : ""}
         </p>
       </div>
-      <div className="flex items-center">
-        <p>Publicised:</p>
-        <input
-          type="checkbox"
-          className="ml-2 dh-check"
-          checked={publicised}
-          onChange={(e) => setPublicised(e.target.checked)}
-        />
-        <button className="dh-btn ml-4" onClick={generateQR}>
-          Generate
-        </button>
-      </div>
+      <button className="dh-btn" onClick={generateQR}>
+        Generate
+      </button>
       {error && <p className="dh-err">{error}</p>}
     </div>
   );
