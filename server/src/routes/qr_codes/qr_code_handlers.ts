@@ -354,17 +354,15 @@ class QRHandlers {
         { challenge_rank: null },
         {
           where: { challenge_rank: { [Op.not]: null } },
-          transaction: transaction,
+          transaction,
         }
       );
 
       for (const challenge of request.body.challenges) {
-        const found_challenge = await QRCode.findByPk(challenge.id, {
-          rejectOnEmpty: new NullError(),
-        });
-        await found_challenge.update({
-          challenge_rank: challenge.rank,
-        });
+        await QRCode.update(
+          { challenge_rank: challenge.rank },
+          { where: { qrcode_id: challenge.id }, transaction }
+        );
       }
 
       await transaction.commit();
