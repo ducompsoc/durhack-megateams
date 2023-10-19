@@ -4,38 +4,18 @@ import { useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import useUser from "@/app/lib/useUser";
 import { redirect } from "next/navigation";
+import useSWR from "swr";
+import { useFormState } from "react-hooks-use-form-state";
 
 export default function Challenges() {
   const { user, isLoading } = useUser({ redirectTo: "/volunteer" });
+  const { data = { challenges: [] } } = useSWR<{ challenges: any[] }>(
+    "/qr_codes/challenges"
+  );
 
   const [animationParent] = useAutoAnimate();
 
-  const [challenges, setChallenges] = useState([
-    {
-      name: "Attend Amazon Workshop",
-      points: 10,
-      position: 1,
-      id: 1,
-    },
-    {
-      name: "Attend THG Workshop",
-      points: 10,
-      position: 2,
-      id: 2,
-    },
-    {
-      name: "Attend Netcraft Workshop",
-      points: 10,
-      position: 3,
-      id: 3,
-    },
-    {
-      name: "Attend Waterstons Workshop",
-      points: 10,
-      position: 4,
-      id: 4,
-    },
-  ]);
+  const [challenges, setChallenges] = useFormState(data.challenges);
 
   if (isLoading) return <></>;
   if (user?.role !== "admin") return redirect("/");
@@ -44,29 +24,29 @@ export default function Challenges() {
     let newList = [...challenges];
     if (newPos > oldPos) {
       for (let challenge of newList) {
-        if (challenge.position === oldPos) {
-          challenge.position = newPos;
+        if (challenge.rank === oldPos) {
+          challenge.rank = newPos;
         } else if (
-          challenge.position > oldPos &&
-          challenge.position <= newPos
+          challenge.rank > oldPos &&
+          challenge.rank <= newPos
         ) {
-          challenge.position--;
+          challenge.rank--;
         }
       }
     }
     if (newPos < oldPos) {
       for (let challenge of newList) {
-        if (challenge.position === oldPos) {
-          challenge.position = newPos;
+        if (challenge.rank === oldPos) {
+          challenge.rank = newPos;
         } else if (
-          challenge.position >= newPos &&
-          challenge.position < oldPos
+          challenge.rank >= newPos &&
+          challenge.rank < oldPos
         ) {
-          challenge.position++;
+          challenge.rank++;
         }
       }
     }
-    newList.sort((a, b) => a.position - b.position);
+    newList.sort((a, b) => a.rank - b.rank);
     setChallenges(newList);
   }
 
@@ -74,22 +54,22 @@ export default function Challenges() {
     <div className="flex flex-col h-full">
       <p className="font-bold text-center mb-4">Manage Challenge List</p>
       <ul ref={animationParent}>
-        {challenges.map(({ name, points, position, id }) => (
+        {challenges.map(({ title, points, rank, id }) => (
           <li className="dh-box p-4 mb-4" key={id} draggable>
-            <p className="mb-2">{name}</p>
+            <p className="mb-2">{title}</p>
             <p className="mb-2">{points} points</p>
             <div className="flex items-center">
               <p>Position: </p>
               <select
-                value={position}
+                value={rank}
                 onChange={(e) =>
-                  updatePosition(position, parseInt(e.target.value))
+                  updatePosition(rank, parseInt(e.target.value))
                 }
                 className="ml-2 dh-input"
               >
-                {challenges.map(({ position }) => (
-                  <option key={position} value={position}>
-                    {position}
+                {challenges.map(({ rank }) => (
+                  <option key={rank} value={rank}>
+                    {rank}
                   </option>
                 ))}
               </select>
