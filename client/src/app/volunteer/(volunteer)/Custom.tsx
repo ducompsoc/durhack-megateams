@@ -33,7 +33,7 @@ export default function Custom({
   async function submitForm() {
     if (!name) return setError("Please set a name!");
     try {
-      await fetchMegateamsApi("/qr_codes", {
+      const { data: qr } = await fetchMegateamsApi("/qr_codes", {
         method: "POST",
         body: JSON.stringify({
           name,
@@ -54,8 +54,8 @@ export default function Custom({
       setPublicised(false);
       setStartDate(now);
       setEndDate(nowPlusFive);
-
       setError("");
+      displayQR(qr.name, qr.redemption_url, qr.category);
     } catch {
       setError("Failed to create QR code!");
     }

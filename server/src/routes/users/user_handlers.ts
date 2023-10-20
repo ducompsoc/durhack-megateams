@@ -106,10 +106,10 @@ class UserHandlers {
     const payload = result.map((user: User) => ({
       id: user.id,
       preferred_name: user.preferred_name,
-      full_name: user.full_name,
       email: user.email,
       points: Point.getPointsTotal(user.points || []),
       team_name: user.team?.name,
+      team_id: user.team?.id,
       megateam_name: user.team?.area?.megateam?.name,
     }));
 
@@ -246,9 +246,6 @@ class UserHandlers {
     };
   }
 
-  doPatchAdmin = UserHandlers.getPatchHandler(patch_user_payload_schema);
-  //doPatchSelf = UserHandlers.getPatchHandler(self_patch_user_payload_schema);
-
   /**
    * Handles an authenticated admin POST request to /users/:id.
    * Allows editing of all fields excluding password.
@@ -259,7 +256,7 @@ class UserHandlers {
    */
   @requireUserIsAdmin
   async patchUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    await this.doPatchAdmin(request, response);
+    await UserHandlers.getPatchHandler(patch_user_payload_schema)(request, response);
   }
 
   /**

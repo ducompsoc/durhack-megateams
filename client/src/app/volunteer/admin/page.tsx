@@ -4,7 +4,7 @@ import useUser from "@/app/lib/useUser";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
-const Admin = dynamic(() => import("./admin"), {
+const Admin = dynamic(() => import("./AdminPage"), {
   ssr: false,
 });
 
