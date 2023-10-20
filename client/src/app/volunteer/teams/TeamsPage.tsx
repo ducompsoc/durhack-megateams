@@ -66,7 +66,7 @@ export default function TeamsPage() {
           headers: { "Content-Type": "application/json" },
         });
         setMessage("Successfully updated team!");
-        mutateTeams();
+        await mutateTeams();
         resetForm();
       } catch {
         setMessage("Failed to update team!");
