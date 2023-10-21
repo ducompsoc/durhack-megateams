@@ -39,11 +39,11 @@ export default function HackerLayout({
       icon: UserGroupIcon,
       path: "/hacker/team",
     },
-    {
-      icon: CogIcon,
-      path: "https://durhack.com/",
-      openNewWindow: true,
-    },
+    // {
+    //   icon: CogIcon,
+    //   path: "https://durhack.com/",
+    //   openNewWindow: true,
+    // },
   ];
 
   return (
