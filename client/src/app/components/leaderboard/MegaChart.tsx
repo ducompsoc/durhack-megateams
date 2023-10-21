@@ -12,6 +12,7 @@ import { useMediaQuery } from "react-responsive";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
 import useSWR from "swr";
+import { fetchMegateamsApi } from "@/app/lib/api";
 
 ChartJS.register(
   CategoryScale,
@@ -22,11 +23,15 @@ ChartJS.register(
 );
 
 export default function MegaChart() {
-  const { data: { megateams } = { megateams: null } } = useSWR("/megateams");
+  const { data: { megateams } = { megateams: null } } = useSWR(
+    "/megateams",
+    fetchMegateamsApi,
+    { refreshInterval: 1000 }
+  );
 
   megateams?.sort((a: any, b: any) => {
     return a.megateam_name.localeCompare(b.megateam_name);
-  })
+  });
 
   const isDark = useMediaQuery({
     query: "(prefers-color-scheme: dark)",
@@ -42,7 +47,7 @@ export default function MegaChart() {
     if (megateam.points > largestPoints) {
       largestPoints = megateam.points;
     }
-  })
+  });
 
   const dataset = {
     labels: megateams?.map((team: any) => team.megateam_name),
@@ -90,8 +95,8 @@ export default function MegaChart() {
         annotations: megateams?.map((team: any, i: number) => {
           const options: AnnotationOptions = {
             type: "box",
-            yMin: Math.max((largestPoints * 0.6), (team.points * 0.75)),
-            yMax: Math.max((largestPoints * 0.6), (team.points * 0.75)),
+            yMin: Math.max(largestPoints * 0.6, team.points * 0.75),
+            yMax: Math.max(largestPoints * 0.6, team.points * 0.75),
             xMax: i,
             xMin: i,
             label: {
@@ -108,5 +113,11 @@ export default function MegaChart() {
     },
   };
 
-  return <Bar data={dataset} options={options} key={`${isDark ? "dark" : "light"}`} />;
+  return (
+    <Bar
+      data={dataset}
+      options={options}
+      key={`${isDark ? "dark" : "light"}`}
+    />
+  );
 }

@@ -5,9 +5,14 @@ import MegaChart from "./MegaChart";
 import { getPositionMedal } from "@/app/lib/rankEmojis";
 import useSWR from "swr";
 import TeamName from "../TeamName";
+import { fetchMegateamsApi } from "@/app/lib/api";
 
 export default function Leaderboard() {
-  const { data: { teams } = { teams: null } } = useSWR("/teams");
+  const { data: { teams } = { teams: null } } = useSWR(
+    "/teams",
+    fetchMegateamsApi,
+    { refreshInterval: 1000 }
+  );
 
   teams?.sort((a: any, b: any) => {
     return b.points - a.points;
