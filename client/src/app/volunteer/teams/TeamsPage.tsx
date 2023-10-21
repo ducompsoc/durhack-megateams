@@ -18,8 +18,10 @@ export default function TeamsPage() {
   }>("/areas");
   const [message, setMessage] = useState("");
   const [messageOpen, setMessageOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  const filteredTeams = teams.filter((team) => !team.hidden);
+  const lowerSearch = searchText.toLowerCase();
+  const filteredTeams = teams.filter((team) => team.name.toLowerCase().includes(lowerSearch));
 
   function changeMegateam(team: any, name: string) {
     const newTeams = [...teams];
@@ -44,17 +46,6 @@ export default function TeamsPage() {
     const filteredAreas =
       megateam?.areas?.filter((area: any) => area.id === area_id) ?? [];
     return filteredAreas.length ? filteredAreas[0] : null;
-  }
-
-  function filterTeams(searchText: string) {
-    const lowerSearch = searchText.toLowerCase();
-    setTeams(
-      teams.map((team) => {
-        team.hidden = true;
-        if (team.name.toLowerCase().includes(lowerSearch)) team.hidden = false;
-        return team;
-      })
-    );
   }
 
   async function saveTeam(team: any) {
@@ -86,7 +77,8 @@ export default function TeamsPage() {
               type="text"
               className="dh-input w-full pl-10"
               placeholder="Search for teams..."
-              onChange={(e) => filterTeams(e.target.value)}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
             />
             <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
           </div>

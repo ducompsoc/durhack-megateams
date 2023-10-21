@@ -1,12 +1,19 @@
 import { z } from "zod";
 import createHttpError from "http-errors";
-import {NextFunction, Request, Response} from "express";
-import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidationError } from "sequelize";
+import { NextFunction, Request, Response } from "express";
+import {
+  literal as SequelizeLiteral,
+  Op,
+  ValidationError as SequelizeValidationError,
+} from "sequelize";
 
 import { NullError, ValueError } from "@server/common/errors";
 import { requireUserIsAdmin } from "@server/common/decorators";
 import { UserRole } from "@server/common/model_enums";
-import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
+import {
+  buildQueryFromRequest,
+  SequelizeQueryTransformFactory,
+} from "@server/database";
 import User from "@server/database/tables/user";
 import Team from "@server/database/tables/team";
 import Point from "@server/database/tables/point";
@@ -15,20 +22,24 @@ import Area from "@server/database/tables/area";
 
 import { requireSelf } from "./user_util";
 
-
-const user_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
+const user_transform_factories = new Map<
+  string,
+  SequelizeQueryTransformFactory<User>
+>();
 user_transform_factories.set("email", (value: string) => ({
-  condition: {email: { [Op.like]: SequelizeLiteral("concat('%', :email, '%')") }},
+  condition: {
+    email: { [Op.like]: SequelizeLiteral("concat('%', :email, '%')") },
+  },
   replacements: new Map([["email", value]]),
-  orders: [
-    ["email", "ASC"],
-  ]
+  orders: [["email", "ASC"]],
 }));
 
 user_transform_factories.set("checked_in", (checked_in: string) => {
-  if (checked_in === "true") return { condition: { checked_in: true }};
-  if (checked_in === "false") return { condition: { checked_in: false }};
-  throw new createHttpError.BadRequest("Malformed query parameter value for 'checked_in'");
+  if (checked_in === "true") return { condition: { checked_in: true } };
+  if (checked_in === "false") return { condition: { checked_in: false } };
+  throw new createHttpError.BadRequest(
+    "Malformed query parameter value for 'checked_in'"
+  );
 });
 
 const user_attributes = User.getAttributes();
@@ -61,9 +72,12 @@ class UserHandlers {
    * @param request
    * @param response
    */
-  async getUsersListDefault(request: Request, response: Response): Promise<void> {
+  async getUsersListDefault(
+    request: Request,
+    response: Response
+  ): Promise<void> {
     const result = await User.findAll({
-      attributes: [["user_id", "id"], "preferred_name"]
+      attributes: [["user_id", "id"], "preferred_name"],
     });
     response.status(200);
     response.json({
@@ -86,22 +100,26 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async getUsersListAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    const query = buildQueryFromRequest(request, user_transform_factories);
-    query.attributes = [["user_id", "id"], "preferred_name", "full_name", "email"];
-    query.include = [
-      { model: Point },
-      {
-        model: Team,
-        include: [
-          {
-            model: Area,
-            include: [ Megateam ],
-          },
-        ],
-      },
-    ];
-    const result = await User.findAll(query);
+  async getUsersListAsAdmin(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const result = await User.findAll({
+      attributes: [["user_id", "id"], "preferred_name", "email"],
+      include: [
+        { model: Point },
+        {
+          model: Team,
+          include: [
+            {
+              model: Area,
+              include: [Megateam],
+            },
+          ],
+        },
+      ],
+    });
 
     const payload = result.map((user: User) => ({
       id: user.id,
@@ -134,8 +152,14 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async createUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    const invalid_fields = Object.keys(request.body).filter((key) => !allowed_create_fields.has(key));
+  async createUserAsAdmin(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const invalid_fields = Object.keys(request.body).filter(
+      (key) => !allowed_create_fields.has(key)
+    );
     if (invalid_fields.length > 0) {
       throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
     }
@@ -151,7 +175,11 @@ class UserHandlers {
     }
 
     response.status(200);
-    response.json({ status: response.statusCode, message: "OK", data: new_instance });
+    response.json({
+      status: response.statusCode,
+      message: "OK",
+      data: new_instance,
+    });
   }
 
   /**
@@ -161,9 +189,13 @@ class UserHandlers {
    * @param request
    * @param response
    */
-  async getUserDetailsDefault(request: Request, response: Response): Promise<void> {
+  async getUserDetailsDefault(
+    request: Request,
+    response: Response
+  ): Promise<void> {
     const { user_id } = response.locals;
-    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.");
+    if (typeof user_id !== "number")
+      throw new Error("Parsed `user_id` not found.");
 
     const result = await User.findByPk(user_id, {
       attributes: ["id", "preferred_name"],
@@ -175,15 +207,30 @@ class UserHandlers {
     payload.points = Point.getPointsTotal(result.points);
 
     response.status(200);
-    response.json({ "status": response.statusCode, "message": "OK", "data": payload });
+    response.json({
+      status: response.statusCode,
+      message: "OK",
+      data: payload,
+    });
   }
 
-  private async doGetAllUserDetails(request: Request, response: Response): Promise<void> {
+  private async doGetAllUserDetails(
+    request: Request,
+    response: Response
+  ): Promise<void> {
     const { user_id } = response.locals;
-    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.");
+    if (typeof user_id !== "number")
+      throw new Error("Parsed `user_id` not found.");
 
     const result = await User.findByPk(user_id, {
-      attributes: {exclude: ["hashed_password", "password_salt", "verify_code", "verify_sent_at"]},
+      attributes: {
+        exclude: [
+          "hashed_password",
+          "password_salt",
+          "verify_code",
+          "verify_sent_at",
+        ],
+      },
       include: [Team, Point],
       rejectOnEmpty: new NullError(),
     });
@@ -192,7 +239,11 @@ class UserHandlers {
     payload.points = Point.getPointsTotal(result.points);
 
     response.status(200);
-    response.json({ "status": response.statusCode, "message": "OK", "data": payload });
+    response.json({
+      status: response.statusCode,
+      message: "OK",
+      data: payload,
+    });
   }
 
   /**
@@ -204,7 +255,11 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async getUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async getUserDetailsAsAdmin(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
     await this.doGetAllUserDetails(request, response);
   }
 
@@ -217,14 +272,22 @@ class UserHandlers {
    * @param next
    */
   @requireSelf
-  async getMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async getMyUserDetails(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
     await this.doGetAllUserDetails(request, response);
   }
 
   static getPatchHandler(payload_schema: z.Schema) {
-    return async function(request: Request, response: Response): Promise<void> {
+    return async function (
+      request: Request,
+      response: Response
+    ): Promise<void> {
       const { user_id } = response.locals;
-      if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.");
+      if (typeof user_id !== "number")
+        throw new Error("Parsed `user_id` not found.");
 
       const parsed_payload = payload_schema.parse(request.body);
 
@@ -255,8 +318,15 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async patchUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    await UserHandlers.getPatchHandler(patch_user_payload_schema)(request, response);
+  async patchUserDetailsAsAdmin(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
+    await UserHandlers.getPatchHandler(patch_user_payload_schema)(
+      request,
+      response
+    );
   }
 
   /**
@@ -268,7 +338,11 @@ class UserHandlers {
    * @param next
    */
   @requireSelf
-  async patchMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async patchMyUserDetails(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
     next();
   }
 
@@ -281,9 +355,14 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async deleteUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async deleteUserAsAdmin(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
     const { user_id } = response.locals;
-    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.");
+    if (typeof user_id !== "number")
+      throw new Error("Parsed `user_id` not found.");
 
     const result = await User.findByPk(user_id, {
       attributes: ["id"],

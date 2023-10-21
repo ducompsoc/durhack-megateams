@@ -18,8 +18,14 @@ export default function Admin() {
   }>("/teams");
   const [message, setMessage] = useState("");
   const [messageOpen, setMessageOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  const filteredUsers = users.filter((team) => !team.hidden);
+  const lowerSearch = searchText.toLowerCase();
+  const filteredUsers = users.filter((users) => {
+    if (users.preferred_name.toLowerCase().includes(lowerSearch)) return true;
+    if (users.email.toLowerCase().includes(lowerSearch)) return true;
+    return false;
+  });
 
   async function alterPoints(id: number) {
     const points = (
@@ -60,20 +66,6 @@ export default function Admin() {
     setMessageOpen(true);
   }
 
-  function filterUsers(searchText: string) {
-    const lowerSearch = searchText.toLowerCase();
-    setUsers(
-      users.map((users) => {
-        users.hidden = true;
-        if (users.preferred_name.toLowerCase().includes(lowerSearch))
-          users.hidden = false;
-        if (users.email.toLowerCase().includes(lowerSearch))
-          users.hidden = false;
-        return users;
-      })
-    );
-  }
-
   return (
     <>
       <div className="flex flex-col h-full">
@@ -83,7 +75,8 @@ export default function Admin() {
               type="text"
               className="dh-input w-full pl-10"
               placeholder="Search for users..."
-              onChange={(e) => filterUsers(e.target.value)}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
             />
             <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
           </div>
