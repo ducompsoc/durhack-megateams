@@ -19,13 +19,25 @@ export default function Admin() {
   const [message, setMessage] = useState("");
   const [messageOpen, setMessageOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [searchTextActive, setSearchTextActive] = useState("");
 
-  const lowerSearch = searchText.toLowerCase();
+  const lowerSearch = searchTextActive.toLowerCase();
   const filteredUsers = users.filter((users) => {
     if (users.preferred_name.toLowerCase().includes(lowerSearch)) return true;
     if (users.email.toLowerCase().includes(lowerSearch)) return true;
     return false;
   });
+
+  function handleSearchText(text: string) {
+    setSearchText(text);
+    if (!text) {
+      setSearchTextActive(text);
+    }
+  }
+
+  function search() {
+    setSearchTextActive(searchText);
+  }
 
   async function alterPoints(id: number) {
     const points = (
@@ -76,9 +88,12 @@ export default function Admin() {
               className="dh-input w-full pl-10"
               placeholder="Search for users..."
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => handleSearchText(e.target.value)}
             />
             <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
+            <button className="dh-btn ml-2" onClick={search}>
+              Search
+            </button>
           </div>
         </div>
         {filteredUsers.map(

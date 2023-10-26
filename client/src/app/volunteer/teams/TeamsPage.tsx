@@ -19,9 +19,23 @@ export default function TeamsPage() {
   const [message, setMessage] = useState("");
   const [messageOpen, setMessageOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [searchTextActive, setSearchTextActive] = useState("");
 
-  const lowerSearch = searchText.toLowerCase();
-  const filteredTeams = teams.filter((team) => team.name.toLowerCase().includes(lowerSearch));
+  const lowerSearch = searchTextActive.toLowerCase();
+  const filteredTeams = teams.filter((team) =>
+    team.name.toLowerCase().includes(lowerSearch)
+  );
+
+  function handleSearchText(text: string) {
+    setSearchText(text);
+    if (!text) {
+      setSearchTextActive(text);
+    }
+  }
+
+  function search() {
+    setSearchTextActive(searchText);
+  }
 
   function changeMegateam(team: any, name: string) {
     const newTeams = [...teams];
@@ -78,9 +92,12 @@ export default function TeamsPage() {
               className="dh-input w-full pl-10"
               placeholder="Search for teams..."
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => handleSearchText(e.target.value)}
             />
             <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
+            <button className="dh-btn ml-2" onClick={search}>
+              Search
+            </button>
           </div>
         </div>
         {filteredTeams.map((team) => {
