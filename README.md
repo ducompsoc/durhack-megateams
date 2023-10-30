@@ -68,8 +68,8 @@ server {
         proxy_set_header Connection "upgrade";
     }
 
-    listen [::]:8090 ipv6only=on;
-    listen 8090;
+    listen [::]:80;
+    listen 80;
 }
 ```
 
