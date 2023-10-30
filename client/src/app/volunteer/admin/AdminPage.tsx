@@ -5,6 +5,7 @@ import { fetchMegateamsApi } from "@/app/lib/api";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useFormState } from "react-hooks-use-form-state";
+import ReactPaginate from "react-paginate";
 import Select from "react-select";
 import useSWR from "swr";
 
@@ -19,13 +20,42 @@ export default function Admin() {
   const [message, setMessage] = useState("");
   const [messageOpen, setMessageOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [searchTextActive, setSearchTextActive] = useState("");
+  const [itemOffset, setItemOffset] = useState(0);
+  const [pageNumber, setPageNumber] = useState(0);
 
-  const lowerSearch = searchText.toLowerCase();
+  const lowerSearch = searchTextActive.toLowerCase();
   const filteredUsers = users.filter((users) => {
     if (users.preferred_name.toLowerCase().includes(lowerSearch)) return true;
     if (users.email.toLowerCase().includes(lowerSearch)) return true;
     return false;
   });
+
+  const itemsPerPage = 50;
+  const endOffset = itemOffset + itemsPerPage;
+  const currentItems = filteredUsers.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  function handlePageClick(event: { selected: number }) {
+    const newOffset = (event.selected * itemsPerPage) % filteredUsers.length;
+    setItemOffset(newOffset);
+    setPageNumber(event.selected);
+  }
+
+  function handleSearchText(text: string) {
+    setSearchText(text);
+    if (!text) {
+      setSearchTextActive(text);
+      setItemOffset(0);
+      setPageNumber(0);
+    }
+  }
+
+  function search() {
+    setSearchTextActive(searchText);
+    setItemOffset(0);
+    setPageNumber(0);
+  }
 
   async function alterPoints(id: number) {
     const points = (
@@ -69,19 +99,34 @@ export default function Admin() {
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="dh-box p-4 mb-6">
+        <div className="dh-box p-4">
           <div className="flex flex-row items-center">
             <input
               type="text"
               className="dh-input w-full pl-10"
               placeholder="Search for users..."
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => handleSearchText(e.target.value)}
             />
             <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
+            <button className="dh-btn ml-2" onClick={search}>
+              Search
+            </button>
           </div>
         </div>
-        {filteredUsers.map(
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">"
+          onPageChange={handlePageClick}
+          pageCount={pageCount}
+          previousLabel="<"
+          renderOnZeroPageCount={null}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={1}
+          forcePage={pageNumber}
+          className="dh-paginate my-6"
+        />
+        {currentItems.map(
           (
             {
               preferred_name,
