@@ -59,3 +59,25 @@
 .dh-select .dh-select__single-value {
   @apply text-neutral-600 dark:text-neutral-200;
 }
+
+.dh-paginate {
+  @apply flex justify-between items-center md:justify-center md:gap-x-10;
+
+  a {
+    @apply px-2;
+  }
+
+  .selected a {
+    @apply rounded-3xl border-accent border-2;
+  }
+
+  .previous, .next {
+    a {
+      @extend .dh-btn;
+    }
+
+    &.disabled a {
+      @apply bg-gray-300 disabled:bg-neutral-500 cursor-not-allowed #{!important};
+    }
+  }
+}

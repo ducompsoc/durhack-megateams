@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useFormState } from "react-hooks-use-form-state";
 import Select from "react-select";
 import useSWR from "swr";
+import ReactPaginate from "react-paginate";
 
 export default function TeamsPage() {
   const { mutate: mutateTeams, data: teamsData = { teams: [] } } = useSWR<{
@@ -20,21 +21,38 @@ export default function TeamsPage() {
   const [messageOpen, setMessageOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchTextActive, setSearchTextActive] = useState("");
+  const [itemOffset, setItemOffset] = useState(0);
+  const [pageNumber, setPageNumber] = useState(0);
 
   const lowerSearch = searchTextActive.toLowerCase();
   const filteredTeams = teams.filter((team) =>
     team.name.toLowerCase().includes(lowerSearch)
   );
 
+  const itemsPerPage = 50;
+  const endOffset = itemOffset + itemsPerPage;
+  const currentItems = filteredTeams.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(filteredTeams.length / itemsPerPage);
+
+  function handlePageClick(event: { selected: number }) {
+    const newOffset = (event.selected * itemsPerPage) % filteredTeams.length;
+    setItemOffset(newOffset);
+    setPageNumber(event.selected);
+  }
+
   function handleSearchText(text: string) {
     setSearchText(text);
     if (!text) {
       setSearchTextActive(text);
+      setItemOffset(0);
+      setPageNumber(0);
     }
   }
 
   function search() {
     setSearchTextActive(searchText);
+    setItemOffset(0);
+    setPageNumber(0);
   }
 
   function changeMegateam(team: any, name: string) {
@@ -85,7 +103,7 @@ export default function TeamsPage() {
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="dh-box p-4 mb-6">
+        <div className="dh-box p-4">
           <div className="flex flex-row items-center">
             <input
               type="text"
@@ -100,7 +118,19 @@ export default function TeamsPage() {
             </button>
           </div>
         </div>
-        {filteredTeams.map((team) => {
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">"
+          onPageChange={handlePageClick}
+          pageCount={pageCount}
+          previousLabel="<"
+          renderOnZeroPageCount={null}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={1}
+          forcePage={pageNumber}
+          className="dh-paginate my-6"
+        />
+        {currentItems.map((team) => {
           const megateam = getMegateam(team.area?.megateam?.megateam_name);
           const area = getArea(megateam, team.area?.area_id);
           return (
