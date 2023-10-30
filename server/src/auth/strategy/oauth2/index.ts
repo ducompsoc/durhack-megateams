@@ -33,7 +33,7 @@ async function oauth2VerifyFunction(accessToken: string, refreshToken: string, p
         }
       },
     );
-  } catch (error) {
+  } catch (error: any) {
     return done(error);
   }
 

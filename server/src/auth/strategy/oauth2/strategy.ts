@@ -30,7 +30,7 @@ export default class DurHackLiveOAuth2Strategy extends OAuth2Strategy {
           }
         }
       );
-    } catch (error) {
+    } catch (error: any) {
       return done(error);
     }
 
@@ -39,7 +39,8 @@ export default class DurHackLiveOAuth2Strategy extends OAuth2Strategy {
     }
 
     try {
-      const profile = DurHackLiveProfileSchema.parse((await profileResponse.json())?.data);
+      const profileJSON: any = await profileResponse.json();
+      const profile = DurHackLiveProfileSchema.parse(profileJSON?.data);
       return done(null, profile);
     } catch(error) {
       return done(new createHttpError.BadGateway("Couldn't fetch user profile from DurHack Live."));
