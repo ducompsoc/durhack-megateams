@@ -7,6 +7,7 @@ import { Dialog } from "@headlessui/react";
 import ButtonModal from "@/app/components/ButtonModal";
 import useSWR from "swr";
 import { fetchMegateamsApi } from "@/app/lib/api";
+import { redirect } from "next/navigation";
 
 export default function Team() {
   const [open, setOpen] = useState(false);
@@ -51,6 +52,13 @@ export default function Team() {
         <button
           type="button"
           className="mt-4 inline-flex w-full justify-center rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white shadow-sm"
+          onClick={() => window.open("/api/discord")}
+        >
+          Join Team Discord
+        </button>
+        <button
+          type="button"
+          className="mt-4 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm"
           onClick={() => setOpen(true)}
         >
           Leave Team

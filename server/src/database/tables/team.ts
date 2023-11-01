@@ -42,6 +42,12 @@ export default class Team extends Model {
   declare join_code: number;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare discord_channel_id: string;
+
+  @Column({
     field: "team_name",
     type: DataType.STRING,
     allowNull: false,

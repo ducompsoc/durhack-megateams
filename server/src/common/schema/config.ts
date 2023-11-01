@@ -70,6 +70,17 @@ export const qr_preset_schema = z.object({
   minutesValid: z.number().nonnegative(),
 });
 
+export const discord_options_schema = z.object({
+  apiEndpoint: z.string().url(),
+  clientId: z.string(),
+  clientSecret: z.string(),
+  redirectUri: z.string().url(),
+  botToken: z.string(),
+  guildId: z.string(),
+  inviteLink: z.string(),
+  teamsParentChannel: z.string(),
+});
+
 export const config_schema = z.object({
   listen: listen_options_schema,
   flags: z.object({}),
@@ -95,4 +106,5 @@ export const config_schema = z.object({
     QRCodeRedemptionURL: z.string().url(),
     QRPresets: z.object({}).catchall(qr_preset_schema),
   }),
+  discord: discord_options_schema,
 });

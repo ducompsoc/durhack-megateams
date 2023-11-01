@@ -17,6 +17,7 @@ import qr_codes_router from "./qr_codes";
 import teams_router from "./teams";
 import users_router from "./users";
 import user_router from "./user";
+import discord_router from "./discord";
 import api_error_handler from "./error_handling";
 
 
@@ -52,6 +53,7 @@ api_router.use("/qr_codes", qr_codes_router);
 api_router.use("/teams", teams_router);
 api_router.use("/users", users_router);
 api_router.use("/user", user_router);
+api_router.use("/discord", discord_router);
 
 api_router.use(handle_unhandled_request);
 
