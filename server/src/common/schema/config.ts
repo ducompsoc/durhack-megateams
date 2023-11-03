@@ -56,6 +56,7 @@ export const double_csrf_options_schema = z.object({
 
 export const session_options_schema = z.object({
   name: z.string(),
+  proxy: z.boolean(),
   secret: z.string(),
   resave: z.boolean().optional(),
   saveUninitialized: z.boolean().optional(),
