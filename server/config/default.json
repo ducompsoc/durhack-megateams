@@ -60,6 +60,7 @@
     "name": "durhack-megateams-session",
     "secret": "session_cookie_secret",
     "resave": false,
+    "proxy": false,
     "saveUninitialized": false,
     "cookie": { "secure": false }
   },
