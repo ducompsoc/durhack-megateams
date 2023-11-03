@@ -102,11 +102,10 @@ class DiscordHandlers {
 
     const discord_profile = (await discord_profile_response.json()) as any;
     const discord_user_id = discord_profile.user.id;
+    const guildID = config.get("discord.guildID");
 
     await fetch(
-      `${discordApiBase}/guilds/${config.get(
-        "discord.guildID"
-      )}/members/${discord_user_id}`,
+      `${discordApiBase}/guilds/${guildID}/members/${discord_user_id}`,
       {
         method: "PUT",
         headers: {
@@ -121,7 +120,7 @@ class DiscordHandlers {
 
     if (!team.discord_channel_id) {
       const newChannelRes = await fetch(
-        `${discordApiBase}/guilds/${config.get("discord.guildID")}/channels`,
+        `${discordApiBase}/guilds/${guildID}/channels`,
         {
           method: "POST",
           headers: {
@@ -155,7 +154,7 @@ class DiscordHandlers {
       }
     );
 
-    response.redirect(config.get("discord.inviteLink"));
+    response.redirect(`https://discord.com/channels/${guildID}/${team.discord_channel_id}`);
   }
 }
 
