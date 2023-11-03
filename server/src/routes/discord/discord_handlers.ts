@@ -105,7 +105,7 @@ class DiscordHandlers {
 
     await fetch(
       `${discordApiBase}/guilds/${config.get(
-        "discord.guildId"
+        "discord.guildID"
       )}/members/${discord_user_id}`,
       {
         method: "PUT",

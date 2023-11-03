@@ -76,7 +76,7 @@ export const discord_options_schema = z.object({
   clientSecret: z.string(),
   redirectUri: z.string().url(),
   botToken: z.string(),
-  guildId: z.string(),
+  guildID: z.string(),
   inviteLink: z.string(),
   teamsParentChannel: z.string(),
 });
