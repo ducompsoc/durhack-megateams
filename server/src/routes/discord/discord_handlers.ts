@@ -121,7 +121,7 @@ class DiscordHandlers {
 
     if (!team.discord_channel_id) {
       const newChannelRes = await fetch(
-        `${discordApiBase}/guilds/${config.get("discord.guildId")}/channels`,
+        `${discordApiBase}/guilds/${config.get("discord.guildID")}/channels`,
         {
           method: "POST",
           headers: {
