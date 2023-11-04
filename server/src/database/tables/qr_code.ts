@@ -92,7 +92,7 @@ export default class QRCode extends Model {
   })
   declare challenge_rank: number | null;
 
-  async canBeRedeemed() {
+  async canBeRedeemed(user: Awaited<User>) {
     const now = new Date();
 
     if (now < this.start_time) return false;
@@ -100,7 +100,15 @@ export default class QRCode extends Model {
     if (!this.state) return false;
 
     const numberOfUses = await this.$count("uses");
-    return (numberOfUses) < this.max_uses;
+    if ((numberOfUses) >= this.max_uses) return false;
+
+    const redeemsByUser = await this.$count("uses", {
+      where: {
+        redeemer_id: user.id,
+      },
+    });
+    return redeemsByUser == 0;
+
   }
 
   getRedemptionURL() {

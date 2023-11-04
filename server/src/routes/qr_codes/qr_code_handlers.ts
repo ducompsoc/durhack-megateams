@@ -269,7 +269,7 @@ class QRHandlers {
         rejectOnEmpty: new createHttpError.BadRequest(),
       });
 
-      if (!qr.canBeRedeemed()) throw new createHttpError.BadRequest();
+      if (!await qr.canBeRedeemed(request.user!)) throw new createHttpError.BadRequest();
 
       await Point.create({
         value: qr.points_value,
