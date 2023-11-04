@@ -88,7 +88,7 @@
     "apiEndpoint": "https://discord.com/api/v10",
     "clientId": "yourDiscordAppClientIdHere",
     "clientSecret": "yourDiscordAppClientSecretHere",
-    "redirectUri": "http://localhost:3101/api/discord/redirect",
+    "redirectUri": "https://megateams.durhack.com/api/discord/redirect",
     "botToken": "yourDiscordBotTokenHere",
     "guildID": "yourDiscordGuildIDHere",
     "inviteLink": "https://discord.gg/xyz",
