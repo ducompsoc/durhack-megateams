@@ -68,19 +68,19 @@
     "maxTeamMembers": 4,
     "QRCodeRedemptionURL": "https://megateams.durhack.com/hacker/redeem",
     "QRPresets": {
-      "5points": {
-        "name": "5 Points",
-        "description": "A single-use QR to reward hacker engagement.",
+      "chat": {
+        "name": "Chat - 5p",
+        "description": "Speak to a sponsor for 5 points",
         "points": 5,
         "uses": 1,
         "minutesValid": 2
       },
-      "10points": {
-        "name": "10 Points",
-        "description": "A single-use QR to give a larger reward to a hacker.",
+      "workshop": {
+        "name": "Workshop - 10p",
+        "description": "Attend a sponsor workshop for 10 points",
         "points": 10,
-        "uses": 1,
-        "minutesValid": 2
+        "uses": 50,
+        "minutesValid": 10
       }
     }
   },
