@@ -1,33 +1,33 @@
-import createHttpError from "http-errors";
-import { Request, Response, NextFunction } from "express";
-import { z } from "zod";
+import createHttpError from "http-errors"
+import { Request, Response, NextFunction } from "express"
+import { z } from "zod"
 
-import { NullError } from "@server/common/errors";
-import Point from "@server/database/tables/point";
-import User from "@server/database/tables/user";
-import QRCode from "@server/database/tables/qr_code";
-import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database";
-import { requireUserIsAdmin } from "@server/common/decorators";
-
+import { NullError } from "@server/common/errors"
+import Point from "@server/database/tables/point"
+import User from "@server/database/tables/user"
+import QRCode from "@server/database/tables/qr_code"
+import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database"
+import { requireUserIsAdmin } from "@server/common/decorators"
 
 const create_point_payload_schema = z.object({
   value: z.number().positive(),
   origin_qrcode_id: z.number().positive().optional(),
   redeemer_id: z.number().positive(),
-});
+})
 
-const patch_point_payload_schema = z.object({
-  value: z.number().positive().optional(),
-  origin_qrcode_id: z.number().positive().optional(),
-  redeemer_id: z.number().positive().optional(),
-}).strict();
+const patch_point_payload_schema = z
+  .object({
+    value: z.number().positive().optional(),
+    origin_qrcode_id: z.number().positive().optional(),
+    redeemer_id: z.number().positive().optional(),
+  })
+  .strict()
 
-const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>();
-point_transform_factories.set("redeemer_id", (value) => {
-  const parsed_value = z.coerce.number().positive().parse(value);
-  return { condition: { redeemer_id: parsed_value } };
-});
-
+const point_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>()
+point_transform_factories.set("redeemer_id", value => {
+  const parsed_value = z.coerce.number().positive().parse(value)
+  return { condition: { redeemer_id: parsed_value } }
+})
 
 class PointHandlers {
   /**
@@ -39,17 +39,17 @@ class PointHandlers {
    * @param response - `points` attribute contains array of points each with an `id`, `value` and `redeemer` (with redeemer's `id`) attribute
    */
   async getPointsList(request: Request, response: Response): Promise<void> {
-    const query = buildQueryFromRequest(request, point_transform_factories);
-    query.attributes = [["point_id", "id"], "value"];
-    query.include = [{model: User, attributes: [["user_id", "id"]]}];
-    const result = await Point.findAll(query);
+    const query = buildQueryFromRequest(request, point_transform_factories)
+    query.attributes = [["point_id", "id"], "value"]
+    query.include = [{ model: User, attributes: [["user_id", "id"]] }]
+    const result = await Point.findAll(query)
 
-    response.status(200);
+    response.status(200)
     response.json({
       status: 200,
       message: "OK",
       points: result,
-    });
+    })
   }
 
   /**
@@ -59,18 +59,20 @@ class PointHandlers {
    * @param response - response attribute `data` contains the newly created point attributes (same types as initial request!)
    * @param _next - next function to handleFailedAuthentication should user fail requireUserIsAdmin requirement
    */
-  @requireUserIsAdmin  // Point creation via QR code (for non-admins) is handled by a separate endpoint
+  @requireUserIsAdmin // Point creation via QR code (for non-admins) is handled by a separate endpoint
   async createPoint(request: Request, response: Response, _next: NextFunction): Promise<void> {
-    const parsed_payload = create_point_payload_schema.parse(request.body);
+    const parsed_payload = create_point_payload_schema.parse(request.body)
 
-    if (parsed_payload.origin_qrcode_id ) {
-      throw new createHttpError.UnprocessableEntity("You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.");
+    if (parsed_payload.origin_qrcode_id) {
+      throw new createHttpError.UnprocessableEntity(
+        "You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.",
+      )
     }
 
-    const new_instance = await Point.create(request.body);  // database/sequelize errors thrown to error_handling.ts
+    const new_instance = await Point.create(request.body) // database/sequelize errors thrown to error_handling.ts
 
-    response.status(200);
-    response.json({status: response.statusCode, message: "OK", data: new_instance});
+    response.status(200)
+    response.json({ status: response.statusCode, message: "OK", data: new_instance })
   }
 
   /**
@@ -81,21 +83,22 @@ class PointHandlers {
    *   the latter two are their own objects with snapshots of QRCode and User attributes
    */
   async getPointDetails(_request: Request, response: Response): Promise<void> {
-    const { point_id } = response.locals;
-    if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
+    const { point_id } = response.locals
+    if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.")
 
     const result = await Point.findByPk(point_id, {
-      attributes: {exclude: ["origin_qrcode_id", "redeemer_id", "updatedAt"]},
+      attributes: { exclude: ["origin_qrcode_id", "redeemer_id", "updatedAt"] },
       include: [
-        {model: QRCode, attributes: ["id", "name", "category", "start_time", "expiry_time"]},
-        {model: User, attributes: ["id", "team_id", "preferred_name"]}],
+        { model: QRCode, attributes: ["id", "name", "category", "start_time", "expiry_time"] },
+        { model: User, attributes: ["id", "team_id", "preferred_name"] },
+      ],
       rejectOnEmpty: new NullError(),
-    });
+    })
 
-    const payload: any = result.toJSON();
+    const payload: any = result.toJSON()
 
-    response.status(200);
-    response.json({"status": response.statusCode, "message": "OK", "data": payload});
+    response.status(200)
+    response.json({ status: response.statusCode, message: "OK", data: payload })
   }
 
   /**
@@ -107,18 +110,18 @@ class PointHandlers {
    */
   @requireUserIsAdmin
   async patchPointDetails(request: Request, response: Response, _next: NextFunction): Promise<void> {
-    const {point_id} = response.locals;
-    if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
+    const { point_id } = response.locals
+    if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.")
 
-    const parsed_payload = patch_point_payload_schema.parse(request.body);
+    const parsed_payload = patch_point_payload_schema.parse(request.body)
 
     const found_point = await Point.findByPk(point_id, {
       rejectOnEmpty: new NullError(),
-    });
-    await found_point.update(parsed_payload);  // database/sequelize errors thrown to error_handling.ts
+    })
+    await found_point.update(parsed_payload) // database/sequelize errors thrown to error_handling.ts
 
-    response.status(200);
-    response.json({status: response.statusCode, message: "OK", data: found_point});
+    response.status(200)
+    response.json({ status: response.statusCode, message: "OK", data: found_point })
   }
 
   /**
@@ -130,19 +133,19 @@ class PointHandlers {
    */
   @requireUserIsAdmin
   async deletePoint(_request: Request, response: Response, _next: NextFunction): Promise<void> {
-    const { point_id } = response.locals;
-    if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.");
+    const { point_id } = response.locals
+    if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.")
 
     const result = await Point.findByPk(point_id, {
       rejectOnEmpty: new NullError(),
-    });
+    })
 
-    await result.destroy();
+    await result.destroy()
 
-    response.status(200);
-    response.json({status: response.statusCode, message: "OK"});
+    response.status(200)
+    response.json({ status: response.statusCode, message: "OK" })
   }
 }
 
-const PointHandlersInstance = new PointHandlers();
-export default PointHandlersInstance;
+const PointHandlersInstance = new PointHandlers()
+export default PointHandlersInstance

@@ -1,49 +1,37 @@
-import { z } from "zod";
-import createHttpError from "http-errors";
-import { NextFunction, Request, Response } from "express";
-import {
-  literal as SequelizeLiteral,
-  Op,
-  ValidationError as SequelizeValidationError,
-} from "sequelize";
+import { z } from "zod"
+import createHttpError from "http-errors"
+import { NextFunction, Request, Response } from "express"
+import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidationError } from "sequelize"
 
-import { NullError, ValueError } from "@server/common/errors";
-import { requireUserIsAdmin } from "@server/common/decorators";
-import { UserRole } from "@server/common/model_enums";
-import {
-  buildQueryFromRequest,
-  SequelizeQueryTransformFactory,
-} from "@server/database";
-import User from "@server/database/tables/user";
-import Team from "@server/database/tables/team";
-import Point from "@server/database/tables/point";
-import Megateam from "@server/database/tables/megateam";
-import Area from "@server/database/tables/area";
+import { NullError, ValueError } from "@server/common/errors"
+import { requireUserIsAdmin } from "@server/common/decorators"
+import { UserRole } from "@server/common/model_enums"
+import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database"
+import User from "@server/database/tables/user"
+import Team from "@server/database/tables/team"
+import Point from "@server/database/tables/point"
+import Megateam from "@server/database/tables/megateam"
+import Area from "@server/database/tables/area"
 
-import { requireSelf } from "./user_util";
+import { requireSelf } from "./user_util"
 
-const user_transform_factories = new Map<
-  string,
-  SequelizeQueryTransformFactory<User>
->();
+const user_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>()
 user_transform_factories.set("email", (value: string) => ({
   condition: {
     email: { [Op.like]: SequelizeLiteral("concat('%', :email, '%')") },
   },
   replacements: new Map([["email", value]]),
   orders: [["email", "ASC"]],
-}));
+}))
 
 user_transform_factories.set("checked_in", (checked_in: string) => {
-  if (checked_in === "true") return { condition: { checked_in: true } };
-  if (checked_in === "false") return { condition: { checked_in: false } };
-  throw new createHttpError.BadRequest(
-    "Malformed query parameter value for 'checked_in'"
-  );
-});
+  if (checked_in === "true") return { condition: { checked_in: true } }
+  if (checked_in === "false") return { condition: { checked_in: false } }
+  throw new createHttpError.BadRequest("Malformed query parameter value for 'checked_in'")
+})
 
-const user_attributes = User.getAttributes();
-const allowed_create_fields = new Set(Object.keys(user_attributes));
+const user_attributes = User.getAttributes()
+const allowed_create_fields = new Set(Object.keys(user_attributes))
 
 const create_user_payload_schema = z.object({
   team_id: z.number().optional(),
@@ -51,18 +39,18 @@ const create_user_payload_schema = z.object({
   role: z.nativeEnum(UserRole).optional(),
   full_name: z.string(),
   preferred_name: z.string(),
-});
+})
 
-export const patch_user_payload_schema = create_user_payload_schema.partial();
+export const patch_user_payload_schema = create_user_payload_schema.partial()
 
 class UserHandlers {
   constructor() {
-    Object.getOwnPropertyNames(UserHandlers.prototype).forEach((key) => {
+    Object.getOwnPropertyNames(UserHandlers.prototype).forEach(key => {
       if (key !== "constructor") {
         // @ts-ignore
-        this[key] = this[key].bind(this);
+        this[key] = this[key].bind(this)
       }
-    });
+    })
   }
 
   /**
@@ -72,19 +60,16 @@ class UserHandlers {
    * @param request
    * @param response
    */
-  async getUsersListDefault(
-    request: Request,
-    response: Response
-  ): Promise<void> {
+  async getUsersListDefault(request: Request, response: Response): Promise<void> {
     const result = await User.findAll({
       attributes: [["user_id", "id"], "preferred_name"],
-    });
-    response.status(200);
+    })
+    response.status(200)
     response.json({
       status: 200,
       message: "OK",
       users: result,
-    });
+    })
   }
 
   /**
@@ -100,11 +85,7 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async getUsersListAsAdmin(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getUsersListAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
     const result = await User.findAll({
       attributes: [["user_id", "id"], "preferred_name", "email"],
       include: [
@@ -119,7 +100,7 @@ class UserHandlers {
           ],
         },
       ],
-    });
+    })
 
     const payload = result.map((user: User) => ({
       id: user.id,
@@ -129,14 +110,14 @@ class UserHandlers {
       team_name: user.team?.name,
       team_id: user.team?.id,
       megateam_name: user.team?.area?.megateam?.name,
-    }));
+    }))
 
-    response.status(200);
+    response.status(200)
     response.json({
       status: 200,
       message: "OK",
       users: payload,
-    });
+    })
   }
 
   /**
@@ -152,34 +133,28 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async createUserAsAdmin(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    const invalid_fields = Object.keys(request.body).filter(
-      (key) => !allowed_create_fields.has(key)
-    );
+  async createUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+    const invalid_fields = Object.keys(request.body).filter(key => !allowed_create_fields.has(key))
     if (invalid_fields.length > 0) {
-      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`);
+      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
     }
 
-    let new_instance;
+    let new_instance
     try {
-      new_instance = await User.create(request.body);
+      new_instance = await User.create(request.body)
     } catch (error) {
       if (error instanceof SequelizeValidationError) {
-        throw new createHttpError.BadRequest(error.message);
+        throw new createHttpError.BadRequest(error.message)
       }
-      throw error;
+      throw error
     }
 
-    response.status(200);
+    response.status(200)
     response.json({
       status: response.statusCode,
       message: "OK",
       data: new_instance,
-    });
+    })
   }
 
   /**
@@ -189,61 +164,48 @@ class UserHandlers {
    * @param request
    * @param response
    */
-  async getUserDetailsDefault(
-    request: Request,
-    response: Response
-  ): Promise<void> {
-    const { user_id } = response.locals;
-    if (typeof user_id !== "number")
-      throw new Error("Parsed `user_id` not found.");
+  async getUserDetailsDefault(request: Request, response: Response): Promise<void> {
+    const { user_id } = response.locals
+    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
     const result = await User.findByPk(user_id, {
       attributes: ["id", "preferred_name"],
       include: [Team, Point],
       rejectOnEmpty: new NullError(),
-    });
+    })
 
-    const payload: User | { points: number } = result.toJSON();
-    payload.points = Point.getPointsTotal(result.points);
+    const payload: User | { points: number } = result.toJSON()
+    payload.points = Point.getPointsTotal(result.points)
 
-    response.status(200);
+    response.status(200)
     response.json({
       status: response.statusCode,
       message: "OK",
       data: payload,
-    });
+    })
   }
 
-  private async doGetAllUserDetails(
-    request: Request,
-    response: Response
-  ): Promise<void> {
-    const { user_id } = response.locals;
-    if (typeof user_id !== "number")
-      throw new Error("Parsed `user_id` not found.");
+  private async doGetAllUserDetails(request: Request, response: Response): Promise<void> {
+    const { user_id } = response.locals
+    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
     const result = await User.findByPk(user_id, {
       attributes: {
-        exclude: [
-          "hashed_password",
-          "password_salt",
-          "verify_code",
-          "verify_sent_at",
-        ],
+        exclude: ["hashed_password", "password_salt", "verify_code", "verify_sent_at"],
       },
       include: [Team, Point],
       rejectOnEmpty: new NullError(),
-    });
+    })
 
-    const payload: User | { points: number } = result.toJSON();
-    payload.points = Point.getPointsTotal(result.points);
+    const payload: User | { points: number } = result.toJSON()
+    payload.points = Point.getPointsTotal(result.points)
 
-    response.status(200);
+    response.status(200)
     response.json({
       status: response.statusCode,
       message: "OK",
       data: payload,
-    });
+    })
   }
 
   /**
@@ -255,12 +217,8 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async getUserDetailsAsAdmin(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    await this.doGetAllUserDetails(request, response);
+  async getUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+    await this.doGetAllUserDetails(request, response)
   }
 
   /**
@@ -272,41 +230,33 @@ class UserHandlers {
    * @param next
    */
   @requireSelf
-  async getMyUserDetails(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    await this.doGetAllUserDetails(request, response);
+  async getMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+    await this.doGetAllUserDetails(request, response)
   }
 
   static getPatchHandler(payload_schema: z.Schema) {
-    return async function (
-      request: Request,
-      response: Response
-    ): Promise<void> {
-      const { user_id } = response.locals;
-      if (typeof user_id !== "number")
-        throw new Error("Parsed `user_id` not found.");
+    return async function (request: Request, response: Response): Promise<void> {
+      const { user_id } = response.locals
+      if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
-      const parsed_payload = payload_schema.parse(request.body);
+      const parsed_payload = payload_schema.parse(request.body)
 
       const found_user = await User.findByPk(user_id, {
         rejectOnEmpty: new NullError(),
-      });
+      })
 
       try {
-        await found_user.update(parsed_payload);
+        await found_user.update(parsed_payload)
       } catch (error) {
         if (error instanceof SequelizeValidationError) {
-          throw new createHttpError.BadRequest(error.message);
+          throw new createHttpError.BadRequest(error.message)
         }
-        throw error;
+        throw error
       }
 
-      response.status(200);
-      response.json({ status: response.statusCode, message: "OK" });
-    };
+      response.status(200)
+      response.json({ status: response.statusCode, message: "OK" })
+    }
   }
 
   /**
@@ -318,15 +268,8 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async patchUserDetailsAsAdmin(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    await UserHandlers.getPatchHandler(patch_user_payload_schema)(
-      request,
-      response
-    );
+  async patchUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+    await UserHandlers.getPatchHandler(patch_user_payload_schema)(request, response)
   }
 
   /**
@@ -338,12 +281,8 @@ class UserHandlers {
    * @param next
    */
   @requireSelf
-  async patchMyUserDetails(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    next();
+  async patchMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+    next()
   }
 
   /**
@@ -355,26 +294,21 @@ class UserHandlers {
    * @param next
    */
   @requireUserIsAdmin
-  async deleteUserAsAdmin(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    const { user_id } = response.locals;
-    if (typeof user_id !== "number")
-      throw new Error("Parsed `user_id` not found.");
+  async deleteUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+    const { user_id } = response.locals
+    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
     const result = await User.findByPk(user_id, {
       attributes: ["id"],
       rejectOnEmpty: new NullError(),
-    });
+    })
 
-    await result.destroy();
+    await result.destroy()
 
-    response.status(200);
-    response.json({ status: response.statusCode, message: "OK" });
+    response.status(200)
+    response.json({ status: response.statusCode, message: "OK" })
   }
 }
 
-const UserHandlersInstance = new UserHandlers();
-export default UserHandlersInstance;
+const UserHandlersInstance = new UserHandlers()
+export default UserHandlersInstance

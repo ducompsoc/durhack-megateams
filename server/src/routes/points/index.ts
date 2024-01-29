@@ -1,26 +1,23 @@
-import { Router as ExpressRouter } from "express";
+import { Router as ExpressRouter } from "express"
 
-import {
-  handleFailedAuthentication,
-  handleMethodNotAllowed,
-  parseRouteId
-} from "@server/common/middleware";
+import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
-import handlers from "./point_handlers";
+import handlers from "./point_handlers"
 
+const points_router = ExpressRouter()
 
-const points_router = ExpressRouter();
-
-points_router.route("/")
+points_router
+  .route("/")
   .get(handlers.getPointsList)
   .post(handlers.createPoint, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-points_router.route("/:point_id")
+points_router
+  .route("/:point_id")
   .all(parseRouteId("point_id"))
   .get(handlers.getPointDetails)
   .patch(handlers.patchPointDetails, handleFailedAuthentication)
   .delete(handlers.deletePoint, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-export default points_router;
+export default points_router

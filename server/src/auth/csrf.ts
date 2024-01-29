@@ -1,14 +1,13 @@
-import { Request, Response } from "express";
-import config from "config";
-import { doubleCsrf } from "csrf-csrf";
+import { Request, Response } from "express"
+import config from "config"
+import { doubleCsrf } from "csrf-csrf"
 
-import { double_csrf_options_schema } from "@server/common/schema/config";
+import { double_csrf_options_schema } from "@server/common/schema/config"
 
-
-const csrf_options = double_csrf_options_schema.parse(config.get("csrf.options"));
+const csrf_options = double_csrf_options_schema.parse(config.get("csrf.options"))
 
 function rollingSecret(request?: Request): string {
-  return config.get("csrf.secret");
+  return config.get("csrf.secret")
 }
 
 export const { generateToken, doubleCsrfProtection } = doubleCsrf({
@@ -36,11 +35,11 @@ export const { generateToken, doubleCsrfProtection } = doubleCsrf({
           "/".
    Particularly, in development, the URI scheme is not considered "secure" by the user agent.
    */
-  ...csrf_options
-});
+  ...csrf_options,
+})
 
 export function handleGetCsrfToken(request: Request, response: Response): void {
-  const csrfToken = generateToken(request, response);
-  response.status(200);
-  response.json({ "status": 200, "message": "Token generation OK", "token": csrfToken });
+  const csrfToken = generateToken(request, response)
+  response.status(200)
+  response.json({ status: 200, message: "Token generation OK", token: csrfToken })
 }

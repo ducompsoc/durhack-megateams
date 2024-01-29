@@ -1,52 +1,48 @@
-import { Router as ExpressRouter } from "express";
+import { Router as ExpressRouter } from "express"
 
-import handlers from "./qr_code_handlers";
-import {
-  handleFailedAuthentication,
-  handleMethodNotAllowed,
-  parseRouteId,
-} from "@server/common/middleware";
+import handlers from "./qr_code_handlers"
+import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
-const qr_codes_router = ExpressRouter();
+const qr_codes_router = ExpressRouter()
 
-qr_codes_router.route("/")
+qr_codes_router
+  .route("/")
   .get(handlers.getQRCodeList, handleFailedAuthentication)
   .post(handlers.createQRCode, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-qr_codes_router.route("/presets")
+qr_codes_router
+  .route("/presets")
   .get(handlers.getPresetsList, handleFailedAuthentication)
   .post(handlers.createPreset, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-qr_codes_router.route("/presets/:preset_id")
+qr_codes_router
+  .route("/presets/:preset_id")
   .get(handlers.getPresetDetails, handleFailedAuthentication)
   .post(handlers.usePreset, handleFailedAuthentication)
   .delete(handlers.deletePreset, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-qr_codes_router.route("/redeem")
-  .post(handlers.redeemQR)
-  .all(handleMethodNotAllowed);
+qr_codes_router.route("/redeem").post(handlers.redeemQR).all(handleMethodNotAllowed)
 
-qr_codes_router.route("/challenges/reorder")
+qr_codes_router
+  .route("/challenges/reorder")
   .post(handlers.reorderChallengeList, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-qr_codes_router.route("/challenges")
-  .get(
-    handlers.getChallengeListAdmin,
-    handlers.getChallengeListAsAnonymous,
-    handleFailedAuthentication
-  )
+qr_codes_router
+  .route("/challenges")
+  .get(handlers.getChallengeListAdmin, handlers.getChallengeListAsAnonymous, handleFailedAuthentication)
   .post(handlers.createChallenge, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-qr_codes_router.route("/:qr_code_id")
+qr_codes_router
+  .route("/:qr_code_id")
   .all(parseRouteId("qr_code_id"))
   .get(handlers.getQRCodeDetails, handleFailedAuthentication)
   .patch(handlers.patchQRCodeDetails, handleFailedAuthentication)
   .delete(handlers.deleteQRCode, handleFailedAuthentication)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-export default qr_codes_router;
+export default qr_codes_router

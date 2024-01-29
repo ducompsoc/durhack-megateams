@@ -1,30 +1,27 @@
-import { NextFunction, Request, Response, Router as ExpressRouter } from "express";
-import createHttpError from "http-errors";
+import { NextFunction, Request, Response, Router as ExpressRouter } from "express"
+import createHttpError from "http-errors"
 
-import { handleMethodNotAllowed } from "@server/common/middleware";
+import { handleMethodNotAllowed } from "@server/common/middleware"
 
-import handlers from "./user_handlers";
+import handlers from "./user_handlers"
 
-
-const users_router = ExpressRouter();
+const users_router = ExpressRouter()
 
 users_router.use((request: Request, response: Response, next: NextFunction) => {
   if (!request.user) {
-    throw new createHttpError.Unauthorized();
+    throw new createHttpError.Unauthorized()
   }
 
-  next();
-});
+  next()
+})
 
-users_router.route("/")
-  .get(handlers.getUser)
-  .patch(handlers.patchUserDetails)
-  .all(handleMethodNotAllowed);
+users_router.route("/").get(handlers.getUser).patch(handlers.patchUserDetails).all(handleMethodNotAllowed)
 
-users_router.route("/team")
+users_router
+  .route("/team")
   .get(handlers.getTeam)
   .post(handlers.joinTeam)
   .delete(handlers.leaveTeam)
-  .all(handleMethodNotAllowed);
+  .all(handleMethodNotAllowed)
 
-export default users_router;
+export default users_router

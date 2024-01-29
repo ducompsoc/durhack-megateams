@@ -1,7 +1,6 @@
-import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
+import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript"
 
-import Area from "./area";
-
+import Area from "./area"
 
 @Table
 export default class Megateam extends Model {
@@ -11,22 +10,22 @@ export default class Megateam extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-  declare id: number;
+  declare id: number
 
   @Column({
     field: "megateam_name",
     type: DataType.STRING,
     allowNull: false,
   })
-  declare name: string;
+  declare name: string
 
   @Column({
     field: "megateam_description",
     type: DataType.STRING,
     allowNull: true,
   })
-  declare description: string | null;
+  declare description: string | null
 
   @HasMany(() => Area, "megateam_id")
-    areas!: Awaited<Area>[];
+  areas!: Awaited<Area>[]
 }

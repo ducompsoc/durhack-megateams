@@ -1,7 +1,7 @@
-import {NextFunction, Request, Response} from "express";
-import {UserRole} from "@server/common/model_enums";
+import { NextFunction, Request, Response } from "express"
+import { UserRole } from "@server/common/model_enums"
 
-type ICondition = (request: Request, response: Response) => boolean;
+type ICondition = (request: Request, response: Response) => boolean
 
 /**
  * Returns a decorator that can be applied to an Express request handler class method.
@@ -14,56 +14,56 @@ type ICondition = (request: Request, response: Response) => boolean;
  */
 export function requireCondition(condition: ICondition) {
   return function (target: any, property_key: string, descriptor: PropertyDescriptor) {
-    const old_function = descriptor.value;
+    const old_function = descriptor.value
 
-    async function wrapped_function (request: Request, response: Response, next: NextFunction) {
+    async function wrapped_function(request: Request, response: Response, next: NextFunction) {
       if (!condition(request, response)) {
-        return next();
+        return next()
       }
-      return await old_function.apply(target, [request, response, next]);
+      return await old_function.apply(target, [request, response, next])
     }
 
-    descriptor.value = wrapped_function;
-  };
+    descriptor.value = wrapped_function
+  }
 }
 
 export function userIsRole(role: UserRole) {
-  return function(request: Request) {
-    return request.user?.role === role;
-  };
+  return function (request: Request) {
+    return request.user?.role === role
+  }
 }
 
 export function userIsLoggedIn(request: Request) {
-  return !!request.user;
+  return !!request.user
 }
 
 /**
  * Decorator that ensures `request.user.role` is `UserRole.admin`.
  */
-export const requireUserIsAdmin = requireCondition(userIsRole(UserRole.admin));
+export const requireUserIsAdmin = requireCondition(userIsRole(UserRole.admin))
 
 /**
  * Decorator that ensures `request.user.role` is `UserRole.volunteer`.
  */
-export const requireUserIsVolunteer = requireCondition(userIsRole(UserRole.volunteer));
+export const requireUserIsVolunteer = requireCondition(userIsRole(UserRole.volunteer))
 
 /**
  * Decorator that ensures `request.user.role` is `UserRole.sponsor`.
  */
-export const requireUserIsSponsor = requireCondition(userIsRole(UserRole.sponsor));
+export const requireUserIsSponsor = requireCondition(userIsRole(UserRole.sponsor))
 
 /**
  * Decorator that ensures `request.user` is not null/undefined.
  */
-export const requireLoggedIn = requireCondition(userIsLoggedIn);
+export const requireLoggedIn = requireCondition(userIsLoggedIn)
 
 /**
  * Decorator that ensures `request.user.role` is one of the provided roles.
  */
 export function requireUserIsOneOf(...roles: UserRole[]) {
   return requireCondition(function (request: Request): boolean {
-    return !!request.user && roles.includes(request.user.role);
-  });
+    return !!request.user && roles.includes(request.user.role)
+  })
 }
 
 /**
@@ -75,10 +75,10 @@ export function requireUserIsOneOf(...roles: UserRole[]) {
  * @private
  */
 export function userIsSelf(request: Request, response: Response): boolean {
-  return (!!request.user && request.user.id === response.locals.user_id);
+  return !!request.user && request.user.id === response.locals.user_id
 }
 
 /**
  * Decorator that ensures a user is trying to access/modify themselves, not some other person.
  */
-export const requireSelf = requireCondition(userIsSelf);
+export const requireSelf = requireCondition(userIsSelf)
