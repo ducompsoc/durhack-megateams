@@ -17,6 +17,9 @@
   "repository": {
     "url": "https://github.com/ducompsoc/durhack-megateams"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "npx cross-env NODE_ENV=production node --import extensionless/register ./dist/main.js",
     "dev": "tsx ./src/main",
