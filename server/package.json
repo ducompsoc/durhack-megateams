@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package",
   "name": "durhack-megateams-server",
   "description": "Server for DurHack Megateams project",
   "version": "0.1.0",
