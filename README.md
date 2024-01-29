@@ -1,5 +1,7 @@
 # durhack-megateams
 
+[![Continuous Integration](https://github.com/ducompsoc/durhack-megateams/actions/workflows/ci.yml/badge.svg)](https://github.com/ducompsoc/durhack-megateams/actions/workflows/ci.yml)
+
 Building the megateams project for DurHack 2023.
 
 ## Stack
