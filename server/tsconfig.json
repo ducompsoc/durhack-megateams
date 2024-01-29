@@ -1,21 +1,26 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
-    "strictNullChecks": true,
+    "rootDir": "./src",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "noImplicitAny": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "newLine": "lf",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir": "dist",
-    "baseUrl": "./",
     "paths": {
       "@server/*": ["./src/*"]
     }
   },
-  "include": [
-    "src"
-  ]
+  "exclude": ["./dist", "./node_modules", "./__tests__"],
+  "include": ["src"]
 }
