@@ -24,12 +24,12 @@
     "compile": "npx tsc -p tsconfig.json && npx tsc-alias -p tsconfig.json",
     "compile:watch": "npm run compile -- --watch",
     "lint": "npx eslint . -c ./.eslintrc.yml",
-    "build": "npm run format:write && npm run package",
+    "build": "npm run format:write && npm run compile",
     "ci-test": "jest --passWithNoTests",
     "format:write": "prettier --write './**/*.ts'",
     "format:check": "prettier --check './**/*.ts'",
     "test": "jest",
-    "all": "npm run format:write && npm run lint && npm run test && npm run package"
+    "all": "npm run format:write && npm run lint && npm run test && npm run compile"
   },
   "type": "module",
   "dependencies": {
