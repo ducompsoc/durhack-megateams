@@ -143,7 +143,7 @@ class TeamHandlers {
   }
 
   @requireLoggedIn
-  async createTeamAsHacker(request: Request, response: Response) {
+  async createTeamAsHacker(request: Request, response: Response): Promise<void> {
     if (!request.session.generatedTeamName) {
       throw new createHttpError.Conflict()
     }
