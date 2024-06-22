@@ -17,7 +17,10 @@ export type DurHackLiveProfile = z.infer<typeof DurHackLiveProfileSchema>
 const profile_url = z.string().url().parse(config.get("passport.oauth2.profileURL"))
 
 export default class DurHackLiveOAuth2Strategy extends OAuth2Strategy {
-  async userProfile(accessToken: string, done: (err?: Error | null, profile?: DurHackLiveProfile) => void) {
+  async userProfile(
+    accessToken: string,
+    done: (err?: Error | null, profile?: DurHackLiveProfile) => void,
+  ): Promise<void> {
     let profileResponse: Response
     try {
       profileResponse = await fetch(profile_url, {
