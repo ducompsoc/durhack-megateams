@@ -200,7 +200,7 @@ class TeamHandlers {
   }
 
   @requireUserIsAdmin
-  async removeUserFromTeamAsAdmin(request: Request, response: Response) {
+  async removeUserFromTeamAsAdmin(_request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
