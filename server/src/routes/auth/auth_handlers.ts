@@ -3,7 +3,7 @@ import { Request, Response } from "express"
 import { UserRole } from "@server/common/model_enums"
 
 class AuthHandlers {
-  async handleLoginSuccess(request: Request, response: Response) {
+  async handleLoginSuccess(request: Request, response: Response): Promise<void> {
     if (!request.user) {
       return response.redirect("/")
     }
