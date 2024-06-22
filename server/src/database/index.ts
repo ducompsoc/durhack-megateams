@@ -79,7 +79,7 @@ export function buildQueryFromRequest<M extends Model>(
   return findOptions
 }
 
-export async function ensureDatabaseExists() {
+export async function ensureDatabaseExists(): Promise<void> {
   const initialConnectOptions = mysql_options_schema.parse(config.get("mysql.data")) as MySqlConnectionOptions
   const database_name = initialConnectOptions.database
 
