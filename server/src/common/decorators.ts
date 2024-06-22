@@ -33,7 +33,7 @@ export function userIsRole(role: UserRole) {
   }
 }
 
-export function userIsLoggedIn(request: Request) {
+export function userIsLoggedIn(request: Request): boolean {
   return !!request.user
 }
 
