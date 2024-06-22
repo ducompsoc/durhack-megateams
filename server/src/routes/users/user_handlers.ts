@@ -57,10 +57,10 @@ class UserHandlers {
    * Handles an unauthenticated or non-admin GET request to /users.
    * Returns a list of user IDs and preferred names that cannot be filtered.
    *
-   * @param request
+   * @param _request
    * @param response
    */
-  async getUsersListDefault(request: Request, response: Response): Promise<void> {
+  async getUsersListDefault(_request: Request, response: Response): Promise<void> {
     const result = await User.findAll({
       attributes: [["user_id", "id"], "preferred_name"],
     })
