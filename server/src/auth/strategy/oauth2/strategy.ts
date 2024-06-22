@@ -28,8 +28,11 @@ export default class DurHackLiveOAuth2Strategy extends OAuth2Strategy {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-    } catch (error: any) {
-      return done(error)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        done(error)
+      }
+      return
     }
 
     if (!profileResponse.ok) {
