@@ -276,12 +276,12 @@ class UserHandlers {
    * Handles an authenticated hacker self POST request to /users/:id.
    * Allows editing of all MLH fields, email, etc.
    *
-   * @param request
-   * @param response
+   * @param _request
+   * @param _response
    * @param next
    */
   @requireSelf
-  async patchMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async patchMyUserDetails(_request: Request, _response: Response, next: NextFunction): Promise<void> {
     next()
   }
 
