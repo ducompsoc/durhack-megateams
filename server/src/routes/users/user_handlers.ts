@@ -289,12 +289,12 @@ class UserHandlers {
    * Handles an authenticated admin DELETE request to /users/:id.
    * Deletes the resource.
    *
-   * @param request
+   * @param _request
    * @param response
-   * @param next
+   * @param _next
    */
   @requireUserIsAdmin
-  async deleteUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async deleteUserAsAdmin(_request: Request, response: Response, _next: NextFunction): Promise<void> {
     const { user_id } = response.locals
     if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
