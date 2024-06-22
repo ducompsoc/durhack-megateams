@@ -26,6 +26,5 @@ export default class Megateam extends Model {
   })
   declare description: string | null
 
-  @HasMany(() => Area, "megateam_id")
-  areas!: Awaited<Area>[]
+  @HasMany(() => Area, "megateam_id") areas!: Awaited<Area>[]
 }
