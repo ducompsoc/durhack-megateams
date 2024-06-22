@@ -22,7 +22,7 @@ async function oauth2VerifyFunction(
   refreshToken: string,
   profile: DurHackLiveProfile,
   done: VerifyCallback,
-) {
+): Promise<void> {
   const timestamp = new Date()
 
   let user: User
