@@ -2,7 +2,7 @@ import createHttpError from "http-errors"
 import { NextFunction, Request, Response } from "express"
 import { ValueError } from "@server/common/errors"
 
-export function handleMethodNotAllowed() {
+export function handleMethodNotAllowed(): void {
   // The endpoint does support this method: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
   throw new createHttpError.MethodNotAllowed()
 }
