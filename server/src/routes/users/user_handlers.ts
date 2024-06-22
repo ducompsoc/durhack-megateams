@@ -227,10 +227,10 @@ class UserHandlers {
    *
    * @param request
    * @param response
-   * @param next
+   * @param _next
    */
   @requireSelf
-  async getMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async getMyUserDetails(request: Request, response: Response, _next: NextFunction): Promise<void> {
     await this.doGetAllUserDetails(request, response)
   }
 
