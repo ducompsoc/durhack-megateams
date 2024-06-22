@@ -90,7 +90,7 @@ export default class QRCode extends Model {
   })
   declare challenge_rank: number | null
 
-  async canBeRedeemed(user: Awaited<User>) {
+  async canBeRedeemed(user: Awaited<User>): Promise<boolean> {
     const now = new Date()
 
     if (now < this.start_time) return false
