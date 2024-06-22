@@ -161,10 +161,10 @@ class UserHandlers {
    * Handles an unauthenticated or non-admin GET request to /users/:id.
    * Returns the user's basic details including team affiliation, points, etc.
    *
-   * @param request
+   * @param _request
    * @param response
    */
-  async getUserDetailsDefault(request: Request, response: Response): Promise<void> {
+  async getUserDetailsDefault(_request: Request, response: Response): Promise<void> {
     const { user_id } = response.locals
     if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
