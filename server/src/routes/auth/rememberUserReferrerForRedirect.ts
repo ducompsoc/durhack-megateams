@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express"
 
-export default function rememberUserReferrerForRedirect(request: Request, _response: Response, next: NextFunction) {
+export default function rememberUserReferrerForRedirect(
+  request: Request,
+  _response: Response,
+  next: NextFunction,
+): void {
   const referrer = request.query.referrer
 
   if (referrer) {
