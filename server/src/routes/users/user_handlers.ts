@@ -214,10 +214,10 @@ class UserHandlers {
    *
    * @param request
    * @param response
-   * @param next
+   * @param _next
    */
   @requireUserIsAdmin
-  async getUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async getUserDetailsAsAdmin(request: Request, response: Response, _next: NextFunction): Promise<void> {
     await this.doGetAllUserDetails(request, response)
   }
 
