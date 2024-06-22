@@ -78,7 +78,7 @@ class UserHandlers {
     .transform(val => parseInt(val, 16))
     .refine(val => !isNaN(val))
 
-  async joinTeam(request: Request, response: Response) {
+  async joinTeam(request: Request, response: Response): Promise<void> {
     const user = request.user as User
 
     if (await user.$get("team")) {
