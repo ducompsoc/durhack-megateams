@@ -20,22 +20,22 @@ class AreaHandlers {
   }
 
   @requireUserIsAdmin
-  async createArea(request: Request, response: Response): Promise<void> {
+  async createArea(_request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
   @requireUserIsAdmin
-  async getAreaDetails(request: Request, response: Response): Promise<void> {
+  async getAreaDetails(_request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
   @requireUserIsAdmin
-  async patchAreaDetails(request: Request, response: Response): Promise<void> {
+  async patchAreaDetails(_request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
   @requireUserIsAdmin
-  async deleteArea(request: Request, response: Response): Promise<void> {
+  async deleteArea(_request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 }
