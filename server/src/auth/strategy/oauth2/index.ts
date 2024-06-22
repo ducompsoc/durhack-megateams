@@ -35,8 +35,11 @@ async function oauth2VerifyFunction(
         initially_logged_in_at: timestamp,
       },
     })
-  } catch (error: any) {
-    return done(error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      done(error)
+    }
+    return
   }
 
   await user.update({
