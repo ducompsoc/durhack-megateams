@@ -130,10 +130,10 @@ class UserHandlers {
    *
    * @param request
    * @param response
-   * @param next
+   * @param _next
    */
   @requireUserIsAdmin
-  async createUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
+  async createUserAsAdmin(request: Request, response: Response, _next: NextFunction): Promise<void> {
     const invalid_fields = Object.keys(request.body).filter(key => !allowed_create_fields.has(key))
     if (invalid_fields.length > 0) {
       throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
