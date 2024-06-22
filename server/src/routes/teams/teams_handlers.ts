@@ -180,7 +180,7 @@ class TeamHandlers {
         throw new createHttpError.Conflict("Team creation failed because no available join-code was found. Try again.")
       }
 
-      await (request.user as User).$set("team", team, { transaction: transaction })
+      await (request.user as User).$set("team", team, { transaction })
 
       await transaction.commit()
     } catch (error) {
