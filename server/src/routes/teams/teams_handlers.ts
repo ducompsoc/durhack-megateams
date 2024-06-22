@@ -208,7 +208,7 @@ class TeamHandlers {
     throw new createHttpError.NotImplemented()
   }
 
-  async deleteTeam(request: Request, response: Response) {
+  async deleteTeam(_request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 }
