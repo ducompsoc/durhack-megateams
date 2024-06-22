@@ -138,7 +138,7 @@ class TeamHandlers {
   }
 
   @requireUserIsAdmin
-  async createTeamAsAdmin(request: Request, response: Response, next: NextFunction) {
+  async createTeamAsAdmin(_request: Request, _response: Response, next: NextFunction): Promise<void> {
     next()
   }
 
