@@ -7,7 +7,7 @@ export function handleMethodNotAllowed(): void {
   throw new createHttpError.MethodNotAllowed()
 }
 
-export function handleNotImplemented() {
+export function handleNotImplemented(): void {
   throw new createHttpError.NotImplemented()
 }
 
