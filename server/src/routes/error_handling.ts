@@ -9,7 +9,12 @@ import { ZodError } from "zod"
 import { sendHttpErrorResponse, sendZodErrorResponse } from "@server/common/response"
 import { NullError, ValueError } from "@server/common/errors"
 
-export default function api_error_handler(error: Error, _request: Request, response: Response, next: NextFunction) {
+export default function api_error_handler(
+  error: Error,
+  _request: Request,
+  response: Response,
+  next: NextFunction,
+): void {
   if (response.headersSent) {
     return next(error)
   }
