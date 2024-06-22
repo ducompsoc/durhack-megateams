@@ -16,7 +16,7 @@ export function requireCondition(condition: ICondition) {
   return function (target: any, property_key: string, descriptor: PropertyDescriptor) {
     const old_function = descriptor.value
 
-    async function wrapped_function(request: Request, response: Response, next: NextFunction) {
+    async function wrapped_function(request: Request, response: Response, next: NextFunction): Promise<void> {
       if (!condition(request, response)) {
         return next()
       }
