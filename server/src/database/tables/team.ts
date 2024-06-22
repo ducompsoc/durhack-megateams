@@ -56,7 +56,7 @@ export default class Team extends Model {
   @HasMany(() => User)
   declare members: Awaited<User>[]
 
-  async isJoinable() {
+  async isJoinable(): Promise<boolean> {
     const team_members: number = await this.$count("members")
     return team_members < maxTeamMembers
   }
