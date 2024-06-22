@@ -72,7 +72,7 @@ function validateID(value: unknown): number {
  * @returns A middleware function that takes a request, response, and next function.
  * The key is extracted from the request's params and set in the local key of the response.
  */
-export function parseRouteId(key: string) {
+export function parseRouteId(key: string): unknown {
   return mutateRequestValue(
     getRouteParameter(key), // returns a function that takes a request and returns the value key from the request's params
     validateID, // function validates whether input value is a valid ID (i.e. number >= 0) & returns number in this case
