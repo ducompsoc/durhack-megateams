@@ -36,7 +36,7 @@ class TeamHandlers {
     })
   }
 
-  async listTeamsAsAnonymous(request: Request, response: Response) {
+  async listTeamsAsAnonymous(_request: Request, response: Response): Promise<void> {
     const result = await Team.findAll({
       attributes: ["name", [sequelize.fn("sum", sequelize.col("members.points.value")), "points"]],
       include: [
