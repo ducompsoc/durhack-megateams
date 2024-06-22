@@ -21,7 +21,7 @@ class TeamHandlers {
     .transform(val => parseInt(val, 16))
     .refine(val => !isNaN(val))
 
-  async generateTeamName(request: Request, response: Response) {
+  async generateTeamName(request: Request, response: Response): Promise<void> {
     request.session.generatedTeamName = uniqueNamesGenerator({
       dictionaries: [adjectives, adjectives, animals],
       length: 3,
