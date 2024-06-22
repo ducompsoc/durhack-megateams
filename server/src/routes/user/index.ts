@@ -7,7 +7,7 @@ import handlers from "./user_handlers"
 
 const users_router = ExpressRouter()
 
-users_router.use((request: Request, response: Response, next: NextFunction) => {
+users_router.use((request: Request, _response: Response, next: NextFunction) => {
   if (!request.user) {
     throw new createHttpError.Unauthorized()
   }
