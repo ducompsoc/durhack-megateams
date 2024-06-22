@@ -7,7 +7,7 @@ import handlers from "./discord_handlers"
 
 const discord_router = ExpressRouter()
 
-discord_router.use((request: Request, response: Response, next: NextFunction) => {
+discord_router.use((request: Request, _response: Response, next: NextFunction) => {
   if (!request.user) {
     throw new createHttpError.Unauthorized()
   }
