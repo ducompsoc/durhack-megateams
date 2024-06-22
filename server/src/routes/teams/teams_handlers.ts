@@ -163,7 +163,7 @@ class TeamHandlers {
       let try_index = 0
       while (team.isNewRecord && try_index < 10) {
         try {
-          await team.save({ transaction: transaction })
+          await team.save({ transaction })
         } catch (error) {
           if (error instanceof SequelizeValidationError) {
             try_index += 1
