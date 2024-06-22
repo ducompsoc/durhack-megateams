@@ -6,7 +6,7 @@ import { z } from "zod"
 import User from "@server/database/tables/user"
 
 class DiscordHandlers {
-  async getDiscord(request: Request, response: Response) {
+  async getDiscord(request: Request, response: Response): Promise<void> {
     const user = request.user as User
 
     const team = await user.$get("team")
