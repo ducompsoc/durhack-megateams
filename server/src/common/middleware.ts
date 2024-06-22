@@ -40,7 +40,7 @@ function getRouteParameter(key: string) {
   }
 }
 
-function getQueryParameter(key: string) {
+function _getQueryParameter(key: string) {
   return function (request: Request): unknown {
     return request.query[key]
   }
