@@ -11,7 +11,7 @@ export function handleNotImplemented(): void {
   throw new createHttpError.NotImplemented()
 }
 
-export function handleFailedAuthentication(request: Request) {
+export function handleFailedAuthentication(request: Request): void {
   if (request.user) {
     // Re-authenticating will not allow access (i.e. you are not a high-enough privileged user):
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
