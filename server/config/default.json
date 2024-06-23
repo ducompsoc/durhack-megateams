@@ -14,15 +14,15 @@
       "passReqToCallback": false
     },
     "oauth2": {
-      "authorizationURL": "https://live.durhack.com/login/authorize",
-      "tokenURL": "https://live.durhack.com/api/auth/oauth/token",
+      "authorizationURL": "https://login.durhack.com/realms/durhack/protocol/openid-connect/auth",
+      "tokenURL": "https://login.durhack.com/realms/durhack/protocol/openid-connect/token",
+      "callbackURL": "https://megateams.durhack.com/api/auth/login/callback",
+      "profileURL": "https://login.durhack.com/realms/durhack/protocol/openid-connect/userinfo",
       "clientID": "megateams",
       "clientSecret": "this-is-not-a-real-client-secret",
-      "callbackURL": "https://megateams.durhack.com/api/auth/durhack-live/callback",
       "state": true,
-      "scope": ["api"],
-      "pkce": true,
-      "profileURL": "https://live.durhack.com/api/user"
+      "scope": ["openid"],
+      "pkce": true
     }
   },
   "mysql": {

@@ -47,7 +47,7 @@ export default function RedeemPage() {
     } else {
       const qr_id = searchParams.get("qr_id");
       return redirect(
-        "/api/auth/durhack-live?" +
+        "/api/auth/login?" +
           makeSearchParams({
             referrer:
               "/hacker/redeem?" + makeSearchParams({ qr_id: qr_id ?? "" }),

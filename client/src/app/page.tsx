@@ -17,7 +17,7 @@ export default function Home() {
           </div>
           <div className="sm:mx-auto sm:w-full sm:max-w-sm space-y-6">
             <a
-              href="/api/auth/durhack-live"
+              href="/api/auth/login"
               className="flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-400 hover:text-black"
             >
               Sign In

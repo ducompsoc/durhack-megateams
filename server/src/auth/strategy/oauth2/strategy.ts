@@ -8,8 +8,7 @@ import { UserRole } from "@server/common/model_enums"
 
 const DurHackLiveProfileSchema = z.object({
   email: z.string(),
-  role: z.nativeEnum(UserRole),
-  preferred_name: z.string(),
+  preferred_name: z.string()
 })
 
 export type DurHackLiveProfile = z.infer<typeof DurHackLiveProfileSchema>
@@ -30,15 +29,15 @@ export default class DurHackLiveOAuth2Strategy extends OAuth2Strategy {
     }
 
     if (!profileResponse.ok) {
-      return done(new createHttpError.BadGateway("Couldn't fetch user profile from DurHack Live."))
+      return done(new createHttpError.BadGateway("Couldn't fetch user profile from DurHack Login."))
     }
 
     try {
       const profileJSON: any = await profileResponse.json()
-      const profile = DurHackLiveProfileSchema.parse(profileJSON?.data)
+      const profile = DurHackLiveProfileSchema.parse(profileJSON)
       return done(null, profile)
     } catch (error) {
-      return done(new createHttpError.BadGateway("Couldn't fetch user profile from DurHack Live."))
+      return done(new createHttpError.BadGateway("Invalid user profile received from DurHack Login."))
     }
   }
 }

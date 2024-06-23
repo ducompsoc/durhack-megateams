@@ -10,13 +10,13 @@ import rememberUserReferrerForRedirect from "./rememberUserReferrerForRedirect"
 const auth_router = ExpressRouter()
 
 auth_router
-  .route("/durhack-live")
+  .route("/login")
   .all(rememberUserReferrerForRedirect)
   .get(passport.authenticate("oauth2"))
   .all(handleMethodNotAllowed)
 
 auth_router
-  .route("/durhack-live/callback")
+  .route("/login/callback")
   .get(
     passport.authenticate("oauth2", {
       failureRedirect: "/",
