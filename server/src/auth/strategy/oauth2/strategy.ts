@@ -8,7 +8,8 @@ import { UserRole } from "@server/common/model_enums"
 
 const DurHackLiveProfileSchema = z.object({
   email: z.string(),
-  preferred_name: z.string()
+  preferred_name: z.string(),
+  role: z.nativeEnum(UserRole)
 })
 
 export type DurHackLiveProfile = z.infer<typeof DurHackLiveProfileSchema>

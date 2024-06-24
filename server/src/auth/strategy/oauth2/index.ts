@@ -42,6 +42,7 @@ async function oauth2VerifyFunction(
   await user.update({
     ...profile,
     last_logged_in_at: timestamp,
+    role: profile.role
   })
 
   return done(null, user)
