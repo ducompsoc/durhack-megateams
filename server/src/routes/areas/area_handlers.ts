@@ -25,7 +25,7 @@ class AreaHandlers {
   }
 
   @requireUserIsAdmin
-  async getAreaDetails(_request: Request, _response: Response): Promise<void> {
+  async getAreaDetails(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
