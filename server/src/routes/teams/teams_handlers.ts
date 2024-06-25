@@ -195,7 +195,7 @@ class TeamHandlers {
   }
 
   @requireUserIsAdmin
-  async addUserToTeamAsAdmin(_request: Request, _response: Response): Promise<void> {
+  async addUserToTeamAsAdmin(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
