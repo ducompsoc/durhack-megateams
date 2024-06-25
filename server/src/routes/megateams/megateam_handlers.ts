@@ -12,7 +12,7 @@ import Point from "@server/database/tables/point"
 class MegateamHandlers {
   static numberParser = z.coerce.number().catch(0)
 
-  async getMegateamsList(_request: Request, response: Response): Promise<void> {
+  async getMegateamsList(this: void, _request: Request, response: Response): Promise<void> {
     const result = await Megateam.findAll({
       attributes: [
         "megateam_name",
