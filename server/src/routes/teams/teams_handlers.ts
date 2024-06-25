@@ -68,7 +68,7 @@ class TeamHandlers {
   }
 
   @requireUserIsAdmin
-  async listTeamsAsAdmin(_request: Request, response: Response): Promise<void> {
+  async listTeamsAsAdmin(this: void, _request: Request, response: Response): Promise<void> {
     const result = await Team.findAll({
       attributes: [
         "team_id",
