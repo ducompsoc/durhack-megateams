@@ -7,7 +7,7 @@ import createHttpError from "http-errors"
 
 class AreaHandlers {
   @requireUserIsAdmin
-  async getAreasList(_request: Request, response: Response): Promise<void> {
+  async getAreasList(this: void, _request: Request, response: Response): Promise<void> {
     const result = await Megateam.findAll({
       include: [Area],
     })
