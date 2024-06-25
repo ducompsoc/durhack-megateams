@@ -38,7 +38,7 @@ class PointHandlers {
    * @param request - query parameters can include `redeemer_id` (positive integer)
    * @param response - `points` attribute contains array of points each with an `id`, `value` and `redeemer` (with redeemer's `id`) attribute
    */
-  async getPointsList(request: Request, response: Response): Promise<void> {
+  async getPointsList(this: void, request: Request, response: Response): Promise<void> {
     const query = buildQueryFromRequest(request, point_transform_factories)
     query.attributes = [["point_id", "id"], "value"]
     query.include = [{ model: User, attributes: [["user_id", "id"]] }]
