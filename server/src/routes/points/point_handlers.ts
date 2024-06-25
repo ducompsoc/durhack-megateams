@@ -132,7 +132,7 @@ class PointHandlers {
    * @param _next - next function to handleFailedAuthentication should user fail requireUserIsAdmin requirement
    */
   @requireUserIsAdmin
-  async deletePoint(_request: Request, response: Response, _next: NextFunction): Promise<void> {
+  async deletePoint(this: void, _request: Request, response: Response, _next: NextFunction): Promise<void> {
     const { point_id } = response.locals
     if (typeof point_id !== "number") throw new Error("Parsed `point_id` not found.")
 
