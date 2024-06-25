@@ -21,7 +21,7 @@ class AuthHandlers {
     return response.redirect("/hacker")
   }
 
-  async handleLogout(request: Request, response: Response): Promise<void> {
+  async handleLogout(this: void, request: Request, response: Response): Promise<void> {
     request.session.destroy(() => {
       response.status(200)
       response.json({ status: response.statusCode, message: "OK" })
