@@ -36,7 +36,7 @@ class UserHandlers {
     response.json({ status: response.statusCode, message: "OK" })
   }
 
-  async getTeam(request: Request, response: Response): Promise<void> {
+  async getTeam(this: void, request: Request, response: Response): Promise<void> {
     const team = await (request.user as User).$get("team", {
       include: [
         {
