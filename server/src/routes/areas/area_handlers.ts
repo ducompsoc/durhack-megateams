@@ -35,7 +35,7 @@ class AreaHandlers {
   }
 
   @requireUserIsAdmin
-  async deleteArea(_request: Request, _response: Response): Promise<void> {
+  async deleteArea(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 }
