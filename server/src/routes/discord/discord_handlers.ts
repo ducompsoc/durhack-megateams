@@ -54,12 +54,12 @@ class DiscordHandlers {
 
     const discordApiBase = config.get("discord.apiEndpoint")
 
-    const access_code_exchange_payload = {
-      client_id: config.get("discord.clientId") as string,
-      client_secret: config.get("discord.clientSecret") as string,
+    const access_code_exchange_payload: Record<string, string> = {
+      client_id: config.get("discord.clientId"),
+      client_secret: config.get("discord.clientSecret"),
       grant_type: "authorization_code",
-      code: code,
-      redirect_uri: config.get("discord.redirectUri") as string,
+      code,
+      redirect_uri: config.get("discord.redirectUri"),
     }
     const encoded_access_code_exchange_payload = new URLSearchParams(access_code_exchange_payload)
 
