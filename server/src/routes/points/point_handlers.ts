@@ -60,7 +60,7 @@ class PointHandlers {
    * @param _next - next function to handleFailedAuthentication should user fail requireUserIsAdmin requirement
    */
   @requireUserIsAdmin // Point creation via QR code (for non-admins) is handled by a separate endpoint
-  async createPoint(request: Request, response: Response, _next: NextFunction): Promise<void> {
+  async createPoint(this: void, request: Request, response: Response, _next: NextFunction): Promise<void> {
     const parsed_payload = create_point_payload_schema.parse(request.body)
 
     if (parsed_payload.origin_qrcode_id) {
