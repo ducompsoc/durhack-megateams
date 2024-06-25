@@ -20,7 +20,7 @@ class AreaHandlers {
   }
 
   @requireUserIsAdmin
-  async createArea(_request: Request, _response: Response): Promise<void> {
+  async createArea(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
