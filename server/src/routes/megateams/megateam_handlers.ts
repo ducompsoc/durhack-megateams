@@ -75,7 +75,7 @@ class MegateamHandlers {
     throw new createHttpError.NotImplemented()
   }
 
-  async patchMegateamDetails(request: Request, response: Response): Promise<void> {
+  async patchMegateamDetails(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
