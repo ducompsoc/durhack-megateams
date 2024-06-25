@@ -204,7 +204,7 @@ class TeamHandlers {
     throw new createHttpError.NotImplemented()
   }
 
-  async getTeamDetails(_request: Request, _response: Response): Promise<void> {
+  async getTeamDetails(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
