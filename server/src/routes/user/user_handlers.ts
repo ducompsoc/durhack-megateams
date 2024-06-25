@@ -103,7 +103,7 @@ class UserHandlers {
     })
   }
 
-  async leaveTeam(request: Request, response: Response): Promise<void> {
+  async leaveTeam(this: void, request: Request, response: Response): Promise<void> {
     const user = request.user as User
 
     const team = await user.$get("team")
