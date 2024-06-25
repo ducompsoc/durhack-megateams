@@ -67,7 +67,7 @@ class MegateamHandlers {
     })
   }
 
-  async createMegateam(request: Request, response: Response): Promise<void> {
+  async createMegateam(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
