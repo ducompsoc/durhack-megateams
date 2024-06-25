@@ -39,7 +39,7 @@ class DiscordHandlers {
     scope: z.string(),
   })
 
-  async handleRedirect(request: Request, response: Response) {
+  async handleRedirect(this: void, request: Request, response: Response): Promise<void> {
     const user = request.user as User
 
     const team = await user.$get("team")
