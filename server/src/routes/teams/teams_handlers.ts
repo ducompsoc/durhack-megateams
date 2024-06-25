@@ -117,7 +117,7 @@ class TeamHandlers {
   }
 
   @requireUserIsAdmin
-  async patchTeamAsAdmin(request: Request, response: Response): Promise<void> {
+  async patchTeamAsAdmin(this: void, request: Request, response: Response): Promise<void> {
     const { team_id } = response.locals
     if (typeof team_id !== "number") {
       throw new Error("Parsed `team_id` not found.")
