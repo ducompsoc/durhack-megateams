@@ -268,7 +268,7 @@ class UserHandlers {
    * @param _next
    */
   @requireUserIsAdmin
-  async patchUserDetailsAsAdmin(request: Request, response: Response, _next: NextFunction): Promise<void> {
+  async patchUserDetailsAsAdmin(this: void, request: Request, response: Response, _next: NextFunction): Promise<void> {
     await UserHandlers.getPatchHandler(patch_user_payload_schema)(request, response)
   }
 
