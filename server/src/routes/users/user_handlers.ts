@@ -6,7 +6,7 @@ import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidation
 import { NullError, ValueError } from "@server/common/errors"
 import { requireUserIsAdmin } from "@server/common/decorators"
 import { UserRole } from "@server/common/model_enums"
-import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database"
+import { SequelizeQueryTransformFactory } from "@server/database"
 import User from "@server/database/tables/user"
 import Team from "@server/database/tables/team"
 import Point from "@server/database/tables/point"
