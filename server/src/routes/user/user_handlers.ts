@@ -20,7 +20,7 @@ class UserHandlers {
     response.json({ status: response.statusCode, message: "OK", data: payload })
   }
 
-  async patchUserDetails(request: Request, response: Response) {
+  async patchUserDetails(this: void, request: Request, response: Response): Promise<void> {
     const parsed_payload = patch_user_payload_schema.parse(request.body)
 
     try {
