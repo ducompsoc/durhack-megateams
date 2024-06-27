@@ -69,7 +69,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  async createQRCode(request: Request, response: Response) {
+  async createQRCode(request: Request, response: Response): Promise<void> {
     const create_attributes = QRHandlers.createQRPayload.parse(request.body)
     const publicised = z.boolean().parse(request.body.publicised)
 
