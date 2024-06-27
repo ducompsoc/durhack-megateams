@@ -1,5 +1,4 @@
 import config from "config"
-import { z } from "zod"
 import { DataType, Table, Column, Model, HasMany, BelongsTo, ForeignKey } from "sequelize-typescript"
 
 import { config_schema } from "@server/common/schema/config"
