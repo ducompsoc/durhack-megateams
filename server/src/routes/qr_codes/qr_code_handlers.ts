@@ -259,7 +259,7 @@ class QRHandlers {
         value: qr.points_value,
         origin_qrcode_id: qr.id,
         redeemer_id: (request.user as User).id,
-        transaction: transaction,
+        transaction,
       })
 
       await transaction.commit()
