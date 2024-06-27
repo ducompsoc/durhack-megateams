@@ -222,7 +222,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  createPreset(request: Request, response: Response) {
+  createPreset(this: void, _request: Request, _response: Response): void {
     throw new createHttpError.NotImplemented()
   }
 
