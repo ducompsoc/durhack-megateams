@@ -352,7 +352,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  async createChallenge(request: Request, response: Response) {
+  async createChallenge(this: void, _request: Request, _response: Response): Promise<void> {
     throw new createHttpError.NotImplemented()
   }
 
