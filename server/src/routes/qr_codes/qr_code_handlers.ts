@@ -232,7 +232,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  deletePreset(request: Request, response: Response) {
+  deletePreset(this: void, _request: Request, _response: Response): void {
     throw new createHttpError.NotImplemented()
   }
 
