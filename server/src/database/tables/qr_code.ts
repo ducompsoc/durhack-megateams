@@ -108,7 +108,7 @@ export default class QRCode extends Model {
     return redeemsByUser === 0
   }
 
-  getRedemptionURL() {
+  getRedemptionURL(): string {
     const redemptionUrlSearchParams = new URLSearchParams({ qr_id: this.payload })
     return `${redemption_url}?${redemptionUrlSearchParams.toString()}`
   }
