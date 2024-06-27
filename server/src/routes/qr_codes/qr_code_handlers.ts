@@ -212,7 +212,7 @@ class QRHandlers {
   }
 
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
-  getPresetsList(_request: Request, response: Response) {
+  getPresetsList(this: void, _request: Request, response: Response): void {
     response.status(200)
     response.json({
       status: 200,
