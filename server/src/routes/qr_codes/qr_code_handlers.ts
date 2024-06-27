@@ -55,7 +55,7 @@ class QRHandlers {
     creator: User,
     create_attributes: z.infer<typeof QRHandlers.createQRPayload>,
     publicised: boolean,
-  ) {
+  ): Promise<QRCode> {
     const publicisedFields = await this.getPublicisedFields(null, publicised)
 
     const payload = uuid()
