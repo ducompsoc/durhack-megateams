@@ -307,7 +307,7 @@ class QRHandlers {
     await this.getChallengeList(request, response, true)
   }
 
-  async getChallengeListAsAnonymous(request: Request, response: Response) {
+  async getChallengeListAsAnonymous(request: Request, response: Response): Promise<void> {
     await this.getChallengeList(request, response, false)
   }
 
