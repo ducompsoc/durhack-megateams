@@ -312,7 +312,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  async reorderChallengeList(request: Request, response: Response) {
+  async reorderChallengeList(this: void, request: Request, response: Response): Promise<void> {
     const challengeList = z.array(
       z.object({
         id: z.number(),
