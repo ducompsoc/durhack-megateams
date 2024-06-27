@@ -281,7 +281,7 @@ class UserHandlers {
    * @param next
    */
   @requireSelf
-  async patchMyUserDetails(_request: Request, _response: Response, next: NextFunction): Promise<void> {
+  async patchMyUserDetails(this: void, _request: Request, _response: Response, next: NextFunction): Promise<void> {
     next()
   }
 
