@@ -294,7 +294,7 @@ class UserHandlers {
    * @param _next
    */
   @requireUserIsAdmin
-  async deleteUserAsAdmin(_request: Request, response: Response, _next: NextFunction): Promise<void> {
+  async deleteUserAsAdmin(this: void, _request: Request, response: Response, _next: NextFunction): Promise<void> {
     const { user_id } = response.locals
     if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
