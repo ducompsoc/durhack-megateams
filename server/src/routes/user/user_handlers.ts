@@ -12,7 +12,7 @@ import { NullError } from "@server/common/errors"
 import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
 
 class UserHandlers {
-  async getUser(request: Request, response: Response) {
+  async getUser(this: void, request: Request, response: Response): Promise<void> {
     const payload: User | { points: number } = request.user!.toJSON()
     payload.points = Point.getPointsTotal(await request.user!.$get("points"))
 
