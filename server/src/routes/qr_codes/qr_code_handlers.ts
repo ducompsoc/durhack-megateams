@@ -357,7 +357,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  getQRCodeDetails(request: Request, response: Response) {
+  getQRCodeDetails(this: void, _request: Request, _response: Response): void {
     throw new createHttpError.NotImplemented()
   }
 
