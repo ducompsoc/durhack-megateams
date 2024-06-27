@@ -185,7 +185,7 @@ class UserHandlers {
     })
   }
 
-  private async doGetAllUserDetails(_request: Request, response: Response): Promise<void> {
+  private async doGetAllUserDetails(this: void, _request: Request, response: Response): Promise<void> {
     const { user_id } = response.locals
     if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
