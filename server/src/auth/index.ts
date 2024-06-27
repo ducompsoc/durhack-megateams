@@ -22,9 +22,6 @@ passport.serializeUser<SerializedUser>(async function (user: Express.User, callb
 })
 
 passport.deserializeUser<SerializedUser>(async function (identifier, callback) {
-  if (typeof identifier?.id !== "number") {
-    return callback(null, null)
-  }
   try {
     return callback(
       null,
