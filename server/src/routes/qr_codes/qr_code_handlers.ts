@@ -249,7 +249,7 @@ class QRHandlers {
       qr = await QRCode.findOne({
         where: { payload: request.body.uuid },
         include: [Point],
-        transaction: transaction,
+        transaction,
         rejectOnEmpty: new createHttpError.BadRequest(),
       })
 
