@@ -105,7 +105,7 @@ class QRHandlers {
     const expiry = new Date()
     expiry.setMinutes(expiry.getMinutes() + preset.minutesValid)
     const create_attributes = {
-      name: name,
+      name,
       points_value: preset.points,
       max_uses: preset.uses,
       category: QRCategory.preset,
