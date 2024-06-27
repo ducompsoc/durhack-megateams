@@ -60,7 +60,7 @@ class UserHandlers {
    * @param _request
    * @param response
    */
-  async getUsersListDefault(_request: Request, response: Response): Promise<void> {
+  async getUsersListDefault(this: void, _request: Request, response: Response): Promise<void> {
     const result = await User.findAll({
       attributes: [["user_id", "id"], "preferred_name"],
     })
