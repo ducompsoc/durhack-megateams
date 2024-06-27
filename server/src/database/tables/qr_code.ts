@@ -105,7 +105,7 @@ export default class QRCode extends Model {
         redeemer_id: user.id,
       },
     })
-    return redeemsByUser == 0
+    return redeemsByUser === 0
   }
 
   getRedemptionURL() {
