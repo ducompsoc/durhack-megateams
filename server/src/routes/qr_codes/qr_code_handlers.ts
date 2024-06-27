@@ -275,7 +275,7 @@ class QRHandlers {
     })
   }
 
-  private async getChallengeList(_request: Request, response: Response, includeId: boolean) {
+  private async getChallengeList(this: void, _request: Request, response: Response, includeId: boolean): Promise<void> {
     const now = new Date()
     const challenges = await QRCode.findAll({
       where: {
