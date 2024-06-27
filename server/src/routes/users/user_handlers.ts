@@ -85,7 +85,7 @@ class UserHandlers {
    * @param _next
    */
   @requireUserIsAdmin
-  async getUsersListAsAdmin(_request: Request, response: Response, _next: NextFunction): Promise<void> {
+  async getUsersListAsAdmin(this: void, _request: Request, response: Response, _next: NextFunction): Promise<void> {
     const result = await User.findAll({
       attributes: [["user_id", "id"], "preferred_name", "email"],
       include: [
