@@ -164,7 +164,7 @@ class UserHandlers {
    * @param _request
    * @param response
    */
-  async getUserDetailsDefault(_request: Request, response: Response): Promise<void> {
+  async getUserDetailsDefault(this: void, _request: Request, response: Response): Promise<void> {
     const { user_id } = response.locals
     if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
