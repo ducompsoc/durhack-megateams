@@ -320,7 +320,10 @@ class QRHandlers {
       }),
     )
 
-    if (!request.body.hasOwnProperty("challenges") || !challengeList.safeParse(request.body.challenges).success) {
+    if (
+      !Object.prototype.hasOwnProperty.call(request.body, "challenges") ||
+      !challengeList.safeParse(request.body.challenges).success
+    ) {
       throw new createHttpError.BadRequest()
     }
 
