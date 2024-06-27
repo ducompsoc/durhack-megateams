@@ -162,7 +162,10 @@ class QRHandlers {
     })
   }
 
-  private async getPublicisedFields(existing_rank: typeof QRCode.prototype.challenge_rank, publicised: boolean) {
+  private async getPublicisedFields(
+    existing_rank: typeof QRCode.prototype.challenge_rank,
+    publicised: boolean,
+  ): Promise<{ challenge_rank: number | null }> {
     const fields = { challenge_rank: existing_rank }
 
     if (!publicised) {
