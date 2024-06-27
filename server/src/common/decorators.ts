@@ -60,7 +60,9 @@ export const requireLoggedIn = requireCondition(userIsLoggedIn)
 /**
  * Decorator that ensures `request.user.role` is one of the provided roles.
  */
-export function requireUserIsOneOf(...roles: UserRole[]) {
+export function requireUserIsOneOf(
+  ...roles: UserRole[]
+): (target: unknown, property_key: string, descriptor: PropertyDescriptor) => void {
   return requireCondition(function (request: Request): boolean {
     return !!request.user && roles.includes(request.user.role)
   })
