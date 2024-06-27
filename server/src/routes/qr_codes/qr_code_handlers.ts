@@ -306,7 +306,7 @@ class QRHandlers {
   }
 
   @requireUserIsAdmin
-  async getChallengeListAdmin(request: Request, response: Response) {
+  async getChallengeListAdmin(request: Request, response: Response): Promise<void> {
     await this.getChallengeList(request, response, true)
   }
 
