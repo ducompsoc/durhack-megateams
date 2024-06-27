@@ -43,7 +43,7 @@ export function sendZodErrorResponse(response: Response, error: ZodError): void 
 
 export function makeStandardResponseBody(status: number, message?: string): ResponseBody {
   const response_body: ResponseBody = {
-    status: status,
+    status,
     message: STATUS_CODES[status] || "Unknown status",
   }
 
