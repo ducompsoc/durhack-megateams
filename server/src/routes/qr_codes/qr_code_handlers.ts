@@ -240,7 +240,7 @@ class QRHandlers {
   }
 
   @requireLoggedIn
-  async redeemQR(request: Request, response: Response) {
+  async redeemQR(this: void, request: Request, response: Response): Promise<void> {
     if (!request.body.hasOwnProperty("uuid")) {
       throw new createHttpError.BadRequest()
     }
