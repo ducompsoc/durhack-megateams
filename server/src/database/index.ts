@@ -92,7 +92,7 @@ export async function ensureDatabaseExists(): Promise<void> {
 
   await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${database_name}\`;`)
 
-  await connection.destroy()
+  connection.destroy()
 }
 
 const sequelizeConnectOptions = sequelize_options_schema.parse(config.get("mysql.data")) as SequelizeOptions
