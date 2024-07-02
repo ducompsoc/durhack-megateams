@@ -58,7 +58,7 @@ export default function MegaChart() {
         ...(isDark
           ? {
             // @ts-ignore
-              backgroundColor: theme.colors.neutral[700],
+            backgroundColor: theme.colors.neutral[700],
             }
           : {}),
       },
