@@ -32,7 +32,7 @@ export default function VolunteerLayout({
     ...(isVolunteer
       ? [
         {
-            icon: UserGroupIcon,
+          icon: UserGroupIcon,
             path: "/volunteer/teams",
           },
           ...(isAdmin
