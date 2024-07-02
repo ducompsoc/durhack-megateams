@@ -11,6 +11,6 @@ export function getHackerEmoji(points: number) {
   if (points < 250) return "📈";
   if (points < 500) return "🎉";
   if (points < 1000) return "🤯";
-    return "🏆";
+  return "🏆";
 }
 
