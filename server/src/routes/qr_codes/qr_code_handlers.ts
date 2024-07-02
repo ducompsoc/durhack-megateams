@@ -21,7 +21,7 @@ const presets = new Map<string, z.infer<typeof qr_preset_schema>>(
 
 const patch_fields = new Set(["state", "publicised"])
 
-class QRHandlers {
+export default class QRHandlers {
   constructor() {
     Object.getOwnPropertyNames(QRHandlers.prototype).forEach(key => {
       if (key !== "constructor") {
@@ -372,6 +372,3 @@ class QRHandlers {
     throw new createHttpError.NotImplemented()
   }
 }
-
-const handlersInstance = new QRHandlers()
-export default handlersInstance
