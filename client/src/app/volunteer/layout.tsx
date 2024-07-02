@@ -36,7 +36,7 @@ export default function VolunteerLayout({
           path: "/volunteer/teams",
         },
         ...(isAdmin
-            ? [
+          ? [
                 {
                   icon: NewspaperIcon,
                   path: "/volunteer/challenges",
