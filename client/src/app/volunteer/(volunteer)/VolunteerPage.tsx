@@ -79,7 +79,7 @@ export default function Volunteer() {
         {
           name: "Manage",
           content: <Manage displayQR={displayQR} />,
-          },
+        },
         ]
       : []),
   ];
