@@ -39,7 +39,7 @@ export default function VolunteerLayout({
           ? [
             {
               icon: NewspaperIcon,
-                path: "/volunteer/challenges",
+              path: "/volunteer/challenges",
                 },
               ]
             : []),
