@@ -45,7 +45,7 @@ export default function VolunteerLayout({
           : []),
         {
           icon: ScaleIcon,
-            path: "/volunteer/admin",
+          path: "/volunteer/admin",
           },
         ]
       : []),
