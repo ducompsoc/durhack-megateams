@@ -77,7 +77,7 @@ export default function Volunteer() {
     ...(isAdmin
       ? [
         {
-            name: "Manage",
+          name: "Manage",
             content: <Manage displayQR={displayQR} />,
           },
         ]
