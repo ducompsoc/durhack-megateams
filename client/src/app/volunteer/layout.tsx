@@ -42,7 +42,7 @@ export default function VolunteerLayout({
               path: "/volunteer/challenges",
             },
           ]
-            : []),
+          : []),
           {
             icon: ScaleIcon,
             path: "/volunteer/admin",
