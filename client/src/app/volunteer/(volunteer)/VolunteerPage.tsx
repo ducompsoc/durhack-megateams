@@ -69,7 +69,7 @@ export default function Volunteer() {
     ...(isVolunteer
       ? [
         {
-            name: "Custom",
+          name: "Custom",
             content: <Custom displayQR={displayQR} />,
           },
         ]
