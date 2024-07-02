@@ -59,7 +59,7 @@ export default function MegaChart() {
           ? {
             // @ts-ignore
             backgroundColor: theme.colors.neutral[700],
-            }
+          }
           : {}),
       },
     ],
