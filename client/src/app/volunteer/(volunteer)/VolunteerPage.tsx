@@ -68,7 +68,7 @@ export default function Volunteer() {
     },
     ...(isVolunteer
       ? [
-          {
+        {
             name: "Custom",
             content: <Custom displayQR={displayQR} />,
           },
