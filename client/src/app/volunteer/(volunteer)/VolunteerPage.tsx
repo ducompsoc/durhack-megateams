@@ -78,7 +78,7 @@ export default function Volunteer() {
       ? [
         {
           name: "Manage",
-            content: <Manage displayQR={displayQR} />,
+          content: <Manage displayQR={displayQR} />,
           },
         ]
       : []),
