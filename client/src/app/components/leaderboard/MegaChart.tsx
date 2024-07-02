@@ -83,7 +83,7 @@ export default function MegaChart() {
         grid: { display: false },
         ...(isDark
           ? {
-              // @ts-ignore
+            // @ts-ignore
               ticks: { color: theme.colors.neutral[200] },
             }
           : {}),
