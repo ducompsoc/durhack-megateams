@@ -85,7 +85,7 @@ export default function MegaChart() {
           ? {
             // @ts-ignore
               ticks: { color: theme.colors.neutral[200] },
-            }
+          }
           : {}),
       },
     },
