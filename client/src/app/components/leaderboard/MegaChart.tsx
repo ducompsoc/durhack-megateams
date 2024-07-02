@@ -57,7 +57,7 @@ export default function MegaChart() {
         data: megateams?.map((team: any) => team.points),
         ...(isDark
           ? {
-              // @ts-ignore
+            // @ts-ignore
               backgroundColor: theme.colors.neutral[700],
             }
           : {}),
