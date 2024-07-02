@@ -31,7 +31,7 @@ export default function VolunteerLayout({
     },
     ...(isVolunteer
       ? [
-          {
+        {
             icon: UserGroupIcon,
             path: "/volunteer/teams",
           },
