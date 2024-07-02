@@ -38,7 +38,7 @@ export default function VolunteerLayout({
         ...(isAdmin
           ? [
             {
-                  icon: NewspaperIcon,
+                icon: NewspaperIcon,
                   path: "/volunteer/challenges",
                 },
               ]
