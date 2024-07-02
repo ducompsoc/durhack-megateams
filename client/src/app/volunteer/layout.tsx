@@ -41,7 +41,7 @@ export default function VolunteerLayout({
               icon: NewspaperIcon,
               path: "/volunteer/challenges",
             },
-              ]
+          ]
             : []),
           {
             icon: ScaleIcon,
