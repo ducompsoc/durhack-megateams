@@ -71,7 +71,7 @@ export default function Volunteer() {
         {
           name: "Custom",
           content: <Custom displayQR={displayQR} />,
-          },
+        },
         ]
       : []),
     ...(isAdmin
