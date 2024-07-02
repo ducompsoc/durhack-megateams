@@ -84,7 +84,7 @@ export default function MegaChart() {
         ...(isDark
           ? {
             // @ts-ignore
-              ticks: { color: theme.colors.neutral[200] },
+            ticks: { color: theme.colors.neutral[200] },
           }
           : {}),
       },
