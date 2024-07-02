@@ -70,7 +70,7 @@ export default function MegaChart() {
     align: "end",
     ...(isDark
       ? {
-          // @ts-ignore
+        // @ts-ignore
           color: theme.colors.neutral[200],
         }
       : {}),
