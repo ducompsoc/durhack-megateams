@@ -23,7 +23,7 @@ export default function Preset({
 
   useEffect(() => {
     if (presetsList.length && !selected) setSelected(presetsList[0]);
-  }, [presets]);
+  }, [presets,presetsList,selected]);
 
   function getExpiryDate(minutesValid: number) {
     let now = new Date();
