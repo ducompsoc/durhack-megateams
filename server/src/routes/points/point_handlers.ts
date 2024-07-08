@@ -95,7 +95,7 @@ class PointHandlers {
       rejectOnEmpty: new NullError(),
     })
 
-    const payload: any = result.toJSON()
+    const payload: unknown = result.toJSON()
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
