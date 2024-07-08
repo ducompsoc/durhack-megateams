@@ -1,5 +1,5 @@
 import { Router as ExpressRouter } from "express"
-import QRHandlers from "./qr_code_handlers"
+import QRHandlers from "./qr_handlers"
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
 const qr_codes_router = ExpressRouter()
