@@ -42,7 +42,7 @@ export default function TabbedPage({
   return (
     <SWRConfig value={{ fetcher: fetchMegateamsApi }}>
       <div className="h-full flex flex-col text-black dark:text-neutral-200">
-        <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
+        <div className="flex flex-row py-4 px-6 items-center justify-center">
           <object data="/logo.svg" type="image/svg+xml" className="w-16 h-16">
             <img src="/logo.png" alt="DurHack Logo" />
           </object>
