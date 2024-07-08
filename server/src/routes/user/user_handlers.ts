@@ -57,7 +57,7 @@ class UserHandlers {
     const payload = {
       name: team.name,
       members:
-        team.members!.map(member => ({
+        team.members.map(member => ({
           name: member.preferred_name,
           points: Point.getPointsTotal(member.points || []),
         })) || [],

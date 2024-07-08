@@ -86,7 +86,7 @@ class DiscordHandlers {
       throw new createHttpError.BadGateway("Failed to read your Discord profile.")
     }
 
-    const discord_profile = (await discord_profile_response.json()) as any
+    const discord_profile = await discord_profile_response.json()
     const discord_user_id = discord_profile.user.id
     const guildID = config.get("discord.guildID")
 

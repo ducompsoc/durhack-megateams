@@ -9,7 +9,7 @@ import "./strategy/oauth2"
 declare global {
   /* eslint-disable @typescript-eslint/no-namespace */
   namespace Express {
-    interface User extends SequelizeUser {}
+    type User = SequelizeUser
   }
 }
 
