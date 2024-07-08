@@ -1,4 +1,5 @@
 import passport from "passport"
+import { Express } from "express"
 
 import SequelizeUser from "@server/database/tables/user"
 import { NullError } from "@server/common/errors"
