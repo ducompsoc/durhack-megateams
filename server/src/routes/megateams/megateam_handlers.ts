@@ -10,7 +10,13 @@ import User from "@server/database/tables/user"
 import Point from "@server/database/tables/point"
 
 class MegateamHandlers {
-  static numberParser = z.coerce.number().catch(0)
+  static async parseNumber(value: unknown): Promise<number> {
+    try {
+      return await z.coerce.number().parseAsync(value)
+    } catch {
+      return 0
+    }
+  }
 
   async getMegateamsList(this: void, _request: Request, response: Response): Promise<void> {
     const result = await Megateam.findAll({
