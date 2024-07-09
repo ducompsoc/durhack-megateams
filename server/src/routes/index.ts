@@ -36,7 +36,7 @@ function handle_root_request(request: Request, response: Response): void {
   response.json({ status: response.statusCode, message: "OK", api_version: 1 })
 }
 
-function handle_unhandled_request() {
+function handle_unhandled_request(): void {
   throw new createHttpError.NotFound("Unknown API route.")
 }
 
