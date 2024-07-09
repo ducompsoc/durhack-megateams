@@ -295,7 +295,7 @@ export default class QRHandlers {
       },
     })
 
-    challenges.sort((a, b) => a.challenge_rank! - b.challenge_rank!)
+    challenges.sort((a, b) => (a.challenge_rank ?? 0) - (b.challenge_rank ?? 0))
 
     const data = challenges.map((challenge, i) => ({
       title: challenge.name,
