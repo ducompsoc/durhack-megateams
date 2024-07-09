@@ -82,7 +82,7 @@ export default class QRHandlers {
   }
 
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
-  async usePreset(request: Request, response: Response) {
+  async usePreset(request: Request, response: Response): Promise<void> {
     const preset_id: string = request.params.preset_id
     const name = z.string().parse(request.body.name)
 
