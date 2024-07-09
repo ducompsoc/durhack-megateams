@@ -43,16 +43,7 @@ const create_user_payload_schema = z.object({
 
 export const patch_user_payload_schema = create_user_payload_schema.partial()
 
-class UserHandlers {
-  constructor() {
-    Object.getOwnPropertyNames(UserHandlers.prototype).forEach(key => {
-      if (key !== "constructor") {
-        // @ts-ignore
-        this[key] = this[key].bind(this)
-      }
-    })
-  }
-
+export default class UserHandlers {
   /**
    * Handles an unauthenticated or non-admin GET request to /users.
    * Returns a list of user IDs and preferred names that cannot be filtered.
@@ -309,6 +300,3 @@ class UserHandlers {
     response.json({ status: response.statusCode, message: "OK" })
   }
 }
-
-const UserHandlersInstance = new UserHandlers()
-export default UserHandlersInstance

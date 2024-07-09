@@ -1,10 +1,10 @@
 import { Router as ExpressRouter } from "express"
 
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
-
-import handlers from "./user_handlers"
+import UserHandlers from "./user_handlers"
 
 const users_router = ExpressRouter()
+const handlers = new UserHandlers()
 
 users_router
   .route("/")
@@ -15,7 +15,7 @@ users_router
 users_router
   .route("/:user_id")
   .all(parseRouteId("user_id"))
-  .get(handlers.getUserDetailsAsAdmin, handlers.getUserDetailsDefault)
+  .get(handlers.getUserDetailsAsAdmin.bind(handlers), handlers.getUserDetailsDefault)
   .patch(handlers.patchUserDetailsAsAdmin, handlers.patchMyUserDetails, handleFailedAuthentication)
   .delete(handlers.deleteUserAsAdmin, handleFailedAuthentication)
   .all(handleMethodNotAllowed)
