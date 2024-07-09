@@ -31,23 +31,23 @@ export default function VolunteerLayout({
     },
     ...(isVolunteer
       ? [
-          {
-            icon: UserGroupIcon,
-            path: "/volunteer/teams",
-          },
-          ...(isAdmin
-            ? [
-                {
-                  icon: NewspaperIcon,
-                  path: "/volunteer/challenges",
-                },
-              ]
-            : []),
-          {
-            icon: ScaleIcon,
-            path: "/volunteer/admin",
-          },
-        ]
+        {
+          icon: UserGroupIcon,
+          path: "/volunteer/teams",
+        },
+        ...(isAdmin
+          ? [
+            {
+              icon: NewspaperIcon,
+              path: "/volunteer/challenges",
+            },
+          ]
+          : []),
+        {
+          icon: ScaleIcon,
+          path: "/volunteer/admin",
+        },
+      ]
       : []),
   ];
 

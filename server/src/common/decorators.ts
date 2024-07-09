@@ -13,7 +13,7 @@ type ICondition = (request: Request, response: Response) => boolean
  * @param condition
  */
 export function requireCondition(condition: ICondition) {
-  return function (target: any, property_key: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, property_key: string, descriptor: PropertyDescriptor) {
     const old_function = descriptor.value
 
     async function wrapped_function(request: Request, response: Response, next: NextFunction): Promise<void> {

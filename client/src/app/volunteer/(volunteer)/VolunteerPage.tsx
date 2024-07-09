@@ -68,19 +68,19 @@ export default function Volunteer() {
     },
     ...(isVolunteer
       ? [
-          {
-            name: "Custom",
-            content: <Custom displayQR={displayQR} />,
-          },
-        ]
+        {
+          name: "Custom",
+          content: <Custom displayQR={displayQR} />,
+        },
+      ]
       : []),
     ...(isAdmin
       ? [
-          {
-            name: "Manage",
-            content: <Manage displayQR={displayQR} />,
-          },
-        ]
+        {
+          name: "Manage",
+          content: <Manage displayQR={displayQR} />,
+        },
+      ]
       : []),
   ];
 

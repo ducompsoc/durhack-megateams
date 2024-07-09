@@ -6,7 +6,7 @@ import { double_csrf_options_schema } from "@server/common/schema/config"
 
 const csrf_options = double_csrf_options_schema.parse(config.get("csrf.options"))
 
-function rollingSecret(request?: Request): string {
+function rollingSecret(): string {
   return config.get("csrf.secret")
 }
 

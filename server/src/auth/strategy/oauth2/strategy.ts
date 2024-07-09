@@ -40,8 +40,9 @@ export default class DurHackLiveOAuth2Strategy extends OAuth2Strategy {
     }
 
     try {
-      const profileJSON: any = await profileResponse.json()
-      const profile = DurHackLiveProfileSchema.parse(profileJSON?.data)
+      const profileJSON = await profileResponse.json()
+      const parsedProfileJSON: { data: DurHackLiveProfile } = profileJSON as { data: DurHackLiveProfile }
+      const profile = DurHackLiveProfileSchema.parse(parsedProfileJSON.data)
       return done(null, profile)
     } catch (error) {
       return done(new createHttpError.BadGateway("Couldn't fetch user profile from DurHack Live."))

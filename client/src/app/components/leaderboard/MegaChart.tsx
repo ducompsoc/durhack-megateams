@@ -57,9 +57,9 @@ export default function MegaChart() {
         data: megateams?.map((team: any) => team.points),
         ...(isDark
           ? {
-              // @ts-ignore
-              backgroundColor: theme.colors.neutral[700],
-            }
+            // @ts-ignore
+            backgroundColor: theme.colors.neutral[700],
+          }
           : {}),
       },
     ],
@@ -70,9 +70,9 @@ export default function MegaChart() {
     align: "end",
     ...(isDark
       ? {
-          // @ts-ignore
-          color: theme.colors.neutral[200],
-        }
+        // @ts-ignore
+        color: theme.colors.neutral[200],
+      }
       : {}),
   };
 
@@ -83,9 +83,9 @@ export default function MegaChart() {
         grid: { display: false },
         ...(isDark
           ? {
-              // @ts-ignore
-              ticks: { color: theme.colors.neutral[200] },
-            }
+            // @ts-ignore
+            ticks: { color: theme.colors.neutral[200] },
+          }
           : {}),
       },
     },

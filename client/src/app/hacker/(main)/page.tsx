@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import ButtonModal from "@/app/components/ButtonModal";
 import useUser from "@/app/lib/useUser";
 import useSWR from "swr";
+import Image from "next/image";
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
@@ -85,7 +86,7 @@ export default function HackerHome() {
                     type="image/svg+xml"
                     className="w-12"
                   >
-                    <img
+                    <Image
                       src={`/${team?.megateam_name}/icon.png`}
                       alt={`${team?.megateam_name} Logo`}
                     />

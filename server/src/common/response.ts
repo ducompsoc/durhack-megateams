@@ -7,7 +7,7 @@ interface ResponseBody {
   status: number
   message: string
   detail?: string | object
-  [key: string]: any
+  [key: string]: unknown
 }
 
 function makeHttpErrorResponseBody(error: HttpError): ResponseBody {

@@ -1,4 +1,5 @@
 import passport from "passport"
+import { Express } from "express"
 
 import SequelizeUser from "@server/database/tables/user"
 import { NullError } from "@server/common/errors"
@@ -9,7 +10,7 @@ import "./strategy/oauth2"
 declare global {
   /* eslint-disable @typescript-eslint/no-namespace */
   namespace Express {
-    interface User extends SequelizeUser {}
+    type User = SequelizeUser
   }
 }
 
