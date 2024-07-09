@@ -27,10 +27,16 @@ class UserHandlers {
   }
 
   async patchUserDetails(this: void, request: Request, response: Response): Promise<void> {
+    if (!request.user) {
+      response.status(500)
+      response.json({ status: 500, message: "Internal server error: user not found" })
+      return
+    }
+
     const parsed_payload = patch_user_payload_schema.parse(request.body)
 
     try {
-      await request.user!.update(parsed_payload)
+      await request.user.update(parsed_payload)
     } catch (error) {
       if (error instanceof SequelizeValidationError) {
         throw new createHttpError.BadRequest(error.message)
@@ -63,7 +69,7 @@ class UserHandlers {
     const payload = {
       name: team.name,
       members:
-        team.members!.map(member => ({
+        team.members.map(member => ({
           name: member.preferred_name,
           points: Point.getPointsTotal(member.points || []),
         })) || [],
