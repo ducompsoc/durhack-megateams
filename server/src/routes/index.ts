@@ -31,7 +31,7 @@ if (mitigateCsrf) {
   api_router.use(doubleCsrfProtection)
 }
 
-function handle_root_request(request: Request, response: Response) {
+function handle_root_request(request: Request, response: Response): void {
   response.status(200)
   response.json({ status: response.statusCode, message: "OK", api_version: 1 })
 }
