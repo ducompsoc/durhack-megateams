@@ -5,7 +5,7 @@ import { handleGetCsrfToken } from "@server/auth/csrf"
 import { handleMethodNotAllowed } from "@server/common/middleware"
 
 import handlers from "./auth_handlers"
-import rememberUserReferrerForRedirect from "./rememberUserReferrerForRedirect"
+import rememberUserReferrerForRedirect from "./referrer_redirect"
 
 const auth_router = ExpressRouter()
 
