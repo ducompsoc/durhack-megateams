@@ -89,7 +89,16 @@ export default class QRHandlers {
     if (!preset_id || !presets.has(preset_id) || !name) {
       throw new createHttpError.NotFound()
     }
-    const preset = presets.get(preset_id)!
+    const preset = presets.get(preset_id)
+
+    if (!preset) {
+      response.status(500)
+      response.json({
+        status: 500,
+        message: "Internal server error: preset not found",
+      })
+      return
+    }
 
     const publicised = z.boolean().parse(request.body.publicised)
 
