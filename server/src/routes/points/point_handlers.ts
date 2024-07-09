@@ -29,7 +29,7 @@ point_transform_factories.set("redeemer_id", value => {
   return { condition: { redeemer_id: parsed_value } }
 })
 
-class PointHandlers {
+export default class PointHandlers {
   /**
    * Handles a GET request to /points.
    * For transparency, returns a list of points in the database with their values and redeemer's ID.
@@ -146,6 +146,3 @@ class PointHandlers {
     response.json({ status: response.statusCode, message: "OK" })
   }
 }
-
-const PointHandlersInstance = new PointHandlers()
-export default PointHandlersInstance
