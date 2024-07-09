@@ -200,7 +200,7 @@ export default class QRHandlers {
 
     let fields
 
-    if (request.body.hasOwnProperty("publicised")) {
+    if (request.body.publicised) {
       fields = await this.getPublicisedFields(found_code.challenge_rank, request.body.publicised)
     }
 
