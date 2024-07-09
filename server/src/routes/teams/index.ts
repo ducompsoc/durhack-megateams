@@ -1,17 +1,17 @@
 import { Router as ExpressRouter } from "express"
 
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
-
-import handlers from "./teams_handlers"
+import TeamHandlers from "./teams_handlers"
 
 const teams_router = ExpressRouter()
+const handlers = new TeamHandlers()
 
 teams_router
   .route("/")
   .get(handlers.listTeamsAsAdmin, handlers.listTeamsAsAnonymous)
   .post(handlers.createTeamAsAdmin, handlers.createTeamAsHacker, handleFailedAuthentication)
 
-teams_router.route("/generate-name").get(handlers.generateTeamName).all(handleMethodNotAllowed)
+teams_router.route("/generate-name").get(handlers.generateTeamName.bind(handlers)).all(handleMethodNotAllowed)
 
 teams_router
   .route("/:team_id/memberships")

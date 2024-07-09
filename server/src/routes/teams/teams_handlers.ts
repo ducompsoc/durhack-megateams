@@ -14,7 +14,7 @@ import Area from "@server/database/tables/area"
 import Megateam from "@server/database/tables/megateam"
 import Point from "@server/database/tables/point"
 
-class TeamHandlers {
+export default class TeamHandlers {
   static join_code_schema = z
     .string()
     .length(4)
@@ -212,6 +212,3 @@ class TeamHandlers {
     throw new createHttpError.NotImplemented()
   }
 }
-
-const handlersInstance = new TeamHandlers()
-export default handlersInstance
