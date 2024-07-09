@@ -22,15 +22,6 @@ const presets = new Map<string, z.infer<typeof qr_preset_schema>>(
 const patch_fields = new Set(["state", "publicised"])
 
 export default class QRHandlers {
-  constructor() {
-    Object.getOwnPropertyNames(QRHandlers.prototype).forEach(key => {
-      if (key !== "constructor") {
-        // @ts-ignore
-        this[key] = this[key].bind(this)
-      }
-    })
-  }
-
   static createQRPayload = z.object({
     name: z.string(),
     category: z.nativeEnum(QRCategory),
