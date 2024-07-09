@@ -25,7 +25,7 @@ function getExpressApp(): Express {
   return app
 }
 
-async function main() {
+async function main(): Promise<void> {
   await ensureDatabaseExists()
 
   if (dev) {
