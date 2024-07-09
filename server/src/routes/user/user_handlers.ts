@@ -13,8 +13,14 @@ import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
 
 class UserHandlers {
   async getUser(this: void, request: Request, response: Response): Promise<void> {
-    const payload: User | { points: number } = request.user!.toJSON()
-    payload.points = Point.getPointsTotal(await request.user!.$get("points"))
+    if (!request.user) {
+      response.status(500)
+      response.json({ status: 500, message: "Internal server error: user not found" })
+      return
+    }
+
+    const payload: User | { points: number } = request.user.toJSON()
+    payload.points = Point.getPointsTotal(await request.user.$get("points"))
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
