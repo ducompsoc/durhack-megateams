@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String?
+  qrcodes  QRCode[] @relation("UserQRCodes") // Corrected relationship name
+}
+
+model QRCode {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], name: "UserQRCodes") // Corrected relationship name
+}
+
+model Area {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Megateam {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Point {
+  id    Int @id @default(autoincrement())
+  value Int
+}
+
+model Team {
+  id   Int    @id @default(autoincrement())
+  name String
+}

@@ -19,7 +19,8 @@
     "emitDecoratorMetadata": true,
     "paths": {
       "@server/*": ["./src/*"]
-    }
+    },
+    "types": ["node"]
   },
   "exclude": ["./dist", "./node_modules", "./__tests__"],
   "include": ["src"]
