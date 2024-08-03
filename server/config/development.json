@@ -1,12 +1,7 @@
 {
   "passport": {
     "oauth2": {
-      "clientID": "megateams",
-      "clientSecret": "the-best-ever-secret",
-      "authorizationURL": "http://localhost:9000/realms/durhack/protocol/openid-connect/auth",
-      "tokenURL": "http://localhost:9000/realms/durhack/protocol/openid-connect/token",
-      "callbackURL": "http://localhost:8090/api/auth/login/callback",
-      "profileURL": "http://localhost:9000/realms/durhack/protocol/openid-connect/userinfo"
+      "callbackURL": "http://localhost:8090/api/auth/login/callback"
     }
   },
   "megateams": {

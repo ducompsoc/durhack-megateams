@@ -3,7 +3,7 @@ import passport from "passport"
 import { VerifyCallback } from "passport-oauth2"
 import refresh from "passport-oauth2-refresh"
 
-import DurHackLiveOAuth2Strategy, { DurHackLiveProfile } from "@server/auth/strategy/oauth2/strategy"
+import KeycloakOAuth2Strategy, { KeycloakProfile } from "@server/auth/strategy/oauth2/strategy"
 import { oauth2_client_options_schema } from "@server/common/schema/config"
 import User from "@server/database/tables/user"
 
@@ -20,7 +20,7 @@ const oauth2_options = oauth2_client_options_schema.parse(config.get("passport.o
 async function oauth2VerifyFunction(
   accessToken: string,
   refreshToken: string,
-  profile: DurHackLiveProfile,
+  profile: KeycloakProfile,
   done: VerifyCallback,
 ) {
   const timestamp = new Date()
@@ -48,7 +48,7 @@ async function oauth2VerifyFunction(
   return done(null, user)
 }
 
-const oauth2_strategy = new DurHackLiveOAuth2Strategy(oauth2_options, oauth2VerifyFunction)
+const oauth2_strategy = new KeycloakOAuth2Strategy(oauth2_options, oauth2VerifyFunction)
 
 passport.use("oauth2", oauth2_strategy)
 refresh.use("oauth2", oauth2_strategy)
