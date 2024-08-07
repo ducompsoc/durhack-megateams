@@ -1,4 +1,6 @@
 import express, { Express } from "express"
+import { type Server, createServer } from "node:http"
+import { Server as SocketIO } from "socket.io"
 import passport from "passport"
 import config from "config"
 import * as process from "process"
@@ -6,6 +8,7 @@ import * as process from "process"
 import { listen_options_schema } from "@server/common/schema/config"
 
 import session from "./auth/session"
+import SocketManager from "./socket"
 import sequelize, { ensureDatabaseExists } from "./database"
 import api_router from "./routes"
 import "./auth"
@@ -25,6 +28,14 @@ function getExpressApp(): Express {
   return app
 }
 
+function getServer(app: Express): Server {
+  const server = createServer(app)
+  const io = new SocketIO(server)
+  SocketManager.initialise(io)
+
+  return server
+}
+
 async function main() {
   await ensureDatabaseExists()
 
@@ -36,10 +47,11 @@ async function main() {
   }
 
   const app = getExpressApp()
+  const server = getServer(app)
 
   const listen = listen_options_schema.parse(config.get("listen"))
 
-  app.listen(listen.port, listen.host, () => {
+  server.listen(listen.port, listen.host, () => {
     console.log(`> Server listening on http://${listen.host}:${listen.port} as ${dev ? "development" : environment}`)
   })
 }
