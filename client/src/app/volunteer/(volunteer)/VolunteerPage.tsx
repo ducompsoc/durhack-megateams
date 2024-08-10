@@ -12,6 +12,7 @@ import Manage from "./Manage";
 import { useMediaQuery } from "react-responsive";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
+import { socketManager } from "@/app/lib/socket";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
@@ -56,9 +57,15 @@ export default function Volunteer() {
     });
   }
 
-  function displayQR(name: string, url: string, category: string) {
-    setQR({ name, url, category, preset: category === "preset" });
-    setOpen(true);
+  async function displayQR(name: string, url: string, category: string) {
+    // Should use socket to subscribe to QR updates
+    if (await socketManager.ensureConnected()) {
+      console.log("Socket is authenticated")
+      // setQR({ name, url, category, preset: category === "preset" });
+      // setOpen(true);
+    } else {
+      console.log("Failed to get socket")
+    }
   }
 
   const tabs = [

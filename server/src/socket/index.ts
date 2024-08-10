@@ -22,7 +22,7 @@ class SocketConnection {
     this.socket.on("disconnect", this.onDisconnect.bind(this))
   }
 
-  private async onAuthenticate(token: unknown, cb: (err: string | null) => void) {
+  private async onAuthenticate(token: unknown, cb: (res: boolean) => void) {
     if (this.connectedUser) return
     if (typeof token !== "string" || typeof cb !== "function") return
 
@@ -30,7 +30,7 @@ class SocketConnection {
     try {
       decodedPayload = (await TokenVault.decodeToken(TokenType.accessToken, token)).payload
     } catch (error) {
-      return cb("Auth failed.")
+      return cb(false)
     }
 
     let user: User
@@ -38,14 +38,14 @@ class SocketConnection {
     try {
       ;({ user, scope } = await TokenVault.getUserAndScopeClaims(decodedPayload))
     } catch (error) {
-      return cb("Auth failed.")
+      return cb(false)
     }
 
-    if (!scope.includes("socket:state")) return cb("Auth failed.")
+    if (!scope.includes("socket:state")) return cb(false)
 
     this.connectedUser = user
 
-    cb(null)
+    cb(true)
   }
 
   private onDisconnect() {

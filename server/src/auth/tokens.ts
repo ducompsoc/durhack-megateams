@@ -10,14 +10,12 @@ function resolveFilePathFromProjectRoot(path_to_resolve: string): string {
 }
 
 export default await getTokenVault<User>({
-  getUserIdentifier: (user: User) => user.id,
+  getUserIdentifier: (user: User) => user.id.toString(),
   findUniqueUser: async (userId: unknown) => {
-    if (typeof userId !== "number") return null
-    return await User.findOne({
-      where: {
-        id: userId,
-      },
-    })
+    if (typeof userId !== "string") return null
+    const id = parseInt(userId)
+    if (isNaN(id)) return null
+    return await User.findOne({ where: { id } })
   },
   filePathResolver: resolveFilePathFromProjectRoot,
   ...tokenVaultOptionsSchema.parse(config.get("jwt")),
