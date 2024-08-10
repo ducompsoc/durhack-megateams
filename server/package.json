@@ -36,7 +36,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@durhack/token-vault": "^0.1.1",
+    "@durhack/token-vault": "^0.1.2",
     "@types/crypto-js": "^4.1.2",
     "body-parser": "github:expressjs/body-parser#2.x",
     "config": "^3.3.9",
