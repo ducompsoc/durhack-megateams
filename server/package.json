@@ -37,6 +37,7 @@
   "type": "module",
   "dependencies": {
     "@prisma/client": "^5.18.0",
+    "@durhack/token-vault": "^0.1.2",
     "@types/crypto-js": "^4.1.2",
     "body-parser": "github:expressjs/body-parser#2.x",
     "config": "^3.3.9",
@@ -59,6 +60,7 @@
     "passport-oauth2-refresh": "^2.2.0",
     "sequelize": "^6.32.1",
     "sequelize-typescript": "^2.1.5",
+    "socket.io": "^4.7.5",
     "unique-names-generator": "^4.7.1",
     "uuid": "^9.0.0",
     "zod": "^3.22.2"
