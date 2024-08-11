@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Area {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Areas {
+  area_id       Int       @id @default(autoincrement())
+  megateam_id   Int
+  area_name     String    @db.VarChar(255)
+  area_location String    @db.VarChar(255)
+  createdAt     DateTime  @db.DateTime(0)
+  updatedAt     DateTime  @db.DateTime(0)
+  Megateams     Megateams @relation(fields: [megateam_id], references: [megateam_id], onDelete: NoAction, map: "Areas_ibfk_1")
+  Teams         Teams[]
+
+  @@index([megateam_id], map: "megateam_id")
+}
+
+model Megateam {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Megateams {
+  megateam_id          Int      @id @default(autoincrement())
+  megateam_name        String   @db.VarChar(255)
+  megateam_description String?  @db.VarChar(255)
+  createdAt            DateTime @db.DateTime(0)
+  updatedAt            DateTime @db.DateTime(0)
+  Areas                Areas[]
+}
+
+model Point {
+  id    Int @id @default(autoincrement())
+  value Int
+}
+
+model Points {
+  point_id         Int      @id @default(autoincrement())
+  value            Int
+  origin_qrcode_id Int?
+  redeemer_id      Int
+  createdAt        DateTime @db.DateTime(0)
+  updatedAt        DateTime @db.DateTime(0)
+  QRCodes          QRCodes? @relation(fields: [origin_qrcode_id], references: [qrcode_id], map: "Points_ibfk_1")
+  Users            Users    @relation(fields: [redeemer_id], references: [user_id], onDelete: Cascade, map: "Points_ibfk_2")
+
+  @@index([origin_qrcode_id], map: "origin_qrcode_id")
+  @@index([redeemer_id], map: "redeemer_id")
+}
+
+model QRCode {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  userId    Int
+  User      User    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "QRCode_userId_fkey")
+}
+
+model QRCodes {
+  qrcode_id      Int              @id @default(autoincrement())
+  name           String           @db.VarChar(255)
+  category       QRCodes_category @default(workshop)
+  payload        String           @db.VarChar(255)
+  points_value   Int
+  max_uses       Int?
+  state          Boolean
+  start_time     DateTime         @db.DateTime(0)
+  expiry_time    DateTime         @db.DateTime(0)
+  creator_id     Int
+  challenge_rank Int?             @unique(map: "challenge_rank")
+  createdAt      DateTime         @db.DateTime(0)
+  updatedAt      DateTime         @db.DateTime(0)
+  Points         Points[]
+  Users          Users            @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "QRCodes_ibfk_1")
+
+  @@index([creator_id], map: "creator_id")
+}
+
+model Team {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Teams {
+  team_id            Int      @id @default(autoincrement())
+  join_code          Int      @unique(map: "join_code")
+  discord_channel_id String?  @db.VarChar(255)
+  team_name          String   @unique(map: "team_name") @db.VarChar(255)
+  area_id            Int?
+  createdAt          DateTime @db.DateTime(0)
+  updatedAt          DateTime @db.DateTime(0)
+  Areas              Areas?   @relation(fields: [area_id], references: [area_id], map: "Teams_ibfk_1")
+  Users              Users[]
+
+  @@index([area_id], map: "area_id")
+}
+
+model User {
+  id     Int      @id @default(autoincrement())
+  email  String   @unique
+  name   String?
+  QRCode QRCode[]
+}
+
+model Users {
+  user_id                Int        @id @default(autoincrement())
+  team_id                Int?
+  email                  String     @unique(map: "email") @db.VarChar(255)
+  preferred_name         String     @db.VarChar(255)
+  role                   Users_role @default(hacker)
+  initially_logged_in_at DateTime?  @db.DateTime(0)
+  last_logged_in_at      DateTime?  @db.DateTime(0)
+  createdAt              DateTime   @db.DateTime(0)
+  updatedAt              DateTime   @db.DateTime(0)
+  Points                 Points[]
+  QRCodes                QRCodes[]
+  Teams                  Teams?     @relation(fields: [team_id], references: [team_id], map: "Users_ibfk_1")
+
+  @@index([team_id], map: "team_id")
+}
+
+enum QRCodes_category {
+  workshop
+  sponsor
+  challenge
+  preset
+}
+
+enum Users_role {
+  hacker
+  sponsor
+  volunteer
+  admin
+}
