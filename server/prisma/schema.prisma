@@ -17,8 +17,8 @@ model Areas {
   megateam_id   Int
   area_name     String    @db.VarChar(255)
   area_location String    @db.VarChar(255)
-  createdAt     DateTime  @db.DateTime(0)
-  updatedAt     DateTime  @db.DateTime(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   Megateams     Megateams @relation(fields: [megateam_id], references: [megateam_id], onDelete: NoAction, map: "Areas_ibfk_1")
   Teams         Teams[]
 
@@ -34,8 +34,8 @@ model Megateams {
   megateam_id          Int      @id @default(autoincrement())
   megateam_name        String   @db.VarChar(255)
   megateam_description String?  @db.VarChar(255)
-  createdAt            DateTime @db.DateTime(0)
-  updatedAt            DateTime @db.DateTime(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
   Areas                Areas[]
 }
 
@@ -49,8 +49,8 @@ model Points {
   value            Int
   origin_qrcode_id Int?
   redeemer_id      Int
-  createdAt        DateTime @db.DateTime(0)
-  updatedAt        DateTime @db.DateTime(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   QRCodes          QRCodes? @relation(fields: [origin_qrcode_id], references: [qrcode_id], map: "Points_ibfk_1")
   Users            Users    @relation(fields: [redeemer_id], references: [user_id], onDelete: Cascade, map: "Points_ibfk_2")
 
@@ -81,8 +81,8 @@ model QRCodes {
   expiry_time    DateTime         @db.DateTime(0)
   creator_id     Int
   challenge_rank Int?             @unique(map: "challenge_rank")
-  createdAt      DateTime         @db.DateTime(0)
-  updatedAt      DateTime         @db.DateTime(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   Points         Points[]
   Users          Users            @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "QRCodes_ibfk_1")
 
@@ -100,8 +100,8 @@ model Teams {
   discord_channel_id String?  @db.VarChar(255)
   team_name          String   @unique(map: "team_name") @db.VarChar(255)
   area_id            Int?
-  createdAt          DateTime @db.DateTime(0)
-  updatedAt          DateTime @db.DateTime(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
   Areas              Areas?   @relation(fields: [area_id], references: [area_id], map: "Teams_ibfk_1")
   Users              Users[]
 
@@ -123,8 +123,8 @@ model Users {
   role                   Users_role @default(hacker)
   initially_logged_in_at DateTime?  @db.DateTime(0)
   last_logged_in_at      DateTime?  @db.DateTime(0)
-  createdAt              DateTime   @db.DateTime(0)
-  updatedAt              DateTime   @db.DateTime(0)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
   Points                 Points[]
   QRCodes                QRCodes[]
   Teams                  Teams?     @relation(fields: [team_id], references: [team_id], map: "Users_ibfk_1")
