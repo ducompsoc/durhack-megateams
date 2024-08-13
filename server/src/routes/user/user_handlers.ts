@@ -18,7 +18,7 @@ class UserHandlers {
 
     const userId = request.user!.id;
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: {user_id: userId },
       include: {Points: true }
     });

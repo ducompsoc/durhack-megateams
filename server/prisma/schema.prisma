@@ -8,68 +8,42 @@ datasource db {
 }
 
 model Area {
-  id   Int    @id @default(autoincrement())
-  name String
-}
-
-model Areas {
   area_id       Int       @id @default(autoincrement())
   megateam_id   Int
   area_name     String    @db.VarChar(255)
   area_location String    @db.VarChar(255)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  Megateams     Megateams @relation(fields: [megateam_id], references: [megateam_id], onDelete: NoAction, map: "Areas_ibfk_1")
-  Teams         Teams[]
+  Megateam      Megateam  @relation(fields: [megateam_id], references: [megateam_id], onDelete: NoAction, map: "Areas_ibfk_1")
+  Team          Team[]
 
   @@index([megateam_id], map: "megateam_id")
 }
 
 model Megateam {
-  id   Int    @id @default(autoincrement())
-  name String
-}
-
-model Megateams {
   megateam_id          Int      @id @default(autoincrement())
   megateam_name        String   @db.VarChar(255)
   megateam_description String?  @db.VarChar(255)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
-  Areas                Areas[]
+  Area                 Area[]
 }
 
 model Point {
-  id    Int @id @default(autoincrement())
-  value Int
-}
-
-model Points {
   point_id         Int      @id @default(autoincrement())
   value            Int
   origin_qrcode_id Int?
   redeemer_id      Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  QRCodes          QRCodes? @relation(fields: [origin_qrcode_id], references: [qrcode_id], map: "Points_ibfk_1")
-  Users            Users    @relation(fields: [redeemer_id], references: [user_id], onDelete: Cascade, map: "Points_ibfk_2")
+  QRCode           QRCode?  @relation(fields: [origin_qrcode_id], references: [qrcode_id], map: "Points_ibfk_1")
+  User             User     @relation(fields: [redeemer_id], references: [user_id], onDelete: Cascade, map: "Points_ibfk_2")
 
   @@index([origin_qrcode_id], map: "origin_qrcode_id")
   @@index([redeemer_id], map: "redeemer_id")
 }
 
 model QRCode {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  userId    Int
-  User      User    @relation(fields: [userId], references: [id])
-
-  @@index([userId], map: "QRCode_userId_fkey")
-}
-
-model QRCodes {
   qrcode_id      Int              @id @default(autoincrement())
   name           String           @db.VarChar(255)
   category       QRCodes_category @default(workshop)
@@ -83,18 +57,14 @@ model QRCodes {
   challenge_rank Int?             @unique(map: "challenge_rank")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  Points         Points[]
-  Users          Users            @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "QRCodes_ibfk_1")
+  Points         Point[]          
+  User           User             @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "QRCodes_ibfk_1")
 
   @@index([creator_id], map: "creator_id")
 }
 
-model Team {
-  id   Int    @id @default(autoincrement())
-  name String
-}
 
-model Teams {
+model Team {
   team_id            Int      @id @default(autoincrement())
   join_code          Int      @unique(map: "join_code")
   discord_channel_id String?  @db.VarChar(255)
@@ -102,20 +72,13 @@ model Teams {
   area_id            Int?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-  Areas              Areas?   @relation(fields: [area_id], references: [area_id], map: "Teams_ibfk_1")
-  Users              Users[]
+  Area               Area?    @relation(fields: [area_id], references: [area_id], map: "Teams_ibfk_1")
+  User               User[]
 
   @@index([area_id], map: "area_id")
 }
 
 model User {
-  id     Int      @id @default(autoincrement())
-  email  String   @unique
-  name   String?
-  QRCode QRCode[]
-}
-
-model Users {
   user_id                Int        @id @default(autoincrement())
   team_id                Int?
   email                  String     @unique(map: "email") @db.VarChar(255)
@@ -125,9 +88,9 @@ model Users {
   last_logged_in_at      DateTime?  @db.DateTime(0)
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
-  Points                 Points[]
-  QRCodes                QRCodes[]
-  Teams                  Teams?     @relation(fields: [team_id], references: [team_id], map: "Users_ibfk_1")
+  Points                 Point[]    
+  QRCodes                QRCode[]   
+  Team                   Team?      @relation(fields: [team_id], references: [team_id], map: "Users_ibfk_1")
 
   @@index([team_id], map: "team_id")
 }
