@@ -15,9 +15,22 @@ import prisma from '@server/database/prisma';
 
 class UserHandlers {
   async getUser(request: Request, response: Response) {
-    const payload: User | { points: number } = request.user!.toJSON()
-    payload.points = Point.getPointsTotal(await request.user!.$get("points"))
 
+    const userId = request.user!.id;
+
+    const user = await prisma.users.findUnique({
+      where: {user_id: userId },
+      include: {Points: true }
+    });
+
+    let payload;
+
+    if (user) {
+      const totalPoints = user.Points?.reduce((total, point) => total + point.value, 0) || 0;
+      payload = { ...user, points: totalPoints };
+    } else {
+      payload = { points: 0 };
+    }
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
