@@ -11,10 +11,13 @@ import Team from "@server/database/tables/team"
 import { NullError } from "@server/common/errors"
 import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
 
+import prisma from '@server/database/prisma';
+
 class UserHandlers {
   async getUser(request: Request, response: Response) {
     const payload: User | { points: number } = request.user!.toJSON()
     payload.points = Point.getPointsTotal(await request.user!.$get("points"))
+
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
