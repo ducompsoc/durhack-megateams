@@ -10,6 +10,7 @@ import Megateam from "@server/database/tables/megateam"
 import Team from "@server/database/tables/team"
 import { NullError } from "@server/common/errors"
 import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
+import { getTotalPoint } from "@server/common/decorators"
 
 import prisma from '@server/database/prisma';
 
@@ -23,14 +24,7 @@ class UserHandlers {
       include: {Points: true }
     });
 
-    let payload;
-
-    if (user) {
-      const totalPoints = user.Points?.reduce((total, point) => total + point.value, 0) || 0;
-      payload = { ...user, points: totalPoints };
-    } else {
-      payload = { points: 0 };
-    }
+    const payload = getTotalPoint(user);
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
