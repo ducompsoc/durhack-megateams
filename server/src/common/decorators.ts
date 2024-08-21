@@ -83,15 +83,3 @@ export function userIsSelf(request: Request, response: Response): boolean {
  * Decorator that ensures a user is trying to access/modify themselves, not some other person.
  */
 export const requireSelf = requireCondition(userIsSelf)
-
-/**
- * Retrieves the total points of a user from the database or returns 0 if the user is not found.
- */
-export function getTotalPoint(user: any) {
-  if (user) {
-    const totalPoints = user.Points?.reduce((total: number, point: {value : number}) => total + point.value, 0) || 0;
-    return { ...user, points: totalPoints };
-  } else {
-    return { points: 0 };
-  }
-}
