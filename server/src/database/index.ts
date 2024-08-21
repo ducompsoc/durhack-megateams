@@ -11,7 +11,7 @@ import { User, Team, Area, Megateam, Point, QRCode } from "./tables"
 
 export interface SequelizeQueryTransform<M extends Model> {
   condition: WhereOptions<Attributes<M>>
-  replacements?: Map<string, string>
+  replacements?: Map<string, string> 
   orders?: OrderItem[]
 }
 

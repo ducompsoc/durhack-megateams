@@ -8,16 +8,16 @@ datasource db {
 }
 
 model Area {
-  area_id       Int       @id @default(autoincrement())
+  area_id       Int      @id @default(autoincrement())
   megateam_id   Int
-  area_name     String    @db.VarChar(255)
-  area_location String    @db.VarChar(255)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  Megateam      Megateam  @relation(fields: [megateam_id], references: [megateam_id], onDelete: NoAction, map: "Areas_ibfk_1")
+  area_name     String   @db.VarChar(255)
+  area_location String   @db.VarChar(255)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  Megateam      Megateam @relation(fields: [megateam_id], references: [megateam_id], onDelete: NoAction, map: "FK_Area_Megateam")
   Team          Team[]
 
-  @@index([megateam_id], map: "megateam_id")
+  @@index([megateam_id], map: "IDX_Area_megateam_id")
 }
 
 model Megateam {
@@ -36,11 +36,11 @@ model Point {
   redeemer_id      Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  QRCode           QRCode?  @relation(fields: [origin_qrcode_id], references: [qrcode_id], map: "Points_ibfk_1")
-  User             User     @relation(fields: [redeemer_id], references: [user_id], onDelete: Cascade, map: "Points_ibfk_2")
+  QRCode           QRCode?  @relation(fields: [origin_qrcode_id], references: [qrcode_id], map: "FK_Point_QRCode")
+  User             User     @relation(fields: [redeemer_id], references: [user_id], onDelete: Cascade, map: "FK_Point_User")
 
-  @@index([origin_qrcode_id], map: "origin_qrcode_id")
-  @@index([redeemer_id], map: "redeemer_id")
+  @@index([origin_qrcode_id], map: "IDX_Point_origin_qrcode_id")
+  @@index([redeemer_id], map: "IDX_Point_redeemer_id")
 }
 
 model QRCode {
@@ -54,34 +54,33 @@ model QRCode {
   start_time     DateTime         @db.DateTime(0)
   expiry_time    DateTime         @db.DateTime(0)
   creator_id     Int
-  challenge_rank Int?             @unique(map: "challenge_rank")
+  challenge_rank Int?             @unique(map: "UQ_QRCode_challenge_rank")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   Points         Point[]          
-  User           User             @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "QRCodes_ibfk_1")
+  User           User             @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "FK_QRCode_User")
 
-  @@index([creator_id], map: "creator_id")
+  @@index([creator_id], map: "IDX_QRCode_creator_id")
 }
-
 
 model Team {
   team_id            Int      @id @default(autoincrement())
-  join_code          Int      @unique(map: "join_code")
+  join_code          Int      @unique(map: "UQ_Team_join_code")
   discord_channel_id String?  @db.VarChar(255)
-  team_name          String   @unique(map: "team_name") @db.VarChar(255)
+  team_name          String   @unique(map: "UQ_Team_team_name") @db.VarChar(255)
   area_id            Int?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-  Area               Area?    @relation(fields: [area_id], references: [area_id], map: "Teams_ibfk_1")
+  Area               Area?    @relation(fields: [area_id], references: [area_id], map: "FK_Team_Area")
   User               User[]
 
-  @@index([area_id], map: "area_id")
+  @@index([area_id], map: "IDX_Team_area_id")
 }
 
 model User {
   user_id                Int        @id @default(autoincrement())
   team_id                Int?
-  email                  String     @unique(map: "email") @db.VarChar(255)
+  email                  String     @unique(map: "UQ_User_email") @db.VarChar(255)
   preferred_name         String     @db.VarChar(255)
   role                   Users_role @default(hacker)
   initially_logged_in_at DateTime?  @db.DateTime(0)
@@ -90,9 +89,9 @@ model User {
   updatedAt              DateTime   @updatedAt
   Points                 Point[]    
   QRCodes                QRCode[]   
-  Team                   Team?      @relation(fields: [team_id], references: [team_id], map: "Users_ibfk_1")
+  Team                   Team?      @relation(fields: [team_id], references: [team_id], map: "FK_User_Team")
 
-  @@index([team_id], map: "team_id")
+  @@index([team_id], map: "IDX_User_team_id")
 }
 
 enum QRCodes_category {
