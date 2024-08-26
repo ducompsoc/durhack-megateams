@@ -112,7 +112,7 @@ class UserHandlers {
       throw new createHttpError.Conflict();
     }
 
-    const updatedUser = await prisma.user.update({
+    const updateUser = await prisma.user.update({
       where: { user_id: request.user!.id },
       data: { team_id: team.team_id }
     });
@@ -125,15 +125,21 @@ class UserHandlers {
 
   async leaveTeam(request: Request, response: Response) {
     
-    const user = request.user as User
+    const user = await prisma.user!.findUnique({
+      where: { user_id: request.user!.id },
+      include: { Team: true }
+    });
 
-    const team = await user.$get("team")
+    const team = user?.Team
 
     if (!team) {
       throw new createHttpError.NotFound("You are not in a team!")
     }
 
-    await user.$set("team", null)
+    const updateUser = await prisma.user.update({
+      where: { user_id: request.user!.id },
+      data: { team_id: null }
+    })
 
     response.json({
       status: 200,
