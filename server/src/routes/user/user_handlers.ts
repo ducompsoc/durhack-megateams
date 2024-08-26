@@ -45,31 +45,33 @@ class UserHandlers {
   }
 
   async getTeam(request: Request, response: Response) {
-    const team = await (request.user as User).$get("team", {
-      include: [
-        {
-          model: User,
-          include: [Point],
+
+    const userData = await prisma.user.findUnique({
+      where: { user_id: request.user!.id },
+      include: {
+        Team: {
+          include: {
+            User: { include: { Points: true } },
+            Area: { include: { Megateam: true } },
+          },
         },
-        {
-          model: Area,
-          include: [Megateam],
-        },
-      ],
-    })
+      },
+    });
+
+    const team = userData?.Team
 
     if (!team) {
       throw new createHttpError.NotFound("You are not in a team!")
     }
 
     const payload = {
-      name: team.name,
+      name: team.team_name,
       members:
-        team.members!.map(member => ({
-          name: member.preferred_name,
-          points: Point.getPointsTotal(member.points || []),
+        team.User!.map(User => ({
+          name: User.preferred_name,
+          points: prisma.user.getTotalPoints(userData.user_id),
         })) || [],
-      megateam_name: team.area?.megateam.name || null,
+      megateam_name: team.Area?.Megateam?.megateam_name || null,
       join_code: team.join_code,
     }
 
