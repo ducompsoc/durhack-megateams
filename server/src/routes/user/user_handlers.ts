@@ -89,24 +89,34 @@ class UserHandlers {
     .refine(val => !isNaN(val))
 
   async joinTeam(request: Request, response: Response) {
-    const user = request.user as User
 
-    if (await user.$get("team")) {
+    const user = await prisma.user!.findUnique({
+      where: { user_id: request.user!.id },
+      include: { Team: true }
+    });
+    
+    if (user?.Team) {
       throw new createHttpError.Conflict("You are already in a team!")
     }
 
     const provided_join_code = UserHandlers.join_code_schema.parse(request.body.join_code)
-    const team = await Team.findOne({
-      where: { join_code: provided_join_code },
-      rejectOnEmpty: new NullError(),
+    const team = await prisma.team.findUnique({
+      where: { join_code: provided_join_code }
     })
 
-    if (!(await team.isJoinable())) {
-      throw new createHttpError.Conflict()
+    if (!team) {
+      throw new createHttpError.NotFound('Team not found')
     }
 
-    await user.$set("team", team)
+    if (!(await prisma.team.isJoinableTeam(team.team_id))) {
+      throw new createHttpError.Conflict();
+    }
 
+    const updatedUser = await prisma.user.update({
+      where: { user_id: request.user!.id },
+      data: { team_id: team.team_id }
+    });
+    
     response.json({
       status: 200,
       message: "OK",
@@ -114,6 +124,7 @@ class UserHandlers {
   }
 
   async leaveTeam(request: Request, response: Response) {
+    
     const user = request.user as User
 
     const team = await user.$get("team")
