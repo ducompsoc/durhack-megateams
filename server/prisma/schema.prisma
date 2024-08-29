@@ -51,8 +51,8 @@ model QRCode {
   points_value   Int
   max_uses       Int?
   state          Boolean
-  start_time     DateTime         @db.DateTime(0)
-  expiry_time    DateTime         @db.DateTime(0)
+  start_time     DateTime
+  expiry_time    DateTime
   creator_id     Int
   challenge_rank Int?             @unique(map: "UQ_QRCode_challenge_rank")
   createdAt      DateTime         @default(now())
@@ -83,8 +83,8 @@ model User {
   email                  String     @unique(map: "UQ_User_email") @db.VarChar(255)
   preferred_name         String     @db.VarChar(255)
   role                   Users_role @default(hacker)
-  initially_logged_in_at DateTime?  @db.DateTime(0)
-  last_logged_in_at      DateTime?  @db.DateTime(0)
+  initially_logged_in_at DateTime?
+  last_logged_in_at      DateTime?
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
   Points                 Point[]
