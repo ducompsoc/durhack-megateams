@@ -9,8 +9,13 @@ import type { Middleware, Request, Response } from "@server/types"
 class UserHandlers {
   getUser(): Middleware {
     return async (request, response) => {
-      const payload = request.user!
-      payload.points = await prisma.user.getTotalPoints(request.user!.id);
+      const payload = {
+        id: request.user!.id,
+        email: request.user!.email,
+        preferred_name: request.user!.preferred_name,
+        role: request.user!.role,
+        points: await prisma.user.getTotalPoints(request.user!.id),
+      }
   
       response.status(200)
       response.json({ status: response.statusCode, message: "OK", data: payload })
@@ -21,19 +26,12 @@ class UserHandlers {
     return async (request, response) => {
       const parsed_payload = patch_user_payload_schema.parse(request.body)
 
-      try {
-        await prisma.user.update({
-          where: {
-            user_id: request.user!.id,
-          },
-          data: parsed_payload
-        })
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientValidationError) {
-          throw new createHttpError.BadRequest(error.message)
-        }
-        throw error
-      }
+      await prisma.user.update({
+        where: {
+          user_id: request.user!.id,
+        },
+        data: parsed_payload
+      })
 
       response.status(200)
       response.json({status: response.statusCode, message: "OK"})
@@ -63,7 +61,7 @@ class UserHandlers {
       const payload = {
         name: team.team_name,
         members:
-          team.Members!.map(member => ({
+          team.Members.map(member => ({
             name: member.preferred_name,
             points: prisma.user.getTotalPoints(userData.user_id),
           })) || [],
@@ -82,12 +80,12 @@ class UserHandlers {
   static join_code_schema = z
     .string()
     .length(4)
-    .transform(val => parseInt(val, 16))
-    .refine(val => !isNaN(val))
+    .transform(val => Number.parseInt(val, 16))
+    .refine(val => !Number.isNaN(val))
 
   joinTeam(): Middleware {
     return async (request: Request, response: Response) => {
-      const user = await prisma.user!.findUnique({
+      const user = await prisma.user.findUnique({
         where: {user_id: request.user!.id},
         include: {Team: true}
       });
@@ -123,7 +121,7 @@ class UserHandlers {
 
   leaveTeam(): Middleware {
     return async (request, response) => {
-      const user = await prisma.user!.findUnique({
+      const user = await prisma.user.findUnique({
         where: {user_id: request.user!.id},
         include: {Team: true}
       });
