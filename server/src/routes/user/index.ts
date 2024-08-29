@@ -3,7 +3,7 @@ import createHttpError from "http-errors"
 
 import { handleMethodNotAllowed } from "@server/common/middleware"
 
-import handlers from "./user_handlers"
+import { userHandlers } from "./user_handlers"
 
 const users_router = ExpressRouter()
 
@@ -15,13 +15,16 @@ users_router.use((request: Request, response: Response, next: NextFunction) => {
   next()
 })
 
-users_router.route("/").get(handlers.getUser).patch(handlers.patchUserDetails).all(handleMethodNotAllowed)
+users_router.route("/")
+  .get(userHandlers.getUser())
+  .patch(userHandlers.patchUserDetails())
+  .all(handleMethodNotAllowed)
 
 users_router
   .route("/team")
-  .get(handlers.getTeam)
-  .post(handlers.joinTeam)
-  .delete(handlers.leaveTeam)
+  .get(userHandlers.getTeam())
+  .post(userHandlers.joinTeam())
+  .delete(userHandlers.leaveTeam())
   .all(handleMethodNotAllowed)
 
 export default users_router
