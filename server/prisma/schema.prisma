@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -57,7 +57,7 @@ model QRCode {
   challenge_rank Int?             @unique(map: "UQ_QRCode_challenge_rank")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  Points         Point[]          
+  Points         Point[]
   User           User             @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, map: "FK_QRCode_User")
 
   @@index([creator_id], map: "IDX_QRCode_creator_id")
@@ -72,7 +72,7 @@ model Team {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   Area               Area?    @relation(fields: [area_id], references: [area_id], map: "FK_Team_Area")
-  Members               User[]
+  Members            User[]
 
   @@index([area_id], map: "IDX_Team_area_id")
 }
@@ -87,8 +87,8 @@ model User {
   last_logged_in_at      DateTime?  @db.DateTime(0)
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
-  Points                 Point[]    
-  QRCodes                QRCode[]   
+  Points                 Point[]
+  QRCodes                QRCode[]
   Team                   Team?      @relation(fields: [team_id], references: [team_id], map: "FK_User_Team")
 
   @@index([team_id], map: "IDX_User_team_id")
