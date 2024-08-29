@@ -13,11 +13,12 @@ import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
 import prisma from '@server/database/prisma';
 import { Prisma } from "@prisma/client"
 
+
 class UserHandlers {
   async getUser(request: Request, response: Response) {
  
-    const userId = request.user!.id;
-    const payload = await prisma.user.getTotalPoints(userId)
+    const payload = request.user!
+    payload.points = await prisma.user.getTotalPoints(request.user!.id);
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
@@ -51,7 +52,7 @@ class UserHandlers {
       include: {
         Team: {
           include: {
-            User: { include: { Points: true } },
+            Members: { include: { Points: true } },
             Area: { include: { Megateam: true } },
           },
         },
@@ -67,11 +68,11 @@ class UserHandlers {
     const payload = {
       name: team.team_name,
       members:
-        team.User!.map(User => ({
-          name: User.preferred_name,
+        team.Members!.map(member => ({
+          name: member.preferred_name,
           points: prisma.user.getTotalPoints(userData.user_id),
         })) || [],
-      megateam_name: team.Area?.Megateam?.megateam_name || null,
+      megateam_name: team.Area?.Megateam.megateam_name || null,
       join_code: team.join_code,
     }
 

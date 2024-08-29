@@ -72,7 +72,7 @@ model Team {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   Area               Area?    @relation(fields: [area_id], references: [area_id], map: "FK_Team_Area")
-  User               User[]
+  Members               User[]
 
   @@index([area_id], map: "IDX_Team_area_id")
 }
