@@ -47,7 +47,7 @@ model QrCode {
   qrCodeId      Int              @id @default(autoincrement()) @map("qr_code_id")
   name          String           @db.VarChar(255)
   category      QRCodes_category @default(workshop)
-  payload       String           @db.VarChar(255)
+  payload       String           @unique @db.Uuid
   pointsValue   Int              @map("points_value")
   maxUses       Int?             @map("max_uses")
   state         Boolean
