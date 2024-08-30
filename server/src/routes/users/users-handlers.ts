@@ -6,7 +6,7 @@ import type { Request, Response, Middleware } from "@server/types"
 import { NullError, ValueError } from "@server/common/errors"
 import { requireUserIsAdmin, requireSelf } from "@server/common/decorators"
 import { UserRole } from "@server/common/model_enums"
-import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database"
+import { buildQueryFromRequest, type SequelizeQueryTransformFactory } from "@server/database"
 import User from "@server/database/tables/user"
 import Team from "@server/database/tables/team"
 import Point from "@server/database/tables/point"
@@ -42,21 +42,9 @@ const create_user_payload_schema = z.object({
 export const patch_user_payload_schema = create_user_payload_schema.partial()
 
 class UsersHandlers {
-  constructor() {
-    Object.getOwnPropertyNames(UsersHandlers.prototype).forEach(key => {
-      if (key !== "constructor") {
-        // @ts-ignore
-        this[key] = this[key].bind(this)
-      }
-    })
-  }
-
   /**
    * Handles an unauthenticated or non-admin GET request to /users.
    * Returns a list of user IDs and preferred names that cannot be filtered.
-   *
-   * @param request
-   * @param response
    */
   getUsersListDefault(): Middleware { 
     return async (request: Request, response: Response): Promise<void> => {
@@ -82,7 +70,7 @@ class UsersHandlers {
    */
   @requireUserIsAdmin()
   getUsersListAsAdmin(): Middleware { 
-    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+    return async (request: Request, response: Response): Promise<void> => {
       const result = await User.findAll({
         attributes: [["user_id", "id"], "preferred_name", "email"],
         include: [
@@ -128,13 +116,13 @@ class UsersHandlers {
    */
   @requireUserIsAdmin()
   createUserAsAdmin(): Middleware { 
-    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+    return async (request: Request, response: Response): Promise<void> => {
       const invalid_fields = Object.keys(request.body).filter(key => !allowed_create_fields.has(key))
       if (invalid_fields.length > 0) {
         throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
       }
 
-      let new_instance
+      let new_instance: User
       try {
         new_instance = await User.create(request.body)
       } catch (error) {
@@ -209,7 +197,7 @@ class UsersHandlers {
    */
   @requireUserIsAdmin()
   getUserDetailsAsAdmin(): Middleware { 
-    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+    return async (request: Request, response: Response): Promise<void> => {
       await this.doGetAllUserDetails(request, response)
     }
   }
@@ -220,13 +208,13 @@ class UsersHandlers {
    */
   @requireSelf()
   getMyUserDetails(): Middleware { 
-    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+    return async (request: Request, response: Response): Promise<void> => {
       await this.doGetAllUserDetails(request, response)
     }
   }
 
   static getPatchHandler(payload_schema: z.Schema) {
-    return async function (request: Request, response: Response): Promise<void> {
+    return async (request: Request, response: Response): Promise<void> => {
       const { user_id } = response.locals
       if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
@@ -253,14 +241,10 @@ class UsersHandlers {
   /**
    * Handles an authenticated admin POST request to /users/:id.
    * Allows editing of all fields excluding password.
-   *
-   * @param request
-   * @param response
-   * @param next
    */
   @requireUserIsAdmin()
   patchUserDetailsAsAdmin(): Middleware { 
-    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+    return async (request: Request, response: Response): Promise<void> => {
       await UsersHandlers.getPatchHandler(patch_user_payload_schema)(request, response)
     }
   }
@@ -268,10 +252,6 @@ class UsersHandlers {
   /**
    * Handles an authenticated hacker self POST request to /users/:id.
    * Allows editing of all MLH fields, email, etc.
-   *
-   * @param request
-   * @param response
-   * @param next
    */
   @requireSelf()
   patchMyUserDetails(): Middleware { 
@@ -283,14 +263,10 @@ class UsersHandlers {
   /**
    * Handles an authenticated admin DELETE request to /users/:id.
    * Deletes the resource.
-   *
-   * @param request
-   * @param response
-   * @param next
    */
   @requireUserIsAdmin()
   deleteUserAsAdmin(): Middleware {
-    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+    return async (request: Request, response: Response): Promise<void> => {
       const {user_id} = response.locals
       if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
