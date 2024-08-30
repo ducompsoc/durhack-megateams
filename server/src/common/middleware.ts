@@ -1,10 +1,12 @@
-import createHttpError from "http-errors"
-import { NextFunction, Request, Response } from "express"
-import { ValueError } from "@server/common/errors"
+import type { NextFunction } from "express";
+import createHttpError from "http-errors";
+
+import { ValueError } from "@server/common/errors";
+import type { Middleware, Request, Response } from "@server/types";
 
 export function handleMethodNotAllowed() {
   // The endpoint does support this method: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
-  throw new createHttpError.MethodNotAllowed()
+  throw new createHttpError.MethodNotAllowed();
 }
 
 export function handleNotImplemented() {
@@ -21,38 +23,21 @@ export function handleFailedAuthentication(request: Request) {
   throw new createHttpError.Unauthorized()
 }
 
-export function mutateRequestValue<T>(
-  getter: (request: Request) => unknown,
-  mutator: (value: unknown) => T,
-  setter: (response: Response, value: T) => void,
-) {
-  return function (request: Request, response: Response, next: NextFunction) {
-    const valueToMutate = getter(request)
-    const mutatedValue = mutator(valueToMutate)
-    setter(response, mutatedValue)
-    next()
-  }
-}
-
 function getRouteParameter(key: string) {
-  return function (request: Request): unknown {
-    return request.params[key]
-  }
+  return (request: Request): unknown => request.params[key]
 }
 
 function getQueryParameter(key: string) {
-  return function (request: Request): unknown {
-    return request.query[key]
-  }
+  return (request: Request): unknown => request.query[key]
 }
 
 function setLocalValue<T>(key: string) {
-  return function (response: Response, value: T): void {
+  return (response: Response, value: T): void => {
     response.locals[key] = value
   }
 }
 
-function validateID(value: unknown): number {
+function parseId(value: unknown): number {
   if (typeof value !== "string") {
     throw new TypeError(`'${value}' should be a single string value.`)
   }
@@ -72,12 +57,12 @@ function validateID(value: unknown): number {
  * @returns A middleware function that takes a request, response, and next function.
  * The key is extracted from the request's params and set in the local key of the response.
  */
-export function parseRouteId(key: string) {
-  return mutateRequestValue(
-    getRouteParameter(key), // returns a function that takes a request and returns the value key from the request's params
-    validateID, // function validates whether input value is a valid ID (i.e. number >= 0) & returns number in this case
-    setLocalValue(key), // returns a function that takes a response and a value and sets the response's local key to the value
-  )
+export function parseRouteId(key: string): Middleware {
+  return (request, response, next) => {
+    const id = getRouteParameter(key)
+    response.locals[key] = parseId(id);
+    next()
+  }
 }
 
 export function useSelfId(request: Request, response: Response, next: NextFunction): void {
@@ -85,6 +70,6 @@ export function useSelfId(request: Request, response: Response, next: NextFuncti
     throw new createHttpError.Unauthorized()
   }
 
-  response.locals.user_id = request.user.id
+  response.locals.user_id = request.user.keycloakUserId
   next()
 }

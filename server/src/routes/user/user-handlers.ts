@@ -1,19 +1,19 @@
 import createHttpError from "http-errors"
 import { z } from "zod"
 
-import { patch_user_payload_schema } from "@server/routes/users/users-handlers"
-import { prisma } from '@server/database/prisma'
+import { patchUserPayloadSchema } from "@server/routes/users/users-handlers"
+import { prisma } from '@server/database'
 import type { Middleware, Request, Response } from "@server/types"
 
 class UserHandlers {
   getUser(): Middleware {
     return async (request, response) => {
       const payload = {
-        id: request.user!.id,
-        email: request.user!.email,
-        preferred_name: request.user!.preferred_name,
-        role: request.user!.role,
-        points: await prisma.user.getTotalPoints(request.user!.id),
+        id: request.user!.keycloakUserId,
+        // todo: include email, preferred name, and roles in this payload
+        points: await prisma.user.getTotalPoints({
+          where: request.user!
+        }),
       }
   
       response.status(200)
@@ -23,12 +23,10 @@ class UserHandlers {
 
   patchUserDetails(): Middleware {
     return async (request, response) => {
-      const parsed_payload = patch_user_payload_schema.parse(request.body)
+      const parsed_payload = patchUserPayloadSchema.parse(request.body)
 
       await prisma.user.update({
-        where: {
-          user_id: request.user!.id,
-        },
+        where: request.user!,
         data: parsed_payload
       })
 
@@ -39,33 +37,33 @@ class UserHandlers {
 
   getTeam(): Middleware {
     return async (request, response) => {
-      const userData = await prisma.user.findUnique({
-        where: {user_id: request.user!.id},
+      const user = await prisma.user.findUnique({
+        where: request.user!,
         include: {
-          Team: {
+          team: {
             include: {
-              Members: {include: {Points: true}},
-              Area: {include: {Megateam: true}},
+              members: { include: { points: true } },
+              area: { include: { megateam: true } },
             },
           },
         },
       });
 
-      const team = userData?.Team
+      const team = user?.team
 
       if (!team) {
         throw new createHttpError.NotFound("You are not in a team!")
       }
 
       const payload = {
-        name: team.team_name,
+        name: team.teamName,
         members:
-          team.Members.map(member => ({
-            name: member.preferred_name,
-            points: prisma.user.getTotalPoints(userData.user_id),
+          team.members.map(member => ({
+            // todo: include team member names in this payload using keycloak service account
+            points: prisma.point.sumPoints(member.points),
           })) || [],
-        megateam_name: team.Area?.Megateam.megateam_name || null,
-        join_code: team.join_code,
+        megateam_name: team.area?.megateam.megateamName || null,
+        join_code: team.joinCode,
       }
 
       response.json({
@@ -76,7 +74,7 @@ class UserHandlers {
     }
   }
 
-  static join_code_schema = z
+  static joinCodeSchema = z
     .string()
     .length(4)
     .transform(val => Number.parseInt(val, 16))
@@ -85,30 +83,30 @@ class UserHandlers {
   joinTeam(): Middleware {
     return async (request: Request, response: Response) => {
       const user = await prisma.user.findUnique({
-        where: {user_id: request.user!.id},
-        include: {Team: true}
+        where: request.user!,
+        include: { team: true },
       });
 
-      if (user?.Team) {
+      if (user!.team) {
         throw new createHttpError.Conflict("You are already in a team!")
       }
 
-      const provided_join_code = UserHandlers.join_code_schema.parse(request.body.join_code)
+      const providedJoinCode = UserHandlers.joinCodeSchema.parse(request.body.join_code)
       const team = await prisma.team.findUnique({
-        where: {join_code: provided_join_code}
+        where: { joinCode: providedJoinCode }
       })
 
-      if (!team) {
+      if (team == null) {
         throw new createHttpError.NotFound('Team not found')
       }
 
-      if (!(await prisma.team.isJoinableTeam(team.team_id))) {
+      if (!(await prisma.team.isJoinableTeam({ where: team }))) {
         throw new createHttpError.Conflict();
       }
 
-      const updateUser = await prisma.user.update({
-        where: {user_id: request.user!.id},
-        data: {team_id: team.team_id}
+      await prisma.user.update({
+        where: request.user!,
+        data: { teamId: team.teamId }
       });
 
       response.json({
@@ -121,19 +119,19 @@ class UserHandlers {
   leaveTeam(): Middleware {
     return async (request, response) => {
       const user = await prisma.user.findUnique({
-        where: {user_id: request.user!.id},
-        include: {Team: true}
+        where: request.user!,
+        include: { team: true }
       });
 
-      const team = user?.Team
+      const team = user?.team
 
-      if (!team) {
+      if (team == null) {
         throw new createHttpError.NotFound("You are not in a team!")
       }
 
       const updateUser = await prisma.user.update({
-        where: {user_id: request.user!.id},
-        data: {team_id: null}
+        where: request.user!,
+        data: { teamId: null }
       })
 
       response.json({

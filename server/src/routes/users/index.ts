@@ -9,12 +9,10 @@ export const usersRouter = ExpressRouter()
 usersRouter
   .route("/")
   .get(usersHandlers.getUsersListAsAdmin(), usersHandlers.getUsersListDefault())
-  .post(usersHandlers.createUserAsAdmin(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
 usersRouter
   .route("/:user_id")
-  .all(parseRouteId("user_id"))
   .get(usersHandlers.getUserDetailsAsAdmin(), usersHandlers.getUserDetailsDefault())
   .patch(usersHandlers.patchUserDetailsAsAdmin(), usersHandlers.patchMyUserDetails(), handleFailedAuthentication)
   .delete(usersHandlers.deleteUserAsAdmin(), handleFailedAuthentication)

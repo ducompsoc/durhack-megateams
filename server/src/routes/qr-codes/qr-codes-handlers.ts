@@ -1,15 +1,12 @@
 import createHttpError from "http-errors"
 import { v4 as uuid } from "uuid"
 import { z } from "zod"
-import { Op } from "sequelize"
+import assert from "node:assert/strict";
 
 import type { Request, Response, Middleware } from "@server/types"
 import { NullError, ValueError } from "@server/common/errors"
 import { QRCategory, UserRole } from "@server/common/model-enums"
-import sequelize from "@server/database"
-import QRCode from "@server/database/tables/qr_code"
-import Point from "@server/database/tables/point"
-import User from "@server/database/tables/user"
+import { prisma, type QrCode, type User } from "@server/database";
 import { requireLoggedIn, requireUserIsAdmin, requireUserIsOneOf } from "@server/common/decorators"
 import { megateamsConfig } from "@server/config";
 
@@ -21,16 +18,16 @@ class QRCodesHandlers {
   static createQRPayload = z.object({
     name: z.string(),
     category: z.nativeEnum(QRCategory),
-    points_value: z.number().nonnegative(),
-    max_uses: z.number().nonnegative(),
+    pointsValue: z.number().nonnegative(),
+    maxUses: z.number().nonnegative(),
     state: z.boolean(),
-    start_time: z.date().or(
+    startTime: z.date().or(
       z
         .string()
         .datetime()
         .transform(val => new Date(val)),
     ),
-    expiry_time: z.date().or(
+    expiryTime: z.date().or(
       z
         .string()
         .datetime()
@@ -45,13 +42,16 @@ class QRCodesHandlers {
   ) {
     const publicisedFields = await this.getPublicisedFields(null, publicised)
 
+    // todo: update to uuid v7
     const payload = uuid()
 
-    return await QRCode.create({
-      payload,
-      creator_id: creator.id,
-      ...create_attributes,
-      ...publicisedFields,
+    return await prisma.qrCode.create({
+      data: {
+        payload: payload,
+        creatorUserId: creator.keycloakUserId,
+        ...create_attributes,
+        ...publicisedFields,
+      }
     })
   }
 
@@ -72,8 +72,9 @@ class QRCodesHandlers {
         status: response.statusCode,
         message: "OK",
         data: {
-          ...new_instance.toJSON(),
-          redemption_url: new_instance.getRedemptionURL(),
+          ...new_instance,
+          // todo: check prisma extension properties are not enumerable
+          redemption_url: new_instance.redemptionUrl,
         },
       })
     }
@@ -96,12 +97,12 @@ class QRCodesHandlers {
       expiry.setMinutes(expiry.getMinutes() + preset.minutesValid)
       const create_attributes = {
         name: name,
-        points_value: preset.points,
-        max_uses: preset.uses,
+        pointsValue: preset.points,
+        maxUses: preset.uses,
         category: QRCategory.preset,
         state: true,
-        start_time: new Date(),
-        expiry_time: expiry,
+        startTime: new Date(),
+        expiryTime: expiry,
       }
 
       const new_instance = await this.buildAndSaveQRCodeFromCreateAttributes(
@@ -115,8 +116,8 @@ class QRCodesHandlers {
         status: response.statusCode,
         message: "OK",
         data: {
-          ...new_instance.toJSON(),
-          redemption_url: new_instance.getRedemptionURL(),
+          ...new_instance,
+          redemption_url: new_instance.redemptionUrl,
         },
       })
     }
@@ -125,25 +126,26 @@ class QRCodesHandlers {
   @requireUserIsAdmin()
   getQRCodeList(): Middleware {
     return async (_request: Request, response: Response): Promise<void> => {
-      const result = await QRCode.findAll({
-        include: [Point, User],
-        order: [["createdAt", "DESC"]],
+      const result = await prisma.qrCode.findMany({
+        include: { redeems: true, creator: true },
+        orderBy: { createdAt: "desc" },
       })
 
-      const payload = result.map((code: QRCode) => ({
-        id: code.id,
+      const payload = result.map((code) => ({
+        id: code.qrCodeId,
         name: code.name,
         category: code.category,
-        scans: code.uses?.length || 0,
-        max_scans: code.max_uses,
-        creator: code.creator.preferred_name,
-        value: code.points_value,
-        start: code.start_time,
-        end: code.expiry_time,
+        scans: code.redeems.length,
+        max_scans: code.maxUses,
+        // todo: this used to be a preferred name
+        creator: code.creator.keycloakUserId,
+        value: code.pointsValue,
+        start: code.startTime,
+        end: code.expiryTime,
         enabled: code.state,
         uuid: code.payload,
-        publicised: code.challenge_rank !== null,
-        redemption_url: code.getRedemptionURL(),
+        publicised: code.challengeRank !== null,
+        redemption_url: code.redemptionUrl,
       }))
 
       response.status(200)
@@ -155,23 +157,17 @@ class QRCodesHandlers {
     }
   }
 
-  private async getPublicisedFields(existing_rank: typeof QRCode.prototype.challenge_rank, publicised: boolean) {
-    const fields = { challenge_rank: existing_rank }
+  private async getPublicisedFields(existing_rank: number | null, publicised: boolean) {
+    if (!publicised) return { challenge_rank: null }
+    if (existing_rank != null) return { challenge_rank: existing_rank }
 
-    if (!publicised) {
-      fields.challenge_rank = null
-    } else {
-      if (!existing_rank) {
-        const maxRank: number = await QRCode.max("challenge_rank")
-        if (maxRank) {
-          fields.challenge_rank = maxRank + 1
-        } else {
-          fields.challenge_rank = 1
-        }
+    const maxRankResult = await prisma.qrCode.aggregate({
+      _max: {
+        challengeRank: true,
       }
-    }
-
-    return fields
+    })
+    const maxRank = maxRankResult._max.challengeRank
+    return { challenge_rank: (maxRank ?? 0) + 1 }
   }
 
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
@@ -185,17 +181,24 @@ class QRCodesHandlers {
         throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
       }
 
-      const found_code = await QRCode.findByPk(qr_code_id, {
-        rejectOnEmpty: new NullError(),
+      const found_code = await prisma.qrCode.findUnique({
+        where: { qrCodeId: qr_code_id },
       })
+      if (found_code == null) throw new NullError()
 
       let fields: { challenge_rank: number | null } | undefined
 
       if (Object.hasOwn(request.body, "publicised")) {
-        fields = await this.getPublicisedFields(found_code.challenge_rank, request.body.publicised)
+        fields = await this.getPublicisedFields(found_code.challengeRank, request.body.publicised)
       }
 
-      await found_code.update({ state: request.body.state, ...fields })
+      await prisma.qrCode.update({
+        where: { qrCodeId: qr_code_id },
+        data: {
+          state: request.body.state,
+          ...fields,
+        }
+      })
 
       response.status(200)
       response.json({
@@ -245,60 +248,67 @@ class QRCodesHandlers {
       if (!Object.hasOwn(request.body, "uuid")) {
         throw new createHttpError.BadRequest()
       }
+      const user = request.user
+      assert(user != null)
 
-      const transaction = await sequelize.transaction()
-
-      let qr: QRCode
-      try {
-        qr = await QRCode.findOne({
+      let qr = null as (QrCode | null)
+      await prisma.$transaction(async (context) => {
+        qr = await context.qrCode.findUnique({
           where: { payload: request.body.uuid },
-          include: [Point],
-          transaction: transaction,
-          rejectOnEmpty: new createHttpError.BadRequest(),
+          include: { redeems: true },
         })
+        if (qr == null) throw new createHttpError.BadRequest()
 
-        if (!(await qr.canBeRedeemed(request.user!))) throw new createHttpError.BadRequest()
+        const qrCanBeRedeemed = await qr.canBeRedeemed(user)
+        if (!qrCanBeRedeemed) throw new createHttpError.BadRequest()
 
-        await Point.create({
-          value: qr.points_value,
-          origin_qrcode_id: qr.id,
-          redeemer_id: (request.user as User).id,
-          transaction: transaction,
+        await context.point.create({
+          data: {
+            value: qr.pointsValue,
+            originQrCodeId: qr.qrCodeId,
+            redeemerUserId: user.keycloakUserId,
+          },
         })
+      })
 
-        await transaction.commit()
-      } catch (error) {
-        await transaction.rollback()
-        throw error
-      }
+      assert(qr != null)
 
       response.json({
         status: 200,
         message: "OK",
-        points: qr.points_value,
+        points: qr.pointsValue,
       })
     }
   }
 
   private async getChallengeList(_request: Request, response: Response, includeId: boolean) {
     const now = new Date()
-    const challenges = await QRCode.findAll({
+    const challenges = await prisma.qrCode.findMany({
       where: {
-        challenge_rank: { [Op.ne]: null },
+        challengeRank: { not: null },
         state: true,
-        start_time: { [Op.lt]: now },
-        expiry_time: { [Op.gt]: now },
+        startTime: { lt: now },
+        expiryTime: { gt: now },
+      },
+      orderBy: {
+        challengeRank: "asc",
       },
     })
 
-    challenges.sort((a, b) => a.challenge_rank! - b.challenge_rank!)
-
-    const data = challenges.map((challenge, i) => ({
-      title: challenge.name,
-      points: challenge.points_value,
-      rank: i,
-      ...(includeId ? { id: challenge.id } : {}),
-    }))
+    const data = challenges.map((challenge, i) => {
+      const challengeRepresentation: {
+        title: string,
+        points: number,
+        rank: number,
+        id?: number,
+      } = {
+        title: challenge.name,
+        points: challenge.pointsValue,
+        rank: i,
+      }
+      if (includeId) challengeRepresentation.id = challenge.qrCodeId
+      return challengeRepresentation
+    })
 
     response.json({
       status: 200,
@@ -320,40 +330,31 @@ class QRCodesHandlers {
     }
   }
 
+  static reorderChallengeListPayloadSchema = z.array(
+    z.object({
+      id: z.number(),
+      rank: z.number(),
+    }),
+  )
+
   @requireUserIsAdmin()
   reorderChallengeList(): Middleware {
     return async (request: Request, response: Response) => {
-      const challengeList = z.array(
-        z.object({
-          id: z.number(),
-          rank: z.number(),
+
+      if (!Object.hasOwn(request.body, "challenges")) throw new createHttpError.BadRequest()
+      const challenges = QRCodesHandlers.reorderChallengeListPayloadSchema.parse(request.body.challenges)
+
+      await prisma.$transaction([
+        prisma.qrCode.updateMany({
+          data: { challengeRank: null }
         }),
-      )
-
-      if (!Object.hasOwn(request.body, "challenges") || !challengeList.safeParse(request.body.challenges).success) {
-        throw new createHttpError.BadRequest()
-      }
-
-      const transaction = await sequelize.transaction()
-
-      try {
-        await QRCode.update(
-          { challenge_rank: null },
-          {
-            where: { challenge_rank: { [Op.not]: null } },
-            transaction,
-          },
-        )
-
-        for (const challenge of request.body.challenges) {
-          await QRCode.update({ challenge_rank: challenge.rank }, { where: { qrcode_id: challenge.id }, transaction })
-        }
-
-        await transaction.commit()
-      } catch (error) {
-        await transaction.rollback()
-        throw error
-      }
+        ...challenges.map((challenge) => {
+          return prisma.qrCode.update({
+            where: { qrCodeId: challenge.id },
+            data: { challengeRank: challenge.rank },
+          })
+        })
+      ])
 
       response.json({
         status: 200,

@@ -1,10 +1,11 @@
-import type { JWTPayload } from "jose"
 import type { Server, Socket } from "socket.io"
 import { TokenType } from "@durhack/token-vault/lib"
 
 import TokenVault from "@server/auth/tokens"
 
-import { User } from "@server/database/tables"
+import type { User } from "@server/database"
+
+type JWTPayload = Awaited<ReturnType<typeof TokenVault.decodeToken>>["payload"]
 
 class SocketConnection {
   declare connectedUser?: User
