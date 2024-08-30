@@ -1,4 +1,4 @@
-import { UserRole } from "@server/common/model_enums"
+import { UserRole } from "@server/common/model-enums"
 import type { Middleware, Request, Response } from "@server/types"
 
 type Condition = (request: Request, response: Response) => boolean | Promise<boolean>

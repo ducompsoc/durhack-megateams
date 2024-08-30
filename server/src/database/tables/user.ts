@@ -1,6 +1,6 @@
 import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript"
 
-import { UserRole } from "@server/common/model_enums"
+import { UserRole } from "@server/common/model-enums"
 
 import Team from "./team"
 import Point from "./point"

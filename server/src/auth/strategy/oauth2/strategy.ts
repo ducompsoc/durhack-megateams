@@ -4,7 +4,7 @@ import { z } from "zod"
 import config from "config"
 import createHttpError from "http-errors"
 
-import { UserRole } from "@server/common/model_enums"
+import { UserRole } from "@server/common/model-enums"
 
 const KeycloakProfileSchema = z.object({
   email: z.string(),

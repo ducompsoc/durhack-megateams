@@ -6,7 +6,7 @@ import { Op } from "sequelize"
 
 import type { Request, Response, Middleware } from "@server/types"
 import { NullError, ValueError } from "@server/common/errors"
-import { QRCategory, UserRole } from "@server/common/model_enums"
+import { QRCategory, UserRole } from "@server/common/model-enums"
 import sequelize from "@server/database"
 import QRCode from "@server/database/tables/qr_code"
 import Point from "@server/database/tables/point"

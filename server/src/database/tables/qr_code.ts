@@ -1,7 +1,7 @@
 import { DataType, Table, Column, Model, BelongsTo, HasMany, ForeignKey } from "sequelize-typescript"
 import config from "config"
 
-import { QRCategory } from "@server/common/model_enums"
+import { QRCategory } from "@server/common/model-enums"
 import { config_schema } from "@server/common/schema/config"
 
 import User from "./user"

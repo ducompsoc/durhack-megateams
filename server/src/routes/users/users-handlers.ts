@@ -5,7 +5,7 @@ import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidation
 import type { Request, Response, Middleware } from "@server/types"
 import { NullError, ValueError } from "@server/common/errors"
 import { requireUserIsAdmin, requireSelf } from "@server/common/decorators"
-import { UserRole } from "@server/common/model_enums"
+import { UserRole } from "@server/common/model-enums"
 import { buildQueryFromRequest, type SequelizeQueryTransformFactory } from "@server/database"
 import User from "@server/database/tables/user"
 import Team from "@server/database/tables/team"

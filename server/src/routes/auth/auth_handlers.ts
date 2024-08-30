@@ -1,6 +1,6 @@
 import { TokenType } from "@durhack/token-vault/lib"
 
-import { UserRole } from "@server/common/model_enums"
+import { UserRole } from "@server/common/model-enums"
 import { requireLoggedIn } from "@server/common/decorators"
 import TokenVault from "@server/auth/tokens"
 import type { Middleware, Request, Response } from "@server/types";
