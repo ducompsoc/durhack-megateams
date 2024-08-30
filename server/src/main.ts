@@ -1,9 +1,9 @@
-import express, { Express } from "express"
+import express, { type Express } from "express"
 import { type Server, createServer } from "node:http"
 import { Server as SocketIO } from "socket.io"
 import passport from "passport"
 import config from "config"
-import * as process from "process"
+import * as process from "node:process"
 
 import { listen_options_schema } from "@server/common/schema/config"
 
