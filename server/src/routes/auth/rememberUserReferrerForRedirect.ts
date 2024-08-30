@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express"
+import type { Request, Response } from "@server/types"
 
-export default function rememberUserReferrerForRedirect(request: Request, _response: Response, next: NextFunction) {
+export function rememberUserReferrerForRedirect(request: Request, _response: Response, next: () => void) {
   const referrer = request.query.referrer
 
   if (referrer) {
