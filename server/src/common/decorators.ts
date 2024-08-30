@@ -80,10 +80,6 @@ export function requireUserIsOneOf(...roles: UserRole[]) {
 /**
  * Condition function that determines if the resource a user is trying to access/modify
  * is themselves.
- *
- * @param request
- * @param response
- * @private
  */
 export function userIsSelf(): Condition {
   return (request: Request, response: Response): boolean => {

@@ -1,10 +1,10 @@
 import { z } from "zod"
 import createHttpError from "http-errors"
-import { NextFunction, Request, Response } from "express"
 import { literal as SequelizeLiteral, Op, ValidationError as SequelizeValidationError } from "sequelize"
 
+import type { Request, Response, Middleware } from "@server/types"
 import { NullError, ValueError } from "@server/common/errors"
-import { requireUserIsAdmin } from "@server/common/decorators"
+import { requireUserIsAdmin, requireSelf } from "@server/common/decorators"
 import { UserRole } from "@server/common/model_enums"
 import { buildQueryFromRequest, SequelizeQueryTransformFactory } from "@server/database"
 import User from "@server/database/tables/user"
@@ -12,8 +12,6 @@ import Team from "@server/database/tables/team"
 import Point from "@server/database/tables/point"
 import Megateam from "@server/database/tables/megateam"
 import Area from "@server/database/tables/area"
-
-import { requireSelf } from "./user_util"
 
 const user_transform_factories = new Map<string, SequelizeQueryTransformFactory<User>>()
 user_transform_factories.set("email", (value: string) => ({
@@ -43,9 +41,9 @@ const create_user_payload_schema = z.object({
 
 export const patch_user_payload_schema = create_user_payload_schema.partial()
 
-class UserHandlers {
+class UsersHandlers {
   constructor() {
-    Object.getOwnPropertyNames(UserHandlers.prototype).forEach(key => {
+    Object.getOwnPropertyNames(UsersHandlers.prototype).forEach(key => {
       if (key !== "constructor") {
         // @ts-ignore
         this[key] = this[key].bind(this)
@@ -60,16 +58,18 @@ class UserHandlers {
    * @param request
    * @param response
    */
-  async getUsersListDefault(request: Request, response: Response): Promise<void> {
-    const result = await User.findAll({
-      attributes: [["user_id", "id"], "preferred_name"],
-    })
-    response.status(200)
-    response.json({
-      status: 200,
-      message: "OK",
-      users: result,
-    })
+  getUsersListDefault(): Middleware { 
+    return async (request: Request, response: Response): Promise<void> => {
+      const result = await User.findAll({
+        attributes: [["user_id", "id"], "preferred_name"],
+      })
+      response.status(200)
+      response.json({
+        status: 200,
+        message: "OK",
+        users: result,
+      })
+    }
   }
 
   /**
@@ -79,45 +79,43 @@ class UserHandlers {
    * and searched by
    *   email.
    * using URL search parameters.
-   *
-   * @param request
-   * @param response
-   * @param next
    */
-  @requireUserIsAdmin
-  async getUsersListAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    const result = await User.findAll({
-      attributes: [["user_id", "id"], "preferred_name", "email"],
-      include: [
-        { model: Point },
-        {
-          model: Team,
-          include: [
-            {
-              model: Area,
-              include: [Megateam],
-            },
-          ],
-        },
-      ],
-    })
+  @requireUserIsAdmin()
+  getUsersListAsAdmin(): Middleware { 
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      const result = await User.findAll({
+        attributes: [["user_id", "id"], "preferred_name", "email"],
+        include: [
+          {model: Point},
+          {
+            model: Team,
+            include: [
+              {
+                model: Area,
+                include: [Megateam],
+              },
+            ],
+          },
+        ],
+      })
 
-    const payload = result.map((user: User) => ({
-      id: user.id,
-      preferred_name: user.preferred_name,
-      email: user.email,
-      points: Point.getPointsTotal(user.points || []),
-      team_name: user.team?.name,
-      team_id: user.team?.id,
-      megateam_name: user.team?.area?.megateam?.name,
-    }))
+      const payload = result.map((user: User) => ({
+        id: user.id,
+        preferred_name: user.preferred_name,
+        email: user.email,
+        points: Point.getPointsTotal(user.points || []),
+        team_name: user.team?.name,
+        team_id: user.team?.id,
+        megateam_name: user.team?.area?.megateam?.name,
+      }))
 
-    response.status(200)
-    response.json({
-      status: 200,
-      message: "OK",
-      users: payload,
-    })
+      response.status(200)
+      response.json({
+        status: 200,
+        message: "OK",
+        users: payload,
+      })
+    }
   }
 
   /**
@@ -127,62 +125,59 @@ class UserHandlers {
    *
    * Required fields:
    *   ...
-   *
-   * @param request
-   * @param response
-   * @param next
    */
-  @requireUserIsAdmin
-  async createUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    const invalid_fields = Object.keys(request.body).filter(key => !allowed_create_fields.has(key))
-    if (invalid_fields.length > 0) {
-      throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
-    }
-
-    let new_instance
-    try {
-      new_instance = await User.create(request.body)
-    } catch (error) {
-      if (error instanceof SequelizeValidationError) {
-        throw new createHttpError.BadRequest(error.message)
+  @requireUserIsAdmin()
+  createUserAsAdmin(): Middleware { 
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      const invalid_fields = Object.keys(request.body).filter(key => !allowed_create_fields.has(key))
+      if (invalid_fields.length > 0) {
+        throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
       }
-      throw error
-    }
 
-    response.status(200)
-    response.json({
-      status: response.statusCode,
-      message: "OK",
-      data: new_instance,
-    })
+      let new_instance
+      try {
+        new_instance = await User.create(request.body)
+      } catch (error) {
+        if (error instanceof SequelizeValidationError) {
+          throw new createHttpError.BadRequest(error.message)
+        }
+        throw error
+      }
+
+      response.status(200)
+      response.json({
+        status: response.statusCode,
+        message: "OK",
+        data: new_instance,
+      })
+    }
   }
 
   /**
    * Handles an unauthenticated or non-admin GET request to /users/:id.
    * Returns the user's basic details including team affiliation, points, etc.
-   *
-   * @param request
-   * @param response
    */
-  async getUserDetailsDefault(request: Request, response: Response): Promise<void> {
-    const { user_id } = response.locals
-    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
+  getUserDetailsDefault(): Middleware { 
+    return async (request: Request, response: Response): Promise<void> => {
+      const {user_id} = response.locals
+      if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
-    const result = await User.findByPk(user_id, {
-      attributes: ["id", "preferred_name"],
-      include: [Team, Point],
-      rejectOnEmpty: new NullError(),
-    })
+      const result = await User.findByPk(user_id, {
+        attributes: ["id", "preferred_name"],
+        include: [Team, Point],
+        rejectOnEmpty: new NullError(),
+      })
 
-    const payload: User | { points: number } = result.toJSON()
-    payload.points = Point.getPointsTotal(result.points)
+      const payload: Omit<User, "points"> & { points: number } = result.toJSON()
+      payload.points = Point.getPointsTotal(result.points)
 
-    response.status(200)
-    response.json({
-      status: response.statusCode,
-      message: "OK",
-      data: payload,
-    })
+      response.status(200)
+      response.json({
+        status: response.statusCode,
+        message: "OK",
+        data: payload,
+      })
+    }
   }
 
   private async doGetAllUserDetails(request: Request, response: Response): Promise<void> {
@@ -197,7 +192,7 @@ class UserHandlers {
       rejectOnEmpty: new NullError(),
     })
 
-    const payload: User | { points: number } = result.toJSON()
+    const payload: Omit<User, "points"> & { points: number } = result.toJSON()
     payload.points = Point.getPointsTotal(result.points)
 
     response.status(200)
@@ -211,27 +206,23 @@ class UserHandlers {
   /**
    * Handles an authenticated admin GET request to /users/:id.
    * Returns all the user's details, including Hackathons UK fields.
-   *
-   * @param request
-   * @param response
-   * @param next
    */
-  @requireUserIsAdmin
-  async getUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    await this.doGetAllUserDetails(request, response)
+  @requireUserIsAdmin()
+  getUserDetailsAsAdmin(): Middleware { 
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      await this.doGetAllUserDetails(request, response)
+    }
   }
 
   /**
    * Handles an authenticated self GET request to /users/:id.
    * Returns all the user's details, including Hackathons UK fields.
-   *
-   * @param request
-   * @param response
-   * @param next
    */
-  @requireSelf
-  async getMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
-    await this.doGetAllUserDetails(request, response)
+  @requireSelf()
+  getMyUserDetails(): Middleware { 
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      await this.doGetAllUserDetails(request, response)
+    }
   }
 
   static getPatchHandler(payload_schema: z.Schema) {
@@ -267,9 +258,11 @@ class UserHandlers {
    * @param response
    * @param next
    */
-  @requireUserIsAdmin
-  async patchUserDetailsAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    await UserHandlers.getPatchHandler(patch_user_payload_schema)(request, response)
+  @requireUserIsAdmin()
+  patchUserDetailsAsAdmin(): Middleware { 
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      await UsersHandlers.getPatchHandler(patch_user_payload_schema)(request, response)
+    }
   }
 
   /**
@@ -280,9 +273,11 @@ class UserHandlers {
    * @param response
    * @param next
    */
-  @requireSelf
-  async patchMyUserDetails(request: Request, response: Response, next: NextFunction): Promise<void> {
-    next()
+  @requireSelf()
+  patchMyUserDetails(): Middleware { 
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      next()
+    }
   }
 
   /**
@@ -293,22 +288,24 @@ class UserHandlers {
    * @param response
    * @param next
    */
-  @requireUserIsAdmin
-  async deleteUserAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    const { user_id } = response.locals
-    if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
+  @requireUserIsAdmin()
+  deleteUserAsAdmin(): Middleware {
+    return async (request: Request, response: Response, next: () => void): Promise<void> => {
+      const {user_id} = response.locals
+      if (typeof user_id !== "number") throw new Error("Parsed `user_id` not found.")
 
-    const result = await User.findByPk(user_id, {
-      attributes: ["id"],
-      rejectOnEmpty: new NullError(),
-    })
+      const result = await User.findByPk(user_id, {
+        attributes: ["id"],
+        rejectOnEmpty: new NullError(),
+      })
 
-    await result.destroy()
+      await result.destroy()
 
-    response.status(200)
-    response.json({ status: response.statusCode, message: "OK" })
+      response.status(200)
+      response.json({status: response.statusCode, message: "OK"})
+    }
   }
 }
 
-const UserHandlersInstance = new UserHandlers()
-export default UserHandlersInstance
+const usersHandlers = new UsersHandlers()
+export { usersHandlers }
