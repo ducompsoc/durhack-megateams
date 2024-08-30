@@ -54,8 +54,6 @@
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.7.0",
     "passport-oauth2-refresh": "^2.2.0",
-    "sequelize": "^6.32.1",
-    "sequelize-typescript": "^2.1.5",
     "socket.io": "^4.7.5",
     "unique-names-generator": "^4.7.1",
     "uuid": "^9.0.0",
