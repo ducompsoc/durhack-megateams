@@ -1,15 +1,14 @@
-import config from "config"
 import { Router as ExpressRouter } from "express"
 import bodyParser from "body-parser"
 import methodOverride from "method-override"
 import createHttpError from "http-errors"
 import cookieParser from "cookie-parser"
-import { z } from "zod"
 
 import type { Request, Response } from "@server/types"
 import { handleMethodNotAllowed } from "@server/common/middleware"
-
 import { doubleCsrfProtection } from "@server/auth/csrf"
+import { cookieParserConfig, csrfConfig } from "@server/config";
+
 import { authRouter } from "./auth"
 import { areasRouter } from "./areas"
 import { megateamsRouter } from "./megateams"
@@ -23,12 +22,11 @@ import { apiErrorHandler } from "./error-handling"
 
 export const apiRouter = ExpressRouter()
 
-apiRouter.use(cookieParser(config.get("cookie-parser.secret")))
+apiRouter.use(cookieParser(cookieParserConfig.secret))
 apiRouter.use(bodyParser.json())
 apiRouter.use(bodyParser.urlencoded({ extended: true }))
 
-const mitigateCsrf = z.boolean().parse(config.get("csrf.enabled"))
-if (mitigateCsrf) {
+if (csrfConfig.enabled) {
   apiRouter.use(doubleCsrfProtection)
 }
 

@@ -1,15 +1,16 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, type Prisma } from '@prisma/client';
 import createHttpError from 'http-errors';
-import config from 'config';
-import { config_schema } from '@server/common/schema/config';
 
-export type Point = Prisma.PointGetPayload<{ select: undefined }>;
+import { megateamsConfig } from "@server/config";
 
-const maxTeamMembers = config_schema.shape.megateams.shape.maxTeamMembers.parse(
-  config.get('megateams.maxTeamMembers')
-);
+export type Area = Prisma.AreaGetPayload<{ select: undefined }>
+export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
+export type Point = Prisma.PointGetPayload<{ select: undefined }>
+export type QRCode = Prisma.QRCodeGetPayload<{ select: undefined }>
+export type Team = Prisma.TeamGetPayload<{ select: undefined }>
+export type User = Prisma.UserGetPayload<{ select: undefined }>
 
-const prisma = new PrismaClient().$extends({
+export const prisma = new PrismaClient().$extends({
   name: 'prismaExtensions',
   model: {
     user: {
@@ -42,10 +43,8 @@ const prisma = new PrismaClient().$extends({
             team_id: teamId,
           },
         });
-        return team_members < maxTeamMembers;
+        return team_members < megateamsConfig.maxTeamMembers;
       },
     },
   },
 });
-
-export default prisma;

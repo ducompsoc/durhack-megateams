@@ -1,7 +1,7 @@
 import createHttpError from "http-errors"
-import config from "config"
 import { z } from "zod"
 
+import { discordConfig } from "@server/config";
 import type { Middleware, Request, Response } from "@server/types";
 import type User from "@server/database/tables/user"
 
@@ -17,10 +17,9 @@ class DiscordHandlers {
       }
 
       response.redirect(
-        `https://discord.com/oauth2/authorize?client_id=${config.get(
-          "discord.clientId",
-        )}&redirect_uri=${encodeURIComponent(
-          config.get("discord.redirectUri"),
+        `https://discord.com/oauth2/authorize?client_id=${discordConfig.clientId
+        }&redirect_uri=${encodeURIComponent(
+          discordConfig.redirectUri,
         )}&response_type=code&scope=identify%20guilds.join&state=dh`,
       )
     }
@@ -55,14 +54,14 @@ class DiscordHandlers {
 
       //todo: verify that `state` matches what was assigned on flow begin
 
-      const discordApiBase = config.get("discord.apiEndpoint")
+      const discordApiBase = discordConfig.apiEndpoint
 
       const access_code_exchange_payload = {
-        client_id: config.get("discord.clientId") as string,
-        client_secret: config.get("discord.clientSecret") as string,
+        client_id: discordConfig.clientId,
+        client_secret: discordConfig.clientSecret,
         grant_type: "authorization_code",
         code: code,
-        redirect_uri: config.get("discord.redirectUri") as string,
+        redirect_uri: discordConfig.redirectUri,
       }
       const encoded_access_code_exchange_payload = new URLSearchParams(access_code_exchange_payload)
 
@@ -91,12 +90,12 @@ class DiscordHandlers {
 
       const discord_profile = (await discord_profile_response.json()) as { user: { id: string } };
       const discord_user_id = discord_profile.user.id
-      const guildID = config.get("discord.guildID")
+      const guildID = discordConfig.guildID
 
       await fetch(`${discordApiBase}/guilds/${guildID}/members/${discord_user_id}`, {
         method: "PUT",
         headers: {
-          Authorization: `Bot ${config.get("discord.botToken")}`,
+          Authorization: `Bot ${discordConfig.botToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -108,16 +107,16 @@ class DiscordHandlers {
         const newChannelRes = await fetch(`${discordApiBase}/guilds/${guildID}/channels`, {
           method: "POST",
           headers: {
-            Authorization: `Bot ${config.get("discord.botToken")}`,
+            Authorization: `Bot ${discordConfig.botToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             name: team.name,
             type: "0",
-            parent_id: config.get("discord.teamsParentChannel"),
+            parent_id: discordConfig.teamsParentChannel,
           }),
         })
-        const newChannel = await newChannelRes.json()
+        const newChannel: { id: string } = await newChannelRes.json()
         team.discord_channel_id = newChannel.id
         await team.save()
       }
@@ -125,7 +124,7 @@ class DiscordHandlers {
       await fetch(`${discordApiBase}/channels/${team.discord_channel_id}/permissions/${discord_user_id}`, {
         method: "PUT",
         headers: {
-          Authorization: `Bot ${config.get("discord.botToken")}`,
+          Authorization: `Bot ${discordConfig.botToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

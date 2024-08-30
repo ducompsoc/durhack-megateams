@@ -34,6 +34,7 @@ export const {
   },
   csrf: csrfConfig,
   "cookie-parser": cookieParserConfig,
+  jsonwebtoken: tokenVaultConfig,
   session: sessionConfig,
   discord: discordConfig,
   keycloak: keycloakConfig,

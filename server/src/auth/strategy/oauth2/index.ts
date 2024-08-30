@@ -4,10 +4,10 @@ import { VerifyCallback } from "passport-oauth2"
 import refresh from "passport-oauth2-refresh"
 
 import KeycloakOAuth2Strategy, { KeycloakProfile } from "@server/auth/strategy/oauth2/strategy"
-import { oauth2_client_options_schema } from "@server/common/schema/config"
+import { oauth2ClientOptionsSchema } from "@server/config/schema"
 import User from "@server/database/tables/user"
 
-const oauth2_options = oauth2_client_options_schema.parse(config.get("passport.oauth2"))
+const oauth2_options = oauth2ClientOptionsSchema.parse(config.get("passport.oauth2"))
 
 /**
  * Verify function for Passport.js 'oauth2' strategy (OAuth2 flow via DurHack Live)

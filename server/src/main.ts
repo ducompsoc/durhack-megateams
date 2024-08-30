@@ -2,10 +2,9 @@ import express, { type Express } from "express"
 import { type Server, createServer } from "node:http"
 import { Server as SocketIO } from "socket.io"
 import passport from "passport"
-import config from "config"
 import * as process from "node:process"
 
-import { listen_options_schema } from "@server/common/schema/config"
+import { listenConfig } from "@server/config";
 
 import session from "./auth/session"
 import SocketManager from "./socket"
@@ -49,10 +48,8 @@ async function main() {
   const app = getExpressApp()
   const server = getServer(app)
 
-  const listen = listen_options_schema.parse(config.get("listen"))
-
-  server.listen(listen.port, listen.host, () => {
-    console.log(`> Server listening on http://${listen.host}:${listen.port} as ${dev ? "development" : environment}`)
+  server.listen(listenConfig.port, listenConfig.host, () => {
+    console.log(`> Server listening on http://${listenConfig.host}:${listenConfig.port} as ${dev ? "development" : environment}`)
   })
 }
 

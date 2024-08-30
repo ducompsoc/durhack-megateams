@@ -1,5 +1,4 @@
 import createHttpError from "http-errors"
-import config from "config"
 import { v4 as uuid } from "uuid"
 import { z } from "zod"
 import { Op } from "sequelize"
@@ -12,12 +11,9 @@ import QRCode from "@server/database/tables/qr_code"
 import Point from "@server/database/tables/point"
 import User from "@server/database/tables/user"
 import { requireLoggedIn, requireUserIsAdmin, requireUserIsOneOf } from "@server/common/decorators"
-import { config_schema, type qr_preset_schema } from "@server/common/schema/config"
+import { megateamsConfig } from "@server/config";
 
-const presets_schema = config_schema.shape.megateams.shape.QRPresets
-const presets = new Map<string, z.infer<typeof qr_preset_schema>>(
-  Object.entries(presets_schema.parse(config.get("megateams.QRPresets"))),
-)
+const presets = new Map(Object.entries(megateamsConfig.QRPresets))
 
 const patch_fields = new Set(["state", "publicised"])
 

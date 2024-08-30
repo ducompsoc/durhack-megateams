@@ -1,9 +1,8 @@
 import createHttpError from "http-errors"
 import { z } from "zod"
-import { Prisma } from "@prisma/client"
 
-import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
-import prisma from '@server/database/prisma'
+import { patch_user_payload_schema } from "@server/routes/users/users-handlers"
+import { prisma } from '@server/database/prisma'
 import type { Middleware, Request, Response } from "@server/types"
 
 class UserHandlers {
