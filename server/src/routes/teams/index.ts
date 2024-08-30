@@ -2,30 +2,30 @@ import { Router as ExpressRouter } from "express"
 
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
-import handlers from "./teams_handlers"
+import { teamsHandlers } from "./teams-handlers"
 
-const teams_router = ExpressRouter()
+const teamsRouter = ExpressRouter()
 
-teams_router
+teamsRouter
   .route("/")
-  .get(handlers.listTeamsAsAdmin, handlers.listTeamsAsAnonymous)
-  .post(handlers.createTeamAsAdmin, handlers.createTeamAsHacker, handleFailedAuthentication)
+  .get(teamsHandlers.listTeamsAsAdmin(), teamsHandlers.listTeamsAsAnonymous())
+  .post(teamsHandlers.createTeamAsAdmin(), teamsHandlers.createTeamAsHacker(), handleFailedAuthentication)
 
-teams_router.route("/generate-name").get(handlers.generateTeamName).all(handleMethodNotAllowed)
+teamsRouter.route("/generate-name").get(teamsHandlers.generateTeamName()).all(handleMethodNotAllowed)
 
-teams_router
+teamsRouter
   .route("/:team_id/memberships")
   .all(parseRouteId("team_id"))
-  .post(handlers.addUserToTeamAsAdmin, handleFailedAuthentication)
-  .delete(handlers.removeUserFromTeamAsAdmin, handleFailedAuthentication)
+  .post(teamsHandlers.addUserToTeamAsAdmin(), handleFailedAuthentication)
+  .delete(teamsHandlers.removeUserFromTeamAsAdmin(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
-teams_router
+teamsRouter
   .route("/:team_id")
   .all(parseRouteId("team_id"))
-  .get(handlers.getTeamDetails)
-  .patch(handlers.patchTeamAsAdmin, handleFailedAuthentication)
-  .delete(handlers.deleteTeam)
+  .get(teamsHandlers.getTeamDetails())
+  .patch(teamsHandlers.patchTeamAsAdmin(), handleFailedAuthentication)
+  .delete(teamsHandlers.deleteTeam())
   .all(handleMethodNotAllowed)
 
-export default teams_router
+export default teamsRouter
