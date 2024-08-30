@@ -58,7 +58,7 @@ model QrCode {
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @updatedAt @map("updated_at")
   points        Point[]
-  user          User             @relation(fields: [creatorUserId], references: [keycloakUserId], onDelete: NoAction)
+  creator       User             @relation(fields: [creatorUserId], references: [keycloakUserId], onDelete: NoAction)
 
   @@index([creatorUserId])
 }
