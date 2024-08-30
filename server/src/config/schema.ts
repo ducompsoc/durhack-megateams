@@ -1,18 +1,19 @@
+import { tokenVaultOptionsSchema } from "@durhack/token-vault/config-schema"
 import { z } from "zod"
 
-export const listen_options_schema = z.object({
+export const listenOptionsSchema = z.object({
   host: z.string(),
   port: z.number().int().positive(),
 })
 
-export const passport_local_options_schema = z.object({
+export const passportLocalOptionsSchema = z.object({
   usernameField: z.string().optional(),
   passwordField: z.string().optional(),
   session: z.boolean().optional(),
   passReqToCallback: z.boolean().optional(),
 })
 
-export const oauth2_client_options_schema = z.object({
+export const oauth2ClientOptionsSchema = z.object({
   authorizationURL: z.string().url(),
   tokenURL: z.string().url(),
   clientID: z.string(),
@@ -24,7 +25,7 @@ export const oauth2_client_options_schema = z.object({
   pkce: z.boolean(),
 })
 
-export const mysql_options_schema = z.object({
+export const mysqlOptionsSchema = z.object({
   host: z.string(),
   port: z.number().int().positive(),
   database: z.string(),
@@ -32,7 +33,7 @@ export const mysql_options_schema = z.object({
   password: z.string(),
 })
 
-export const sequelize_options_schema = mysql_options_schema
+export const sequelize_options_schema = mysqlOptionsSchema
   .extend({
     dialect: z.string().default("mysql"),
   })
@@ -51,12 +52,12 @@ export const cookie_options_schema = z.object({
   secure: z.boolean(),
 })
 
-export const double_csrf_options_schema = z.object({
+export const doubleCsrfOptionsSchema = z.object({
   cookieName: z.string(),
   cookieOptions: cookie_options_schema,
 })
 
-export const session_options_schema = z.object({
+export const sessionOptionsSchema = z.object({
   name: z.string(),
   proxy: z.boolean(),
   secret: z.string(),
@@ -65,7 +66,7 @@ export const session_options_schema = z.object({
   cookie: cookie_options_schema,
 })
 
-export const qr_preset_schema = z.object({
+export const qrPresetSchema = z.object({
   name: z.string(),
   description: z.string(),
   points: z.number().nonnegative(),
@@ -73,7 +74,15 @@ export const qr_preset_schema = z.object({
   minutesValid: z.number().nonnegative(),
 })
 
-export const discord_options_schema = z.object({
+export const keycloakOptionsSchema = z.object({
+  url: z.string().url(),
+  clientId: z.string(),
+  clientSecret: z.string(),
+  redirectUris: z.array(z.string()),
+  responseTypes: z.array(z.union([z.literal("code"), z.literal("token"), z.literal("id_token"), z.literal("none")])),
+})
+
+export const discordOptionsSchema = z.object({
   apiEndpoint: z.string().url(),
   clientId: z.string(),
   clientSecret: z.string(),
@@ -84,30 +93,36 @@ export const discord_options_schema = z.object({
   teamsParentChannel: z.string(),
 })
 
-export const config_schema = z.object({
-  listen: listen_options_schema,
+export const configSchema = z.object({
+  listen: listenOptionsSchema,
+  hostname: z.string().url(),
   flags: z.object({}),
   passport: z.object({
-    local: passport_local_options_schema,
-    oauth2: oauth2_client_options_schema,
+    local: passportLocalOptionsSchema,
+    oauth2: oauth2ClientOptionsSchema,
   }),
   mysql: z.object({
-    data: mysql_options_schema,
-    session: mysql_options_schema,
+    data: mysqlOptionsSchema,
+    session: mysqlOptionsSchema,
   }),
   csrf: z.object({
     enabled: z.boolean(),
     secret: z.string(),
-    options: double_csrf_options_schema,
+    options: doubleCsrfOptionsSchema,
   }),
   "cookie-parser": z.object({
     secret: z.string(),
   }),
-  session: session_options_schema,
+  jsonwebtoken: tokenVaultOptionsSchema,
+  session: sessionOptionsSchema,
   megateams: z.object({
     maxTeamMembers: z.number().positive(),
     QRCodeRedemptionURL: z.string().url(),
-    QRPresets: z.object({}).catchall(qr_preset_schema),
+    QRPresets: z.object({}).catchall(qrPresetSchema),
   }),
-  discord: discord_options_schema,
+  discord: discordOptionsSchema,
+  keycloak: keycloakOptionsSchema,
 })
+
+export type Config = z.infer<typeof configSchema>
+export type ConfigIn = z.input<typeof configSchema>

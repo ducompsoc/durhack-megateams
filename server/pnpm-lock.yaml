@@ -17,9 +17,6 @@ importers:
       body-parser:
         specifier: github:expressjs/body-parser#2.x
         version: https://codeload.github.com/expressjs/body-parser/tar.gz/07ce14d6c1708cae18a25be0c44f4eb5a6b063e3
-      config:
-        specifier: ^3.3.9
-        version: 3.3.12
       cookie-parser:
         specifier: ^1.4.6
         version: 1.4.6
@@ -86,13 +83,13 @@ importers:
       zod:
         specifier: ^3.22.2
         version: 3.23.8
+      zod-config:
+        specifier: ^0.0.5
+        version: 0.0.5(zod@3.23.8)
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.8.3
         version: 1.8.3
-      '@types/config':
-        specifier: ^3.3.1
-        version: 3.3.4
       '@types/cookie-parser':
         specifier: ^1.4.4
         version: 1.4.7
@@ -372,9 +369,6 @@ packages:
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
 
-  '@types/config@3.3.4':
-    resolution: {integrity: sha512-qFiTLnWy+TdPSMIXFHP+87lFXFRM4SXjRS+CSB66+56TrpLNw003y1sh7DGaaC1NGesxgKoT5FDy6dyA1Xju/g==}
-
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
 
@@ -503,10 +497,6 @@ packages:
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
-
-  config@3.3.12:
-    resolution: {integrity: sha512-Vmx389R/QVM3foxqBzXO8t2tUikYZP64Q6vQxGrsMpREeJc/aWRnPRERXWsYzOHAumx/AOoILWe6nU3ZJL+6Sw==}
-    engines: {node: '>= 10.0.0'}
 
   content-disposition@0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
@@ -771,11 +761,6 @@ packages:
 
   jose@5.8.0:
     resolution: {integrity: sha512-E7CqYpL/t7MMnfGnK/eg416OsFCVUrU/Y3Vwe7QjKhu/BkS1Ms455+2xsqZQVN57/U2MHMBvEb5SrmAZWAIntA==}
-
-  json5@2.2.3:
-    resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
-    engines: {node: '>=6'}
-    hasBin: true
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -1172,6 +1157,16 @@ packages:
       utf-8-validate:
         optional: true
 
+  zod-config@0.0.5:
+    resolution: {integrity: sha512-tW7J4bwVPYD0eYeaDzIjEpv188118H+uCbb+DaBRIGwuZNCSL0WyMmpeOmgMpbsGzrJ9YjtC5XFpyWlj27vd8g==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      dotenv: '>=15'
+      zod: ^3.x
+    peerDependenciesMeta:
+      dotenv:
+        optional: true
+
   zod@3.23.8:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
@@ -1316,8 +1311,6 @@ snapshots:
     dependencies:
       '@types/connect': 3.4.38
       '@types/node': 20.16.2
-
-  '@types/config@3.3.4': {}
 
   '@types/connect@3.4.38':
     dependencies:
@@ -1490,10 +1483,6 @@ snapshots:
       set-function-length: 1.2.2
 
   concat-map@0.0.1: {}
-
-  config@3.3.12:
-    dependencies:
-      json5: 2.2.3
 
   content-disposition@0.5.4:
     dependencies:
@@ -1795,8 +1784,6 @@ snapshots:
   isexe@2.0.0: {}
 
   jose@5.8.0: {}
-
-  json5@2.2.3: {}
 
   lodash@4.17.21: {}
 
@@ -2182,5 +2169,9 @@ snapshots:
   wrappy@1.0.2: {}
 
   ws@8.17.1: {}
+
+  zod-config@0.0.5(zod@3.23.8):
+    dependencies:
+      zod: 3.23.8
 
   zod@3.23.8: {}
