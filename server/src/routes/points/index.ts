@@ -2,22 +2,22 @@ import { Router as ExpressRouter } from "express"
 
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
-import handlers from "./point_handlers"
+import { pointsHandlers } from "./points-handlers";
 
 const points_router = ExpressRouter()
 
 points_router
   .route("/")
-  .get(handlers.getPointsList)
-  .post(handlers.createPoint, handleFailedAuthentication)
+  .get(pointsHandlers.getPointsList())
+  .post(pointsHandlers.createPoint(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
 points_router
   .route("/:point_id")
   .all(parseRouteId("point_id"))
-  .get(handlers.getPointDetails)
-  .patch(handlers.patchPointDetails, handleFailedAuthentication)
-  .delete(handlers.deletePoint, handleFailedAuthentication)
+  .get(pointsHandlers.getPointDetails())
+  .patch(pointsHandlers.patchPointDetails(), handleFailedAuthentication)
+  .delete(pointsHandlers.deletePoint(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
 export default points_router
