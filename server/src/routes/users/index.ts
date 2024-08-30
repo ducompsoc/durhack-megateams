@@ -2,22 +2,22 @@ import { Router as ExpressRouter } from "express"
 
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
-import handlers from "./user_handlers"
+import { usersHandlers } from "./users-handlers"
 
-const users_router = ExpressRouter()
+const usersRouter = ExpressRouter()
 
-users_router
+usersRouter
   .route("/")
-  .get(handlers.getUsersListAsAdmin, handlers.getUsersListDefault)
-  .post(handlers.createUserAsAdmin, handleFailedAuthentication)
+  .get(usersHandlers.getUsersListAsAdmin(), usersHandlers.getUsersListDefault())
+  .post(usersHandlers.createUserAsAdmin(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
-users_router
+usersRouter
   .route("/:user_id")
   .all(parseRouteId("user_id"))
-  .get(handlers.getUserDetailsAsAdmin, handlers.getUserDetailsDefault)
-  .patch(handlers.patchUserDetailsAsAdmin, handlers.patchMyUserDetails, handleFailedAuthentication)
-  .delete(handlers.deleteUserAsAdmin, handleFailedAuthentication)
+  .get(usersHandlers.getUserDetailsAsAdmin(), usersHandlers.getUserDetailsDefault())
+  .patch(usersHandlers.patchUserDetailsAsAdmin(), usersHandlers.patchMyUserDetails(), handleFailedAuthentication)
+  .delete(usersHandlers.deleteUserAsAdmin(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
-export default users_router
+export default usersRouter

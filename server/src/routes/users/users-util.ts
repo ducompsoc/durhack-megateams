@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import type { Request, Response } from "@server/types"
 import { requireCondition } from "@server/common/decorators"
 
 /**
