@@ -6,7 +6,7 @@ import { handleMethodNotAllowed } from "@server/common/middleware"
 
 import { userHandlers } from "./user-handlers"
 
-const userRouter = ExpressRouter()
+export const userRouter = ExpressRouter()
 
 userRouter.use((request: Request, response: Response, next: () => void) => {
   if (!request.user) {
@@ -27,5 +27,3 @@ userRouter
   .post(userHandlers.joinTeam())
   .delete(userHandlers.leaveTeam())
   .all(handleMethodNotAllowed)
-
-export default userRouter

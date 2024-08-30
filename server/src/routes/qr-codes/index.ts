@@ -4,7 +4,7 @@ import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from
 
 import { qrCodesHandlers } from "./qr-codes-handlers"
 
-const qrCodesRouter = ExpressRouter()
+export const qrCodesRouter = ExpressRouter()
 
 qrCodesRouter
   .route("/")
@@ -47,5 +47,3 @@ qrCodesRouter
   .patch(qrCodesHandlers.patchQRCodeDetails(), handleFailedAuthentication)
   .delete(qrCodesHandlers.deleteQRCode(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
-
-export default qrCodesRouter

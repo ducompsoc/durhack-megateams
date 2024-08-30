@@ -7,15 +7,15 @@ import { handleFailedAuthentication, handleMethodNotAllowed } from "@server/comm
 import { authHandlers } from "./auth_handlers"
 import { rememberUserReferrerForRedirect } from "./rememberUserReferrerForRedirect"
 
-const auth_router = ExpressRouter()
+export const authRouter = ExpressRouter()
 
-auth_router
+authRouter
   .route("/login")
   .all(rememberUserReferrerForRedirect)
   .get(passport.authenticate("oauth2"))
   .all(handleMethodNotAllowed)
 
-auth_router
+authRouter
   .route("/login/callback")
   .get(
     passport.authenticate("oauth2", {
@@ -27,13 +27,11 @@ auth_router
   )
   .all(handleMethodNotAllowed)
 
-auth_router.route("/csrf-token").get(handleGetCsrfToken).all(handleMethodNotAllowed)
+authRouter.route("/csrf-token").get(handleGetCsrfToken).all(handleMethodNotAllowed)
 
-auth_router
+authRouter
   .route("/socket-token")
   .get(authHandlers.handleGetSocketToken(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
-auth_router.route("/logout").post(authHandlers.handleLogout()).all(handleMethodNotAllowed)
-
-export default auth_router
+authRouter.route("/logout").post(authHandlers.handleLogout()).all(handleMethodNotAllowed)

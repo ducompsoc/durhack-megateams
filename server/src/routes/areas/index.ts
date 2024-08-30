@@ -4,20 +4,18 @@ import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from
 
 import { areaHandlers } from "./area_handlers"
 
-const areas_router = ExpressRouter()
+export const areasRouter = ExpressRouter()
 
-areas_router
+areasRouter
   .route("/")
   .get(areaHandlers.getAreasList(), handleFailedAuthentication)
   .post(areaHandlers.createArea(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
-areas_router
+areasRouter
   .route("/:area_id")
   .all(parseRouteId("area_id"))
   .get(areaHandlers.getAreaDetails(), handleFailedAuthentication)
   .patch(areaHandlers.patchAreaDetails(), handleFailedAuthentication)
   .delete(areaHandlers.deleteArea(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
-
-export default areas_router

@@ -10,7 +10,7 @@ import { listen_options_schema } from "@server/common/schema/config"
 import session from "./auth/session"
 import SocketManager from "./socket"
 import sequelize, { ensureDatabaseExists } from "./database"
-import api_router from "./routes"
+import { apiRouter } from "./routes"
 import "./auth"
 
 const environment = process.env.NODE_ENV
@@ -23,7 +23,7 @@ function getExpressApp(): Express {
   app.use(passport.initialize())
   app.use(passport.session())
 
-  app.use("/api", api_router)
+  app.use("/api", apiRouter)
 
   return app
 }

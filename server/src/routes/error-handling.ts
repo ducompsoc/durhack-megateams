@@ -1,15 +1,16 @@
 import createHttpError, { isHttpError } from "http-errors"
-import { Request, Response, NextFunction } from "express"
+import type { NextFunction } from "express"
 import {
   ForeignKeyConstraintError as SequelizeForeignKeyConstraintError,
   ValidationError as SequelizeValidationError,
 } from "sequelize"
 import { ZodError } from "zod"
 
+import type { Request, Response } from "@server/types"
 import { sendHttpErrorResponse, sendZodErrorResponse } from "@server/common/response"
 import { NullError, ValueError } from "@server/common/errors"
 
-export default function api_error_handler(error: Error, _request: Request, response: Response, next: NextFunction) {
+export function apiErrorHandler(error: Error, _request: Request, response: Response, next: NextFunction) {
   if (response.headersSent) {
     return next(error)
   }
@@ -38,8 +39,8 @@ export default function api_error_handler(error: Error, _request: Request, respo
   }
 
   if (error instanceof SequelizeForeignKeyConstraintError) {
-    let httpError
-    if (error.fields instanceof Array) {
+    let httpError: createHttpError.HttpError
+    if (Array.isArray(error.fields)) {
       httpError = new createHttpError.BadRequest(
         `Invalid foreign key(s) provided for field(s): ${error.fields.join(", ")}`,
       )

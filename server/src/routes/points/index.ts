@@ -4,20 +4,18 @@ import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from
 
 import { pointsHandlers } from "./points-handlers";
 
-const points_router = ExpressRouter()
+export const pointsRouter = ExpressRouter()
 
-points_router
+pointsRouter
   .route("/")
   .get(pointsHandlers.getPointsList())
   .post(pointsHandlers.createPoint(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
 
-points_router
+pointsRouter
   .route("/:point_id")
   .all(parseRouteId("point_id"))
   .get(pointsHandlers.getPointDetails())
   .patch(pointsHandlers.patchPointDetails(), handleFailedAuthentication)
   .delete(pointsHandlers.deletePoint(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
-
-export default points_router

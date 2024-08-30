@@ -4,7 +4,7 @@ import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from
 
 import { teamsHandlers } from "./teams-handlers"
 
-const teamsRouter = ExpressRouter()
+export const teamsRouter = ExpressRouter()
 
 teamsRouter
   .route("/")
@@ -27,5 +27,3 @@ teamsRouter
   .patch(teamsHandlers.patchTeamAsAdmin(), handleFailedAuthentication)
   .delete(teamsHandlers.deleteTeam())
   .all(handleMethodNotAllowed)
-
-export default teamsRouter

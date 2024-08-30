@@ -1,60 +1,59 @@
 import config from "config"
-import { Router as ExpressRouter, Request, Response } from "express"
+import { Router as ExpressRouter } from "express"
 import bodyParser from "body-parser"
 import methodOverride from "method-override"
 import createHttpError from "http-errors"
-import cookie_parser from "cookie-parser"
+import cookieParser from "cookie-parser"
 import { z } from "zod"
 
+import type { Request, Response } from "@server/types"
 import { handleMethodNotAllowed } from "@server/common/middleware"
 
 import { doubleCsrfProtection } from "@server/auth/csrf"
-import auth_router from "./auth"
-import areas_router from "./areas"
-import megateams_router from "./megateams"
-import points_router from "./points"
-import qr_codes_router from "./qr_codes"
-import teams_router from "./teams"
-import users_router from "./users"
-import user_router from "./user"
-import discord_router from "./discord"
-import api_error_handler from "./error_handling"
+import { authRouter } from "./auth"
+import { areasRouter } from "./areas"
+import { megateamsRouter } from "./megateams"
+import { pointsRouter } from "./points"
+import { qrCodesRouter } from "./qr-codes"
+import { teamsRouter } from "./teams"
+import { usersRouter } from "./users"
+import { userRouter } from "./user"
+import { discordRouter } from "./discord"
+import { apiErrorHandler } from "./error-handling"
 
-const api_router = ExpressRouter()
+export const apiRouter = ExpressRouter()
 
-api_router.use(cookie_parser(config.get("cookie-parser.secret")))
-api_router.use(bodyParser.json())
-api_router.use(bodyParser.urlencoded({ extended: true }))
+apiRouter.use(cookieParser(config.get("cookie-parser.secret")))
+apiRouter.use(bodyParser.json())
+apiRouter.use(bodyParser.urlencoded({ extended: true }))
 
 const mitigateCsrf = z.boolean().parse(config.get("csrf.enabled"))
 if (mitigateCsrf) {
-  api_router.use(doubleCsrfProtection)
+  apiRouter.use(doubleCsrfProtection)
 }
 
-function handle_root_request(request: Request, response: Response) {
+function rootRequestHandler(request: Request, response: Response) {
   response.status(200)
   response.json({ status: response.statusCode, message: "OK", api_version: 1 })
 }
 
-function handle_unhandled_request() {
+function routeFallthroughHandler() {
   throw new createHttpError.NotFound("Unknown API route.")
 }
 
-api_router.route("/").get(handle_root_request).all(handleMethodNotAllowed)
+apiRouter.route("/").get(rootRequestHandler).all(handleMethodNotAllowed)
 
-api_router.use("/auth", auth_router)
-api_router.use("/areas", areas_router)
-api_router.use("/megateams", megateams_router)
-api_router.use("/points", points_router)
-api_router.use("/qr_codes", qr_codes_router)
-api_router.use("/teams", teams_router)
-api_router.use("/users", users_router)
-api_router.use("/user", user_router)
-api_router.use("/discord", discord_router)
+apiRouter.use("/auth", authRouter)
+apiRouter.use("/areas", areasRouter)
+apiRouter.use("/megateams", megateamsRouter)
+apiRouter.use("/points", pointsRouter)
+apiRouter.use("/qr_codes", qrCodesRouter)
+apiRouter.use("/teams", teamsRouter)
+apiRouter.use("/users", usersRouter)
+apiRouter.use("/user", userRouter)
+apiRouter.use("/discord", discordRouter)
 
-api_router.use(handle_unhandled_request)
+apiRouter.use(routeFallthroughHandler)
 
-api_router.use(methodOverride())
-api_router.use(api_error_handler)
-
-export default api_router
+apiRouter.use(methodOverride())
+apiRouter.use(apiErrorHandler)

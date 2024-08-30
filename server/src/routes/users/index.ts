@@ -4,7 +4,7 @@ import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from
 
 import { usersHandlers } from "./users-handlers"
 
-const usersRouter = ExpressRouter()
+export const usersRouter = ExpressRouter()
 
 usersRouter
   .route("/")
@@ -19,5 +19,3 @@ usersRouter
   .patch(usersHandlers.patchUserDetailsAsAdmin(), usersHandlers.patchMyUserDetails(), handleFailedAuthentication)
   .delete(usersHandlers.deleteUserAsAdmin(), handleFailedAuthentication)
   .all(handleMethodNotAllowed)
-
-export default usersRouter

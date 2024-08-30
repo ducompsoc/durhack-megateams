@@ -6,9 +6,9 @@ import { handleMethodNotAllowed } from "@server/common/middleware"
 
 import { discordHandlers } from "./discord_handlers"
 
-const discord_router = ExpressRouter()
+export const discordRouter = ExpressRouter()
 
-discord_router.use((request: Request, response: Response, next: () => void) => {
+discordRouter.use((request: Request, response: Response, next: () => void) => {
   if (!request.user) {
     throw new createHttpError.Unauthorized()
   }
@@ -16,8 +16,6 @@ discord_router.use((request: Request, response: Response, next: () => void) => {
   next()
 })
 
-discord_router.route("/").get(discordHandlers.getDiscord()).all(handleMethodNotAllowed)
+discordRouter.route("/").get(discordHandlers.getDiscord()).all(handleMethodNotAllowed)
 
-discord_router.route("/redirect").get(discordHandlers.handleRedirect()).all(handleMethodNotAllowed)
-
-export default discord_router
+discordRouter.route("/redirect").get(discordHandlers.handleRedirect()).all(handleMethodNotAllowed)
