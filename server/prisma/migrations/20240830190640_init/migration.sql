@@ -122,7 +122,7 @@ CREATE INDEX "Team_area_id_idx" ON "Team"("area_id");
 CREATE INDEX "User_team_id_idx" ON "User"("team_id");
 
 -- AddForeignKey
-ALTER TABLE "Area" ADD CONSTRAINT "FK_Area_Megateam" FOREIGN KEY ("megateam_id") REFERENCES "Megateam"("megateam_id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "Area" ADD CONSTRAINT "Area_megateam_id_fkey" FOREIGN KEY ("megateam_id") REFERENCES "Megateam"("megateam_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Point" ADD CONSTRAINT "Point_origin_qr_code_id_fkey" FOREIGN KEY ("origin_qr_code_id") REFERENCES "QrCode"("qr_code_id") ON DELETE SET NULL ON UPDATE CASCADE;
