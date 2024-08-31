@@ -1,18 +1,14 @@
 import createHttpError from "http-errors"
 import { uniqueNamesGenerator, adjectives, animals, type Config as UniqueNamesGeneratorConfig } from "unique-names-generator"
 import { z } from "zod"
-import { ValidationError as SequelizeValidationError } from "sequelize"
 import { getRandomValues } from "node:crypto"
+import { getTeamsWithPoints, getTeamsWithEverything } from '@prisma/client/sql'
+import { Prisma } from "@prisma/client"
+import assert from "node:assert/strict"
 
 import type { Request, Response, Middleware } from "@server/types"
-import { NullError } from "@server/common/errors"
 import { requireUserIsAdmin, requireLoggedIn } from "@server/common/decorators"
-import sequelize from "@server/database"
-import Team from "@server/database/tables/team"
-import User from "@server/database/tables/user"
-import Area from "@server/database/tables/area"
-import Megateam from "@server/database/tables/megateam"
-import Point from "@server/database/tables/point"
+import { prisma, type Team } from "@server/database";
 
 class TeamsHandlers {
   static join_code_schema = z
@@ -42,28 +38,12 @@ class TeamsHandlers {
 
   listTeamsAsAnonymous(): Middleware {
     return async (request: Request, response: Response) => {
-      const result = await Team.findAll({
-        attributes: ["name", [sequelize.fn("sum", sequelize.col("members.points.value")), "points"]],
-        include: [
-          {
-            model: User,
-            include: [
-              {
-                model: Point,
-                attributes: [],
-              },
-            ],
-            attributes: [],
-          },
-        ],
-        group: "Team.team_id",
-      })
+      const result = await prisma.$queryRawTyped(getTeamsWithPoints())
 
-      const payload = result.map(team => {
-        const json = team.toJSON()
-        json.points = (!Number.isNaN(json.points) ? Number.parseInt(json.points) : 0) || 0
-        return json
-      })
+      const payload = result.map((team) => ({
+        name: team.teamName,
+        points: Number.isNaN(team.points) ? 0 : Number(team.points),
+      }));
 
       response.json({
         status: 200,
@@ -76,45 +56,23 @@ class TeamsHandlers {
   @requireUserIsAdmin()
   listTeamsAsAdmin(): Middleware {
     return async (request: Request, response: Response) => {
-      const result = await Team.findAll({
-        attributes: [
-          "team_id",
-          "name",
-          "join_code",
-          [sequelize.fn("sum", sequelize.col("members.points.value")), "points"],
-          [sequelize.fn("count", sequelize.col("members.user_id")), "member_count"],
-        ],
-        include: [
-          {
-            model: User,
-            include: [
-              {
-                model: Point,
-                attributes: [],
-              },
-            ],
-            attributes: [],
-          },
-          {
-            model: Area,
-            include: [
-              {
-                model: Megateam,
-                attributes: ["megateam_id", "megateam_name"],
-              },
-            ],
-            attributes: ["area_id", "area_name"],
-          },
-        ],
-        group: "Team.team_id",
-      })
+      const result = await prisma.$queryRawTyped(getTeamsWithEverything())
 
-      const payload = result.map(team => {
-        const json = team.toJSON()
-        json.points = (!Number.isNaN(json.points) ? Number.parseInt(json.points) : 0) || 0
-        json.member_count = (!Number.isNaN(json.member_count) ? Number.parseInt(json.member_count) : 0) || 0
-        return json
-      })
+      const payload = result.map((team) => ({
+        team_id: team.teamId,
+        name: team.teamName,
+        join_code: team.joinCode,
+        points: Number.isNaN(team.points) ? 0 : Number(team.points),
+        member_count: Number.isNaN(team.memberCount) ? 0 : Number(team.memberCount),
+        area: {
+          area_id: team.areaId,
+          area_name: team.areaName,
+          megateam: {
+            megateam_id: team.megateamId,
+            megateam_name: team.megateamName,
+          }
+        }
+      }));
 
       response.json({
         status: 200,
@@ -124,6 +82,10 @@ class TeamsHandlers {
     }
   }
 
+  static patchTeamPayloadSchema = z.object({
+    area_code: z.number()
+  })
+
   @requireUserIsAdmin()
   patchTeamAsAdmin(): Middleware {
     return async (request: Request, response: Response) => {
@@ -131,14 +93,14 @@ class TeamsHandlers {
       if (typeof team_id !== "number") {
         throw new Error("Parsed `team_id` not found.")
       }
-      const areaCode = z.number()
+      const payload = TeamsHandlers.patchTeamPayloadSchema.parse(request.body)
 
-      const result = areaCode.safeParse(request.body.area_code)
-      if (!result.success) throw new createHttpError.BadRequest()
-
-      const team = await Team.findByPk(team_id, { rejectOnEmpty: new NullError() })
-      team.area_id = result.data
-      await team.save()
+      await prisma.team.update({
+        where: { teamId: team_id },
+        data: {
+          areaId: payload.area_code
+        }
+      })
 
       response.json({
         status: 200,
@@ -157,48 +119,41 @@ class TeamsHandlers {
   @requireLoggedIn()
   createTeamAsHacker(): Middleware {
     return async (request: Request, response: Response) => {
-      if (!request.session.generatedTeamName) {
-        throw new createHttpError.Conflict()
-      }
+      assert(request.user!.teamId == null)
+
+      const generatedTeamName = request.session.generatedTeamName
+      assert(generatedTeamName != null)
 
       const randomBuffer = new Uint16Array(1) // length 1, value 0-65535
       const randomValues = getRandomValues(randomBuffer) // Fill the buffer with random values
       let randomValue = randomValues[0]
 
-      const transaction = await sequelize.transaction()
-
-      try {
-        const team = Team.build({
-          name: request.session.generatedTeamName,
-          join_code: randomValue,
-        })
-
-        let try_index = 0
-        while (team.isNewRecord && try_index < 10) {
-          try {
-            await team.save({ transaction: transaction })
-          } catch (error) {
-            if (error instanceof SequelizeValidationError) {
-              try_index += 1
-              randomValue += try_index ** 2
-              randomValue %= 65535
-              team.join_code = randomValue
-              continue
-            }
-            throw error
+      let createdTeam: Team | null = null
+      let tryIndex = 0
+      while (tryIndex < 10) {
+        try {
+          createdTeam = await prisma.team.create({
+            data: {
+              teamName: generatedTeamName,
+              joinCode: randomValue,
+              members: {
+                connect: [ request.user! ],
+              }
+            },
+          });
+        } catch (error) {
+          if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            tryIndex += 1
+            randomValue += tryIndex ** 2
+            randomValue %= 65535
+            continue
           }
+          throw error
         }
+      }
 
-        if (team.isNewRecord) {
-          throw new createHttpError.Conflict("Team creation failed because no available join-code was found. Try again.")
-        }
-
-        await (request.user as User).$set("team", team, { transaction: transaction })
-
-        await transaction.commit()
-      } catch (error) {
-        await transaction.rollback()
-        throw error
+      if (createdTeam == null) {
+        throw new createHttpError.Conflict("Team creation failed because no available join-code was found. Try again.")
       }
 
       response.json({
