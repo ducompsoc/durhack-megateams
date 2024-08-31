@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["typedSql"]
 }
 
 datasource db {
@@ -82,8 +83,8 @@ model User {
   teamId           Int?      @map("team_id")
   initialLoginTime DateTime? @map("initial_login_time")
   lastLoginTime    DateTime? @map("last_login_time")
-  createdAt        DateTime  @default(now()) @map("createdAt")
-  updatedAt        DateTime  @updatedAt @map("updaatedAt")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
   team             Team?     @relation(fields: [teamId], references: [teamId])
   points           Point[]
   createdQrCodes   QrCode[]
@@ -102,7 +103,7 @@ model TokenSet {
   refreshToken String?   @map("refresh_token")
   scope        String?
   accessExpiry DateTime? @map("access_expiry") @db.Timestamp(0)
-  sessionState String?
+  sessionState String?   @map("session_state")
 }
 
 enum QRCodes_category {

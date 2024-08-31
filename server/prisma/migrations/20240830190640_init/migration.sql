@@ -3,14 +3,14 @@ CREATE TYPE "QRCodes_category" AS ENUM ('workshop', 'sponsor', 'challenge', 'pre
 
 -- CreateTable
 CREATE TABLE "Area" (
-    "areaId" SERIAL NOT NULL,
+    "area_id" SERIAL NOT NULL,
     "megateam_id" INTEGER NOT NULL,
     "area_name" VARCHAR(255) NOT NULL,
     "area_location" VARCHAR(255) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Area_pkey" PRIMARY KEY ("areaId")
+    CONSTRAINT "Area_pkey" PRIMARY KEY ("area_id")
 );
 
 -- CreateTable
@@ -74,8 +74,8 @@ CREATE TABLE "User" (
     "team_id" INTEGER,
     "initial_login_time" TIMESTAMP(3),
     "last_login_time" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updaatedAt" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("keycloak_user_id")
 );
@@ -89,7 +89,7 @@ CREATE TABLE "TokenSet" (
     "refresh_token" TEXT,
     "scope" TEXT,
     "access_expiry" TIMESTAMP(0),
-    "sessionState" TEXT,
+    "session_state" TEXT,
 
     CONSTRAINT "TokenSet_pkey" PRIMARY KEY ("user_id")
 );
@@ -134,7 +134,7 @@ ALTER TABLE "Point" ADD CONSTRAINT "Point_redeemer_user_id_fkey" FOREIGN KEY ("r
 ALTER TABLE "QrCode" ADD CONSTRAINT "QrCode_creator_id_fkey" FOREIGN KEY ("creator_id") REFERENCES "User"("keycloak_user_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Team" ADD CONSTRAINT "Team_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "Area"("areaId") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Team" ADD CONSTRAINT "Team_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "Area"("area_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_team_id_fkey" FOREIGN KEY ("team_id") REFERENCES "Team"("team_id") ON DELETE SET NULL ON UPDATE CASCADE;
