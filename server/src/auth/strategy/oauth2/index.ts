@@ -1,13 +1,10 @@
-import config from "config"
 import passport from "passport"
-import { VerifyCallback } from "passport-oauth2"
+import type { VerifyCallback } from "passport-oauth2"
 import refresh from "passport-oauth2-refresh"
 
-import KeycloakOAuth2Strategy, { KeycloakProfile } from "@server/auth/strategy/oauth2/strategy"
-import { oauth2ClientOptionsSchema } from "@server/config/schema"
-import User from "@server/database/tables/user"
-
-const oauth2_options = oauth2ClientOptionsSchema.parse(config.get("passport.oauth2"))
+import KeycloakOAuth2Strategy, { type KeycloakProfile } from "@server/auth/strategy/oauth2/strategy"
+import { prisma, type User } from "@server/database"
+import { passportOauth2Config } from "@server/config";
 
 /**
  * Verify function for Passport.js 'oauth2' strategy (OAuth2 flow via DurHack Live)
@@ -25,30 +22,29 @@ async function oauth2VerifyFunction(
 ) {
   const timestamp = new Date()
 
-  let user: User
-  let _is_new: boolean
+  let user: User | undefined
   try {
-    ;[user, _is_new] = await User.findOrCreate({
-      where: { email: profile.email },
-      defaults: {
-        ...profile,
-        initially_logged_in_at: timestamp,
+    user = await prisma.user.upsert({
+      where: {
+        keycloakUserId: profile.sub,
       },
+      update: {
+        lastLoginTime: timestamp,
+      },
+      create: {
+        keycloakUserId: profile.sub,
+        initialLoginTime: timestamp,
+        lastLoginTime: timestamp,
+      }
     })
-  } catch (error: any) {
+  } catch (error) {
     return done(error)
   }
-
-  await user.update({
-    ...profile,
-    last_logged_in_at: timestamp,
-    role: profile.role
-  })
 
   return done(null, user)
 }
 
-const oauth2_strategy = new KeycloakOAuth2Strategy(oauth2_options, oauth2VerifyFunction)
+const oauth2_strategy = new KeycloakOAuth2Strategy(passportOauth2Config, oauth2VerifyFunction)
 
 passport.use("oauth2", oauth2_strategy)
 refresh.use("oauth2", oauth2_strategy)

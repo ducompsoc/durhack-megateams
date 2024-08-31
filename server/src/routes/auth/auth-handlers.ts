@@ -18,9 +18,7 @@ class AuthHandlers {
         return response.redirect(redirect_to)
       }
 
-      if (request.user.role !== UserRole.hacker) {
-        return response.redirect("/volunteer")
-      }
+      // todo: if the user has 'volunteer' or 'admin' role, redirect to /volunteer
 
       return response.redirect("/hacker")
     }

@@ -119,7 +119,9 @@ class TeamsHandlers {
   @requireLoggedIn()
   createTeamAsHacker(): Middleware {
     return async (request: Request, response: Response) => {
-      assert(request.user!.teamId == null)
+      if (request.user!.teamId == null) {
+        throw new createHttpError.BadRequest("You are already in a team.")
+      }
 
       const generatedTeamName = request.session.generatedTeamName
       assert(generatedTeamName != null)

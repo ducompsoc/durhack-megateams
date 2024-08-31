@@ -2,7 +2,7 @@ import { Router as ExpressRouter } from "express"
 
 import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
 
-import { areaHandlers } from "./area_handlers"
+import { areaHandlers } from "./area-handlers"
 
 export const areasRouter = ExpressRouter()
 

@@ -1,21 +1,15 @@
-import { Request, Response } from "express"
-import config from "config"
 import { doubleCsrf } from "csrf-csrf"
 
-import { doubleCsrfOptionsSchema } from "@server/config/schema"
+import type { Request, Response } from "@server/types"
+import { csrfConfig } from "@server/config"
 
-const csrf_options = doubleCsrfOptionsSchema.parse(config.get("csrf.options"))
-
-function rollingSecret(request?: Request): string {
-  return config.get("csrf.secret")
+function getSecret(request?: Request | undefined): string {
+  return csrfConfig.secret
 }
 
-export const { generateToken, doubleCsrfProtection } = doubleCsrf({
-  getSecret: rollingSecret,
-
-  /*
+/*
   The default value for cookieName is "__Host-psifi.x-csrf-token".
-  We (temporarily) remove the "__Host-" prefix from the cookie name (as below) as it produces this error on
+  We remove the "__Host-" prefix from the cookie name (as in config/default.ts) as it produces this error on
   Chromium browsers:
 
      "This attempt to set a cookie via a Set-Cookie header was blocked because it used the "__Secure-" or " __Host-"
@@ -34,8 +28,11 @@ export const { generateToken, doubleCsrfProtection } = doubleCsrf({
           "__Host-cookie1" MUST contain a "Path" attribute with a value of
           "/".
    Particularly, in development, the URI scheme is not considered "secure" by the user agent.
-   */
-  ...csrf_options,
+ */
+
+export const { generateToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret,
+  ...csrfConfig,
 })
 
 export function handleGetCsrfToken(request: Request, response: Response): void {

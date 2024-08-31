@@ -4,7 +4,7 @@ import createHttpError from "http-errors"
 import type { Request, Response } from "@server/types"
 import { handleMethodNotAllowed } from "@server/common/middleware"
 
-import { discordHandlers } from "./discord_handlers"
+import { discordHandlers } from "./discord-handlers"
 
 export const discordRouter = ExpressRouter()
 

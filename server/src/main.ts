@@ -8,9 +8,9 @@ import { listenConfig } from "@server/config";
 
 import session from "./auth/session"
 import SocketManager from "./socket"
-import sequelize, { ensureDatabaseExists } from "./database"
 import { apiRouter } from "./routes"
 import "./auth"
+import "./database"
 
 const environment = process.env.NODE_ENV
 const dev = environment !== "production"
@@ -36,15 +36,6 @@ function getServer(app: Express): Server {
 }
 
 async function main() {
-  await ensureDatabaseExists()
-
-  if (dev) {
-    // Run with the force: true option to update your schema if your server's schema
-    // is out-of-date compared to the code's schema. Note this will wipe your database.
-    // https://github.com/ducompsoc/durhack-megateams/pull/32#issuecomment-1652556468
-    await sequelize.sync({ force: false })
-  }
-
   const app = getExpressApp()
   const server = getServer(app)
 

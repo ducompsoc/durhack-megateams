@@ -1,16 +1,21 @@
 import createHttpError from "http-errors"
 import { z } from "zod"
+import assert from "node:assert/strict"
 
 import { discordConfig } from "@server/config";
 import type { Middleware, Request, Response } from "@server/types";
-import type User from "@server/database/tables/user"
+import { prisma, type User } from "@server/database"
 
 class DiscordHandlers {
   getDiscord(): Middleware {
     return async (request: Request, response: Response) => {
-      const user = request.user as User
+      const user = request.user
+      assert(user != null)
+      assert(user.teamId != null)
 
-      const team = await user.$get("team")
+      const team = await prisma.team.findUnique({
+        where: { teamId: user.teamId }
+      })
 
       if (!team) {
         throw new createHttpError.NotFound("You are not in a team!")
@@ -44,7 +49,12 @@ class DiscordHandlers {
     return async (request: Request, response: Response) => {
       const user = request.user as User
 
-      const team = await user.$get("team")
+      assert(user != null)
+      assert(user.teamId != null)
+
+      let team = await prisma.team.findUnique({
+        where: { teamId: user.teamId }
+      })
 
       if (!team) {
         throw new createHttpError.NotFound("You are not in a team!")
@@ -103,7 +113,7 @@ class DiscordHandlers {
         }),
       })
 
-      if (!team.discord_channel_id) {
+      if (!team.discordChannelId) {
         const newChannelRes = await fetch(`${discordApiBase}/guilds/${guildID}/channels`, {
           method: "POST",
           headers: {
@@ -111,17 +121,22 @@ class DiscordHandlers {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: team.name,
+            name: team.teamName,
             type: "0",
             parent_id: discordConfig.teamsParentChannel,
           }),
         })
         const newChannel: { id: string } = await newChannelRes.json()
-        team.discord_channel_id = newChannel.id
-        await team.save()
+        team = await prisma.team.update({
+          where: team,
+          data: {
+            discordChannelId: newChannel.id,
+          },
+        })
+        assert(team.discordChannelId != null)
       }
 
-      await fetch(`${discordApiBase}/channels/${team.discord_channel_id}/permissions/${discord_user_id}`, {
+      await fetch(`${discordApiBase}/channels/${team.discordChannelId}/permissions/${discord_user_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bot ${discordConfig.botToken}`,
@@ -133,7 +148,7 @@ class DiscordHandlers {
         }),
       })
 
-      response.redirect(`https://discord.com/channels/${guildID}/${team.discord_channel_id}`)
+      response.redirect(`https://discord.com/channels/${guildID}/${team.discordChannelId}`)
     }
   }
 }

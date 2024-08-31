@@ -4,7 +4,7 @@ import passport from "passport"
 import { handleGetCsrfToken } from "@server/auth/csrf"
 import { handleFailedAuthentication, handleMethodNotAllowed } from "@server/common/middleware"
 
-import { authHandlers } from "./auth_handlers"
+import { authHandlers } from "./auth-handlers"
 import { rememberUserReferrerForRedirect } from "./rememberUserReferrerForRedirect"
 
 export const authRouter = ExpressRouter()

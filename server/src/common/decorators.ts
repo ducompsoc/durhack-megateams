@@ -35,7 +35,8 @@ export function requireCondition(condition: Condition) {
 }
 
 export function userHasRole(role: UserRole): Condition {
-  return (request: Request) => request.user?.role === role
+  // todo: use keycloak token set for this
+  return (request: Request) => false
 }
 
 export function userIsLoggedIn(): Condition {
@@ -74,7 +75,8 @@ export function requireLoggedIn() {
  * Decorator that ensures `request.user.role` is one of the provided roles.
  */
 export function requireUserIsOneOf(...roles: UserRole[]) {
-  return requireCondition((request: Request): boolean => request.user != null && roles.includes(request.user.role))
+  // todo: use keycloak token set for this
+  return requireCondition((request: Request): boolean => false)
 }
 
 /**
@@ -83,7 +85,7 @@ export function requireUserIsOneOf(...roles: UserRole[]) {
  */
 export function userIsSelf(): Condition {
   return (request: Request, response: Response): boolean => {
-    return request.user != null && request.user.id === response.locals.user_id
+    return request.user != null && request.user.keycloakUserId === response.locals.user_id
   }
 }
 

@@ -1,64 +1,30 @@
 import createHttpError from "http-errors"
-import { Sequelize } from "sequelize"
 import { z } from "zod"
+import { getMegateamsWithPointsAndMemberCount } from "@prisma/client/sql"
 
 import type { Request, Response, Middleware } from "@server/types"
-import Megateam from "@server/database/tables/megateam"
-import Area from "@server/database/tables/area"
-import Team from "@server/database/tables/team"
-import User from "@server/database/tables/user"
-import Point from "@server/database/tables/point"
+import { prisma } from "@server/database"
 
 class MegateamsHandlers {
   static numberParser = z.coerce.number().catch(0)
 
   getMegateamsList(): Middleware {
     return async (req: Request, res: Response): Promise<void> => {
-      const result = await Megateam.findAll({
-        attributes: [
-          "megateam_name",
-          "megateam_description",
-          [Sequelize.fn("sum", Sequelize.col("areas.team.members.points.value")), "points"],
-          [Sequelize.fn("count", Sequelize.col("areas.team.members.user_id")), "members"],
-        ],
-        include: [
-          {
-            model: Area,
-            attributes: [],
-            include: [
-              {
-                model: Team,
-                attributes: [],
-                include: [
-                  {
-                    model: User,
-                    attributes: [],
-                    include: [
-                      {
-                        model: Point,
-                        attributes: [],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        group: "Megateam.megateam_id",
-      })
+      const result = await prisma.$queryRawTyped(getMegateamsWithPointsAndMemberCount())
 
-      const most_members = Math.max(
-        ...result.map(megateam => MegateamsHandlers.numberParser.parse(megateam.toJSON().members)),
+      const mostMembers = Math.max(
+        ...result.map(megateam => MegateamsHandlers.numberParser.parse(megateam.memberCount)),
       )
 
       const payload = result.map(megateam => {
-        const plain_megateam = megateam.toJSON()
-
-        const naive_points = MegateamsHandlers.numberParser.parse(plain_megateam.points)
-        const members = MegateamsHandlers.numberParser.parse(plain_megateam.members)
-        plain_megateam.points = Math.round((naive_points * most_members) / members)
-        return plain_megateam
+        const naivePoints = MegateamsHandlers.numberParser.parse(megateam.points)
+        const members = MegateamsHandlers.numberParser.parse(megateam.memberCount)
+        const scaledPoints = members > 0 ? naivePoints * mostMembers / members : 0
+        return {
+          megateam_name: megateam.megateamName,
+          megateam_description: megateam.megateamDescription,
+          points: scaledPoints
+        }
       })
 
       res.json({

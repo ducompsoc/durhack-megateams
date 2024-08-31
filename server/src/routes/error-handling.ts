@@ -1,9 +1,6 @@
 import createHttpError, { isHttpError } from "http-errors"
 import type { NextFunction } from "express"
-import {
-  ForeignKeyConstraintError as SequelizeForeignKeyConstraintError,
-  ValidationError as SequelizeValidationError,
-} from "sequelize"
+import { Prisma } from "@prisma/client"
 import { ZodError } from "zod"
 
 import type { Request, Response } from "@server/types"
@@ -31,22 +28,27 @@ export function apiErrorHandler(error: Error, _request: Request, response: Respo
     return sendHttpErrorResponse(response, new createHttpError.NotFound(error.message))
   }
 
-  if (error instanceof SequelizeValidationError) {
+  if (error instanceof Prisma.PrismaClientValidationError) {
     const httpError = new createHttpError.BadRequest(
-      `${error.message} with fields: ${error.errors.map(e => `* ${e.path} - ${e.message}`).join("; ")}`,
+      "Something failed database client validation."
     )
     return sendHttpErrorResponse(response, httpError)
   }
 
-  if (error instanceof SequelizeForeignKeyConstraintError) {
-    let httpError: createHttpError.HttpError
-    if (Array.isArray(error.fields)) {
-      httpError = new createHttpError.BadRequest(
-        `Invalid foreign key(s) provided for field(s): ${error.fields.join(", ")}`,
-      )
-    } else {
-      httpError = new createHttpError.BadRequest(error.message)
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    let httpError: createHttpError.HttpError | undefined
+    // unique constraint failed
+    if (error.code === "P2002") {
+      httpError = new createHttpError.Conflict(error.message)
     }
+
+    // foreign key constraint failed
+    if (error.code === "P2003") {
+      httpError = new createHttpError.Conflict(error.message)
+    }
+
+    httpError ??= new createHttpError.BadRequest(error.message)
+
     return sendHttpErrorResponse(response, httpError)
   }
 

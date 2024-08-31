@@ -2,15 +2,14 @@ import createHttpError from "http-errors"
 
 import type { Middleware, Request, Response } from "@server/types";
 import { requireUserIsAdmin } from "@server/common/decorators"
-import Area from "@server/database/tables/area"
-import Megateam from "@server/database/tables/megateam"
+import { prisma } from "@server/database"
 
 class AreaHandlers {
   @requireUserIsAdmin()
   getAreasList(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      const result = await Megateam.findAll({
-        include: [Area],
+      const result = await prisma.megateam.findMany({
+        include: { areas: true }
       })
 
       response.json({
