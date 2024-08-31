@@ -31,7 +31,7 @@ model Megateam {
 }
 
 model Point {
-  point_id       Int      @id @default(autoincrement())
+  pointId        Int      @id @default(autoincrement()) @map("point_id")
   value          Int
   originQrCodeId Int?     @map("origin_qr_code_id")
   redeemerUserId String   @map("redeemer_user_id") @db.Uuid
