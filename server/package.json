@@ -36,7 +36,7 @@
   "type": "module",
   "dependencies": {
     "@durhack/token-vault": "^0.1.2",
-    "@prisma/client": "^5.18.0",
+    "@prisma/client": "^5.19.0",
     "body-parser": "github:expressjs/body-parser#2.x",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -76,7 +76,7 @@
     "@types/passport-oauth2": "^1.4.12",
     "@types/passport-oauth2-refresh": "^1.1.1",
     "@types/uuid": "^9.0.3",
-    "prisma": "^5.18.0",
+    "prisma": "^5.19.0",
     "tsx": "^3.12.8",
     "typescript": "^5.5.4"
   },

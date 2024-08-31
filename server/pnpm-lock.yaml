@@ -12,7 +12,7 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2(jose@5.8.0)(zod@3.23.8)
       '@prisma/client':
-        specifier: ^5.18.0
+        specifier: ^5.19.0
         version: 5.19.0(prisma@5.19.0)
       body-parser:
         specifier: github:expressjs/body-parser#2.x
@@ -127,7 +127,7 @@ importers:
         specifier: ^9.0.3
         version: 9.0.8
       prisma:
-        specifier: ^5.18.0
+        specifier: ^5.19.0
         version: 5.19.0
       tsx:
         specifier: ^3.12.8
