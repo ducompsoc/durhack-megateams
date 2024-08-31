@@ -27,7 +27,7 @@ model Megateam {
   megateamDescription String?  @map("megateamDescription") @db.VarChar(255)
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
-  area                Area[]
+  areas               Area[]
 }
 
 model Point {
