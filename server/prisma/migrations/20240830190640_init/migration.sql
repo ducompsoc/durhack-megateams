@@ -17,7 +17,7 @@ CREATE TABLE "Area" (
 CREATE TABLE "Megateam" (
     "megateam_id" SERIAL NOT NULL,
     "megateam_name" VARCHAR(255) NOT NULL,
-    "megateamDescription" VARCHAR(255),
+    "megateam_description" VARCHAR(255),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 

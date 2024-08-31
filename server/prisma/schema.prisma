@@ -24,7 +24,7 @@ model Area {
 model Megateam {
   megateamId          Int      @id @default(autoincrement()) @map("megateam_id")
   megateamName        String   @map("megateam_name") @db.VarChar(255)
-  megateamDescription String?  @map("megateamDescription") @db.VarChar(255)
+  megateamDescription String?  @map("megateam_description") @db.VarChar(255)
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
   areas               Area[]
