@@ -11,6 +11,9 @@ importers:
       '@durhack/token-vault':
         specifier: ^0.1.2
         version: 0.1.2(jose@5.8.0)(zod@3.23.8)
+      '@keycloak/keycloak-admin-client':
+        specifier: ^25.0.4
+        version: 25.0.4
       '@otterhttp/app':
         specifier: ^3.4.4
         version: 3.4.4
@@ -285,6 +288,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@keycloak/keycloak-admin-client@25.0.4':
+    resolution: {integrity: sha512-mZVFwly7cHZq1XpvJrrOutU0qrUbGo8NUdpb7PS4309x8yG2a4/WyZfh2lgiopBRQ6R/b24RsuHa4GetQPqT+g==}
+    engines: {node: '>=18'}
+
   '@otterhttp/accepts@3.0.0':
     resolution: {integrity: sha512-8G9vqGrmEarsIPI0jyPyuPRxnRQMvQpbAUuoXPZNIz569ypy0qGBs3YPTxtQiRy4Q2KDTNMa8PRLMQhkz4I8Gw==}
     engines: {node: '>=20.16.0'}
@@ -431,6 +438,10 @@ packages:
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
     engines: {node: '>= 0.8'}
+
+  camelize-ts@3.0.0:
+    resolution: {integrity: sha512-cgRwKKavoDKLTjO4FQTs3dRBePZp/2Y9Xpud0FhuCOTE86M2cniKN4CCXgRnsyXNMmQMifVHcv6SPaMtTx6ofQ==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   cookie@0.4.2:
     resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
@@ -611,6 +622,14 @@ packages:
     resolution: {integrity: sha512-lMx9dX+KRmG8sq6gulYYpKWZc9RlGsgBR6aoO8Qsm3qvkSJ+3rAymr+TnV8EDMrIrwuFJ4kruzMWM/OpYzPoow==}
     engines: {node: '>=8'}
 
+  url-join@5.0.0:
+    resolution: {integrity: sha512-n2huDr9h9yzd6exQVnH/jU5mr+Pfx08LRXXZhkLLetAMESRj+anQsTAh940iMrIetKAmry9coFuZQ2jY8/p3WA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
+  url-template@3.1.1:
+    resolution: {integrity: sha512-4oszoaEKE/mQOtAmdMWqIRHmkxWkUZMnXFnjQ5i01CuRSK3uluxcH1MRVVVWmhlnzT1SCDfKxxficm2G37qzCA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
@@ -767,6 +786,12 @@ snapshots:
 
   '@esbuild/win32-x64@0.23.1':
     optional: true
+
+  '@keycloak/keycloak-admin-client@25.0.4':
+    dependencies:
+      camelize-ts: 3.0.0
+      url-join: 5.0.0
+      url-template: 3.1.1
 
   '@otterhttp/accepts@3.0.0':
     dependencies:
@@ -925,6 +950,8 @@ snapshots:
   base64id@2.0.0: {}
 
   bytes@3.1.2: {}
+
+  camelize-ts@3.0.0: {}
 
   cookie@0.4.2: {}
 
@@ -1115,6 +1142,10 @@ snapshots:
   undici-types@6.19.8: {}
 
   unique-names-generator@4.7.1: {}
+
+  url-join@5.0.0: {}
+
+  url-template@3.1.1: {}
 
   uuid@9.0.1: {}
 
