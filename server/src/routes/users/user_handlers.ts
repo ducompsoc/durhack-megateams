@@ -99,31 +99,27 @@ class UserHandlers {
    */
   @requireUserIsAdmin
   async getUsersListAsAdmin(request: Request, response: Response, next: NextFunction): Promise<void> {
-    const result = await User.findAll({
-      attributes: [["user_id", "id"], "preferred_name", "email"],
-      include: [
-        { model: Point },
-        {
-          model: Team,
-          include: [
-            {
-              model: Area,
-              include: [Megateam],
-            },
-          ],
-        },
-      ],
-    })
 
-    const payload = result.map((user: User) => ({
-      id: user.id,
+    const userList = await prisma.user.findMany({
+      select: {
+        user_id: true,
+        preferred_name: true,
+        email: true,
+        Points: true,
+        Team: { include: 
+          { Area: { include: 
+            { Megateam : true 
+      } } } } } });
+    
+    const payload = userList.map(user => ({
+      id: user.user_id,
       preferred_name: user.preferred_name,
       email: user.email,
-      points: Point.getPointsTotal(user.points || []),
-      team_name: user.team?.name,
-      team_id: user.team?.id,
-      megateam_name: user.team?.area?.megateam?.name,
-    }))
+      Points: user.Points,
+      team_name: user.Team?.team_name,
+      team_id: user.Team?.team_id,
+      megateam_name: user.Team?.Area?.Megateam.megateam_name
+    }));
 
     response.status(200)
     response.json({
