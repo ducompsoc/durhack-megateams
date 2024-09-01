@@ -61,7 +61,7 @@ class DiscordHandlers {
 
       const { code, state } = DiscordHandlers.discord_access_code_schema.parse(request.query)
 
-      //todo: verify that `state` matches what was assigned on flow begin
+      // todo: verify that `state` matches what was assigned on flow begin
 
       const discordApiBase = discordConfig.apiEndpoint
 

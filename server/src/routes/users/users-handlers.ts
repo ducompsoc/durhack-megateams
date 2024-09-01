@@ -33,15 +33,17 @@ class UsersHandlers {
 
   /**
    * Handles an authenticated admin GET request to /users.
-   * Returns a list of user IDs and preferred names that can be filtered by:
-   *   checked_in.
-   * and searched by
-   *   email.
+   * Returns a list of user IDs and preferred names.
    * using URL search parameters.
    */
   @requireUserIsAdmin()
   getUsersListAsAdmin(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
+      /*
+      todo: joe thinks this whole handler needs a rework.
+           It should query the Keycloak admin API for a 'page' (sub-list) of users that match the (email) search term,
+           look those up in the database for 'points' totals, defaulting to 0, and return that.
+       */
       const result = await prisma.user.findMany({
         select: {
           keycloakUserId: true,
@@ -60,7 +62,7 @@ class UsersHandlers {
 
       const payload = result.map((user) => ({
         id: user.keycloakUserId,
-        // todo: this used to provide preferred name and email too
+        // todo: this used to provide preferred name and email too (see above note)
         points: prisma.point.sumPoints(user.points),
         team_name: user.team?.teamName,
         team_id: user.team?.teamId,

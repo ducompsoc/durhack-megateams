@@ -13,7 +13,7 @@ type ResponseBody = {
 function makeHttpErrorResponseBody(error: HttpError): ResponseBody {
   const response_body: ResponseBody = {
     status: error.statusCode,
-    message: STATUS_CODES[error.statusCode] || error.message,
+    message: error.statusMessage,
   }
 
   if (error.message && error.message !== response_body.message) {

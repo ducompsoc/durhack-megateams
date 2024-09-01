@@ -39,3 +39,8 @@ export async function getKeycloakAdminClient() {
   keycloakAdminClient.setAccessToken(credentials.access_token)
   return keycloakAdminClient
 }
+
+export type KeycloakUserInfo = {
+  groups: string[]
+  preferred_name: string
+}

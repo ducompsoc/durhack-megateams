@@ -7,8 +7,7 @@ import { getSession } from "@server/auth/session"
 import { hostname } from "@server/config"
 import { type User, prisma } from "@server/database"
 import type { Middleware } from "@server/types"
-
-import { keycloakClient } from "./keycloak-client"
+import { keycloakClient } from "@server/auth/keycloak-client"
 
 export class KeycloakHandlers {
   client: Client

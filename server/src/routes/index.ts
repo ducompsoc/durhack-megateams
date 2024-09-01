@@ -1,12 +1,18 @@
 import { App } from "@otterhttp/app"
 import { ClientError } from "@otterhttp/errors"
 import { json } from "@otterhttp/parsec"
+import type { UserinfoResponse } from "openid-client";
+import assert from "node:assert/strict";
 
 import { doubleCsrfProtection } from "@server/auth/csrf"
 import { methodNotAllowed } from "@server/common/middleware"
 import { csrfConfig } from "@server/config"
 import type { Request, Response } from "@server/types"
 import { prisma } from "@server/database";
+import { getSession } from "@server/auth/session";
+import { adaptTokenSetToClient, adaptTokenSetToDatabase } from "@server/auth/adapt-token-set";
+import { keycloakClient } from "@server/auth/keycloak-client";
+import type { KeycloakUserInfo } from "@server/auth/keycloak-client";
 
 import { areasApp } from "./areas"
 import { authApp } from "./auth"
@@ -17,9 +23,6 @@ import { qrCodesApp } from "./qr-codes"
 import { teamsApp } from "./teams"
 import { userApp } from "./user"
 import { usersApp } from "./users"
-import { getSession } from "@server/auth/session";
-import { adaptTokenSetToClient } from "@server/auth/adapt-token-set";
-import { keycloakClient } from "@server/routes/auth/keycloak/keycloak-client";
 
 export const apiApp = new App<Request, Response>()
 
@@ -38,13 +41,43 @@ apiApp.use(async (request, response, next) => {
     return next()
   }
 
+  // if the token set has expired, we try to refresh it
   let tokenSet = adaptTokenSetToClient(user.tokenSet)
-  if (tokenSet.expired()) {
-
+  if (tokenSet.expired() && tokenSet.refresh_token != null) {
+    try {
+      tokenSet = await keycloakClient.refresh(tokenSet.refresh_token)
+      await prisma.tokenSet.update({
+        where: { userId: user.keycloakUserId },
+        data: adaptTokenSetToDatabase(tokenSet),
+      })
+    }
+    catch (error) {
+      assert(error instanceof Error)
+      console.error(`Failed to refresh access token for ${tokenSet.claims().email}: ${error.stack}`)
+    }
   }
 
-  request.userTokenSet = tokenSet
+  // if the token set is still expired, the user needs to log in again
+  if (tokenSet.expired() || tokenSet.access_token == null) {
+    session.userId = undefined
+    await session.commit()
+    return next()
+  }
 
+  // use the token set to get the user profile
+  let profile: UserinfoResponse<KeycloakUserInfo> | undefined
+  try {
+    profile = await keycloakClient.userinfo<KeycloakUserInfo>(tokenSet.access_token)
+  }
+  catch (error) {
+    // if the access token is rejected, the user needs to log in again
+    session.userId = undefined
+    await session.commit()
+    return next()
+  }
+
+  request.userProfile = profile
+  request.userTokenSet = tokenSet
   request.user = user
   next()
 })
