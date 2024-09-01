@@ -130,9 +130,9 @@ class TeamsHandlers {
   @requireLoggedIn()
   createTeamAsHacker(): Middleware {
     return async (request: Request, response: Response) => {
-      if (request.user!.teamId == null) {
+      if (request.user!.teamId != null) {
         throw new ClientError("You are already in a team", {
-          statusCode: HttpStatus.BadRequest,
+          statusCode: HttpStatus.Conflict,
           expected: true,
         })
       }
