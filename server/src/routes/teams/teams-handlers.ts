@@ -33,8 +33,11 @@ class TeamsHandlers {
   generateTeamName(): Middleware {
     return async (request: Request, response: Response) => {
       const session = await getSession(request, response)
-      session.generatedTeamName = uniqueNamesGenerator(TeamsHandlers.namesGeneratorConfig)
-      await session.commit()
+
+      if (session.generatedTeamName == null || Object.hasOwn(request.query, "refresh")) {
+        session.generatedTeamName = uniqueNamesGenerator(TeamsHandlers.namesGeneratorConfig)
+        await session.commit()
+      }
 
       response.json({
         status: 200,
