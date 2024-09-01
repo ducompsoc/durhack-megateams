@@ -22,7 +22,7 @@ const prisma = new PrismaClient().$extends({
         if (!user) {
           throw new createHttpError.NotFound();
         }
-        return prisma.point.sumPoints(user) 
+        return prisma.point.sumPoints(user);
       },
     },
     point: {
@@ -32,7 +32,7 @@ const prisma = new PrismaClient().$extends({
             (total: number, point: { value: number }) => total + point.value,
             0
           ) || 0;
-        return totalPoints
+        return totalPoints;
       }
     },
     team: {

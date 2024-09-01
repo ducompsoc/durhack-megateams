@@ -1,14 +1,7 @@
 import { Request, Response } from "express"
 import createHttpError from "http-errors"
 import { z } from "zod"
-import { ValidationError as SequelizeValidationError } from "sequelize"
 
-import User from "@server/database/tables/user"
-import Point from "@server/database/tables/point"
-import Area from "@server/database/tables/area"
-import Megateam from "@server/database/tables/megateam"
-import Team from "@server/database/tables/team"
-import { NullError } from "@server/common/errors"
 import { patch_user_payload_schema } from "@server/routes/users/user_handlers"
 import prisma from '@server/database/prisma';
 import { Prisma } from "@prisma/client"
@@ -17,8 +10,12 @@ import { Prisma } from "@prisma/client"
 class UserHandlers {
   async getUser(request: Request, response: Response) {
  
-    const payload = request.user!
-    payload.points = await prisma.user.getTotalPoints(request.user!.id);
+    const totalPoints = await prisma.user.getTotalPoints(request.user!.id);
+
+    const payload = {
+        ...request.user!,
+        totalPoints: totalPoints,
+    };
 
     response.status(200)
     response.json({ status: response.statusCode, message: "OK", data: payload })
