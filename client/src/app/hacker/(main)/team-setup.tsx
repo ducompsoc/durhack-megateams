@@ -15,7 +15,7 @@ export function TeamSetup() {
 
   async function getTeamName(refresh: boolean, signal?: AbortSignal) {
     const params = new URLSearchParams();
-    if (refresh) params.set("refresh", "");
+    if (refresh) params.set("refresh", "yes");
     try {
       const { name } = await fetchMegateamsApi(`/teams/generate-name?${params}`, { signal });
       setName(name);
