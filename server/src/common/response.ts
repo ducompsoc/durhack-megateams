@@ -1,14 +1,14 @@
-import { Response } from "express"
-import { HttpError } from "http-errors"
-import { STATUS_CODES } from "http"
-import { ZodError } from "zod"
+import type { HttpError } from "@otterhttp/errors"
+import { STATUS_CODES } from "node:http"
+import type { ZodError } from "zod"
 
-interface ResponseBody {
+import type { Response } from "@server/types"
+
+type ResponseBody = {
   status: number
   message: string
   detail?: string | object
-  [key: string]: any
-}
+} & Record<string, unknown>
 
 function makeHttpErrorResponseBody(error: HttpError): ResponseBody {
   const response_body: ResponseBody = {

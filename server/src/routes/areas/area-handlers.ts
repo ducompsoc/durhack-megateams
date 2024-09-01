@@ -1,4 +1,4 @@
-import createHttpError from "http-errors"
+import { ServerError, HttpStatus } from "@otterhttp/errors";
 
 import type { Middleware, Request, Response } from "@server/types";
 import { requireUserIsAdmin } from "@server/common/decorators"
@@ -23,28 +23,28 @@ class AreaHandlers {
   @requireUserIsAdmin()
   createArea(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   getAreaDetails(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   patchAreaDetails(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   deleteArea(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 }

@@ -1,5 +1,5 @@
-import createHttpError, { isHttpError } from "http-errors"
-import type { NextFunction } from "express"
+import { HttpError, ClientError, ServerError, HttpStatus } from "@otterhttp/errors";
+import type { NextFunction } from "@otterhttp/app"
 import { Prisma } from "@prisma/client"
 import { ZodError } from "zod"
 
@@ -12,7 +12,7 @@ export function apiErrorHandler(error: Error, _request: Request, response: Respo
     return next(error)
   }
 
-  if (isHttpError(error)) {
+  if (error instanceof HttpError) {
     return sendHttpErrorResponse(response, error)
   }
 
@@ -21,38 +21,39 @@ export function apiErrorHandler(error: Error, _request: Request, response: Respo
   }
 
   if (error instanceof ValueError) {
-    return sendHttpErrorResponse(response, new createHttpError.BadRequest(error.message))
+    return sendHttpErrorResponse(response, new ClientError(error.message, { statusCode: HttpStatus.BadRequest }))
   }
 
   if (error instanceof NullError) {
-    return sendHttpErrorResponse(response, new createHttpError.NotFound(error.message))
+    return sendHttpErrorResponse(response, new ClientError(error.message, { statusCode: HttpStatus.NotFound }))
   }
 
   if (error instanceof Prisma.PrismaClientValidationError) {
-    const httpError = new createHttpError.BadRequest(
-      "Something failed database client validation."
+    const httpError = new ClientError(
+      "Something failed database client validation.",
+      { statusCode: HttpStatus.BadRequest },
     )
     return sendHttpErrorResponse(response, httpError)
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    let httpError: createHttpError.HttpError | undefined
+    let httpError: HttpError | undefined
     // unique constraint failed
     if (error.code === "P2002") {
-      httpError = new createHttpError.Conflict(error.message)
+      httpError = new ClientError(error.message, { statusCode: HttpStatus.Conflict })
     }
 
     // foreign key constraint failed
     if (error.code === "P2003") {
-      httpError = new createHttpError.Conflict(error.message)
+      httpError = new ClientError(error.message, { statusCode: HttpStatus.Conflict })
     }
 
-    httpError ??= new createHttpError.BadRequest(error.message)
+    httpError ??= new ClientError(error.message)
 
     return sendHttpErrorResponse(response, httpError)
   }
 
   console.error("Unexpected API error:")
   console.error(error.stack)
-  return sendHttpErrorResponse(response, new createHttpError.InternalServerError())
+  return sendHttpErrorResponse(response, new ServerError())
 }

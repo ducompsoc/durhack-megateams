@@ -8,63 +8,26 @@ export default {
   },
   hostname: "http://localhost:3101",
   flags: {},
-  passport: {
-    local: {
-      usernameField: "email",
-      passwordField: "password",
-      session: true,
-      passReqToCallback: false,
-    },
-    oauth2: {
-      authorizationURL: "https://auth.durhack.com/realms/durhack/protocol/openid-connect/auth",
-      tokenURL: "https://auth.durhack.com/realms/durhack/protocol/openid-connect/token",
-      callbackURL: "https://megateams.durhack.com/api/auth/login/callback",
-      profileURL: "https://auth.durhack.com/realms/durhack/protocol/openid-connect/userinfo",
-      clientID: "megateams",
-      clientSecret: "this-is-not-a-real-client-secret",
-      state: true,
-      scope: ["openid", "email", "profile", "roles"],
-      pkce: true,
-    },
-  },
-  mysql: {
-    data: {
-      host: "127.0.0.1",
-      port: 3306,
-      database: "durhack",
-      user: "root",
-      password: "strongexamplepassword",
-    },
-    session: {
-      host: "127.0.0.1",
-      port: 3306,
-      database: "durhack-session",
-      user: "root",
-      password: "strongexamplepassword",
-    },
-  },
   csrf: {
     enabled: true,
     secret: "csrfisoverrated",
     options: {
-      cookieName: "psifi.x-csrf-token",
       cookieOptions: {
+        name: "durhack-megateams.x-csrf-token",
         sameSite: "strict",
         path: "/",
         secure: false,
       },
     },
   },
-  "cookie-parser": {
+  cookieSigning: {
     secret: "thebestsecretforcookies",
   },
   session: {
-    name: "durhack-megateams-session",
-    secret: "session_cookie_secret",
-    resave: false,
-    proxy: false,
-    saveUninitialized: false,
-    cookie: { secure: false },
+    cookie: {
+      name: "durhack-megateams-session",
+      secure: false
+    },
   },
   megateams: {
     maxTeamMembers: 4,

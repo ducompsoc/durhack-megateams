@@ -1,21 +1,22 @@
-import { Router as ExpressRouter } from "express"
+import { App } from "@otterhttp/app"
 
-import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
+import { handleFailedAuthentication, methodNotAllowed, parseRouteId } from "@server/common/middleware"
 
 import { pointsHandlers } from "./points-handlers";
 
-export const pointsRouter = ExpressRouter()
+export const pointsApp = new App<Request, Response>()
 
-pointsRouter
+pointsApp
   .route("/")
+  .all(methodNotAllowed(["GET", "POST"]))
   .get(pointsHandlers.getPointsList())
   .post(pointsHandlers.createPoint(), handleFailedAuthentication)
-  .all(handleMethodNotAllowed)
 
-pointsRouter
+pointsApp
   .route("/:point_id")
+  .all(methodNotAllowed(["GET", "PATCH", "DELETE"]))
   .all(parseRouteId("point_id"))
   .get(pointsHandlers.getPointDetails())
   .patch(pointsHandlers.patchPointDetails(), handleFailedAuthentication)
   .delete(pointsHandlers.deletePoint(), handleFailedAuthentication)
-  .all(handleMethodNotAllowed)

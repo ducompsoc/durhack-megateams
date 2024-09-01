@@ -1,21 +1,25 @@
-import { Router as ExpressRouter } from "express"
-import createHttpError from "http-errors"
+import { App } from "@otterhttp/app"
+import { ClientError, HttpStatus } from "@otterhttp/errors"
 
 import type { Request, Response } from "@server/types"
-import { handleMethodNotAllowed } from "@server/common/middleware"
+import { methodNotAllowed } from "@server/common/middleware"
 
 import { discordHandlers } from "./discord-handlers"
 
-export const discordRouter = ExpressRouter()
+export const discordApp = new App<Request, Response>()
 
-discordRouter.use((request: Request, response: Response, next: () => void) => {
+discordApp.use((request: Request, response: Response, next: () => void) => {
   if (!request.user) {
-    throw new createHttpError.Unauthorized()
+    throw new ClientError("", { statusCode: HttpStatus.Unauthorized })
   }
 
   next()
 })
 
-discordRouter.route("/").get(discordHandlers.getDiscord()).all(handleMethodNotAllowed)
+discordApp.route("/")
+  .all(methodNotAllowed(["GET"]))
+  .get(discordHandlers.getDiscord())
 
-discordRouter.route("/redirect").get(discordHandlers.handleRedirect()).all(handleMethodNotAllowed)
+discordApp.route("/redirect")
+  .all(methodNotAllowed(["GET"]))
+  .get(discordHandlers.handleRedirect())

@@ -1,4 +1,4 @@
-import createHttpError from "http-errors"
+import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors";
 import { uniqueNamesGenerator, adjectives, animals, type Config as UniqueNamesGeneratorConfig } from "unique-names-generator"
 import { z } from "zod"
 import { getRandomValues } from "node:crypto"
@@ -9,6 +9,7 @@ import assert from "node:assert/strict"
 import type { Request, Response, Middleware } from "@server/types"
 import { requireUserIsAdmin, requireLoggedIn } from "@server/common/decorators"
 import { prisma, type Team } from "@server/database";
+import { getSession } from "@server/auth/session";
 
 class TeamsHandlers {
   static join_code_schema = z
@@ -26,12 +27,14 @@ class TeamsHandlers {
 
   generateTeamName(): Middleware {
     return async (request: Request, response: Response) => {
-      request.session.generatedTeamName = uniqueNamesGenerator(TeamsHandlers.namesGeneratorConfig)
+      const session = await getSession(request, response)
+      session.generatedTeamName = uniqueNamesGenerator(TeamsHandlers.namesGeneratorConfig)
+      await session.commit()
 
       response.json({
         status: 200,
         message: "OK",
-        name: request.session.generatedTeamName,
+        name: session.generatedTeamName,
       })
     }
   }
@@ -120,10 +123,14 @@ class TeamsHandlers {
   createTeamAsHacker(): Middleware {
     return async (request: Request, response: Response) => {
       if (request.user!.teamId == null) {
-        throw new createHttpError.BadRequest("You are already in a team.")
+        throw new ClientError("You are already in a team", {
+          statusCode: HttpStatus.BadRequest,
+          expected: true,
+        })
       }
 
-      const generatedTeamName = request.session.generatedTeamName
+      const session = await getSession(request, response)
+      const generatedTeamName = session.generatedTeamName
       assert(generatedTeamName != null)
 
       const randomBuffer = new Uint16Array(1) // length 1, value 0-65535
@@ -155,7 +162,10 @@ class TeamsHandlers {
       }
 
       if (createdTeam == null) {
-        throw new createHttpError.Conflict("Team creation failed because no available join-code was found. Try again.")
+        throw new ClientError("Team creation failed because no available join-code was found. Try again.", {
+          statusCode: HttpStatus.Conflict,
+          expected: true,
+        })
       }
 
       response.json({
@@ -168,26 +178,26 @@ class TeamsHandlers {
   @requireUserIsAdmin()
   addUserToTeamAsAdmin(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   removeUserFromTeamAsAdmin(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   getTeamDetails(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   deleteTeam(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 }

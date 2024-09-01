@@ -1,35 +1,39 @@
 import { TokenType } from "@durhack/token-vault/lib"
 
-import { UserRole } from "@server/common/model-enums"
 import { requireLoggedIn } from "@server/common/decorators"
 import TokenVault from "@server/auth/tokens"
 import type { Middleware, Request, Response } from "@server/types";
+import { getSession } from "@server/auth/session"
 
 class AuthHandlers {
   handleLoginSuccess(): Middleware {
-    return async (request: Request, response: Response)=> {
+    return async (request: Request, response: Response): Promise<void> => {
       if (!request.user) {
-        return response.redirect("/")
+        await response.redirect("/")
+        return
       }
 
-      if (request.session.redirect_to) {
-        const redirect_to = request.session.redirect_to
-        request.session.redirect_to = undefined
-        return response.redirect(redirect_to)
+      const session = await getSession(request, response)
+      if (session.redirectTo != null) {
+        const redirectTo = session.redirectTo
+        session.redirectTo = undefined
+        await response.redirect(redirectTo)
+        return
       }
 
       // todo: if the user has 'volunteer' or 'admin' role, redirect to /volunteer
 
-      return response.redirect("/hacker")
+      await response.redirect("/hacker")
+      return
     }
   }
 
   handleLogout(): Middleware {
     return async (request: Request, response: Response) => {
-      request.session.destroy(() => {
-        response.status(200)
-        response.json({ status: response.statusCode, message: "OK" })
-      })
+      const session = await getSession(request, response)
+      await session.destroy()
+      response.status(200)
+      response.json({ status: response.statusCode, message: "OK" })
     }
   }
 

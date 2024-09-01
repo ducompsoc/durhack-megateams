@@ -1,18 +1,19 @@
-import { Router as ExpressRouter } from "express"
+import { App } from "@otterhttp/app"
 
-import { handleMethodNotAllowed } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
+import { methodNotAllowed } from "@server/common/middleware"
 
 import { megateamsHandlers } from "./megateam-handlers"
 
-export const megateamsRouter = ExpressRouter()
+export const megateamsApp = new App<Request, Response>()
 
-megateamsRouter.route("/")
+megateamsApp.route("/")
+  .all(methodNotAllowed(["GET", "POST"]))
   .get(megateamsHandlers.getMegateamsList())
   .post(megateamsHandlers.createMegateam())
-  .all(handleMethodNotAllowed)
 
-megateamsRouter.route("/:megateam_id")
+megateamsApp.route("/:megateam_id")
+  .all(methodNotAllowed(["GET", "PATCH", "DELETE"]))
   .get(megateamsHandlers.getMegateamDetails())
   .patch(megateamsHandlers.patchMegateamDetails())
   .delete(megateamsHandlers.deleteMegateam())
-  .all(handleMethodNotAllowed)

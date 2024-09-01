@@ -6,46 +6,6 @@ export const listenOptionsSchema = z.object({
   port: z.number().int().positive(),
 })
 
-export const passportLocalOptionsSchema = z.object({
-  usernameField: z.string().optional(),
-  passwordField: z.string().optional(),
-  session: z.boolean().optional(),
-  passReqToCallback: z.boolean().optional(),
-})
-
-export const oauth2ClientOptionsSchema = z.object({
-  authorizationURL: z.string().url(),
-  tokenURL: z.string().url(),
-  clientID: z.string(),
-  clientSecret: z.string(),
-  callbackURL: z.string().url(),
-  profileURL: z.string().url(),
-  state: z.boolean(),
-  scope: z.string().or(z.string().array()).optional(),
-  pkce: z.boolean(),
-})
-
-export const mysqlOptionsSchema = z.object({
-  host: z.string(),
-  port: z.number().int().positive(),
-  database: z.string(),
-  user: z.string(),
-  password: z.string(),
-})
-
-export const sequelize_options_schema = mysqlOptionsSchema
-  .extend({
-    dialect: z.string().default("mysql"),
-  })
-  .transform(options => ({
-    host: options.host,
-    port: options.port,
-    database: options.database,
-    username: options.user,
-    password: options.password,
-    dialect: options.dialect,
-  }))
-
 export const cookie_options_schema = z.object({
   sameSite: z.union([z.literal("none"), z.literal("lax"), z.literal("strict")]).optional(),
   path: z.string().optional(),
@@ -53,17 +13,19 @@ export const cookie_options_schema = z.object({
 })
 
 export const doubleCsrfOptionsSchema = z.object({
-  cookieName: z.string(),
-  cookieOptions: cookie_options_schema,
+  cookieOptions: cookie_options_schema.extend({
+    name: z.string(),
+  })
+})
+
+export const cookieSigningOptionsSchema = z.object({
+  secret: z.string(),
 })
 
 export const sessionOptionsSchema = z.object({
-  name: z.string(),
-  proxy: z.boolean(),
-  secret: z.string(),
-  resave: z.boolean().optional(),
-  saveUninitialized: z.boolean().optional(),
-  cookie: cookie_options_schema,
+  cookie: cookie_options_schema.extend({
+    name: z.string(),
+  }),
 })
 
 export const qrPresetSchema = z.object({
@@ -97,22 +59,12 @@ export const configSchema = z.object({
   listen: listenOptionsSchema,
   hostname: z.string().url(),
   flags: z.object({}),
-  passport: z.object({
-    local: passportLocalOptionsSchema,
-    oauth2: oauth2ClientOptionsSchema,
-  }),
-  mysql: z.object({
-    data: mysqlOptionsSchema,
-    session: mysqlOptionsSchema,
-  }),
   csrf: z.object({
     enabled: z.boolean(),
     secret: z.string(),
     options: doubleCsrfOptionsSchema,
   }),
-  "cookie-parser": z.object({
-    secret: z.string(),
-  }),
+  cookieSigning: cookieSigningOptionsSchema,
   jsonwebtoken: tokenVaultOptionsSchema,
   session: sessionOptionsSchema,
   megateams: z.object({

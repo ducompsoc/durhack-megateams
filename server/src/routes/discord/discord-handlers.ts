@@ -1,4 +1,4 @@
-import createHttpError from "http-errors"
+import { ClientError, HttpStatus } from "@otterhttp/errors";
 import { z } from "zod"
 import assert from "node:assert/strict"
 
@@ -18,7 +18,7 @@ class DiscordHandlers {
       })
 
       if (!team) {
-        throw new createHttpError.NotFound("You are not in a team!")
+        throw new ClientError("You are not in a team", { statusCode: HttpStatus.NotFound, expected: true })
       }
 
       response.redirect(
@@ -57,7 +57,7 @@ class DiscordHandlers {
       })
 
       if (!team) {
-        throw new createHttpError.NotFound("You are not in a team!")
+        throw new ClientError("You are not in a team", { statusCode: HttpStatus.NotFound, expected: true })
       }
 
       const { code, state } = DiscordHandlers.discord_access_code_schema.parse(request.query)
@@ -81,7 +81,7 @@ class DiscordHandlers {
       })
 
       if (!discord_access_token_response.ok) {
-        throw new createHttpError.BadGateway("Couldn't exchange access code for access token.")
+        throw new ClientError("Couldn't exchange discord access code for discord access token", { statusCode: HttpStatus.BadGateway })
       }
 
       const { access_token } = DiscordHandlers.discord_access_token_schema.parse(
@@ -95,7 +95,7 @@ class DiscordHandlers {
       })
 
       if (!discord_profile_response.ok) {
-        throw new createHttpError.BadGateway("Failed to read your Discord profile.")
+        throw new ClientError("Failed to read your Discord profile.", { statusCode: HttpStatus.BadGateway })
       }
 
       const discord_profile = (await discord_profile_response.json()) as { user: { id: string } };

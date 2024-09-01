@@ -1,42 +1,54 @@
-import express, { type Express } from "express"
+import { App } from "@otterhttp/app"
 import { type Server, createServer } from "node:http"
 import { Server as SocketIO } from "socket.io"
-import passport from "passport"
 import * as process from "node:process"
 
 import { listenConfig } from "@server/config";
+import { matchSignedCookie, signCookie, unsignCookieOrThrow } from "@server/auth/cookies";
 
-import session from "./auth/session"
+import { Request } from "./request"
+import { Response } from "./response"
 import SocketManager from "./socket"
-import { apiRouter } from "./routes"
-import "./auth"
+import { apiApp } from "./routes"
 import "./database"
 
 const environment = process.env.NODE_ENV
 const dev = environment !== "production"
 
-function getExpressApp(): Express {
-  const app = express()
+function getApp(): App<Request, Response> {
+  const app = new App<Request, Response>({
+    settings: {
+      setCookieOptions: {
+        sign: signCookie,
+      },
+      cookieParsing: {
+        signedCookieMatcher: matchSignedCookie,
+        cookieUnsigner: unsignCookieOrThrow,
+      },
+    },
+  })
 
-  app.use(session)
-  app.use(passport.initialize())
-  app.use(passport.session())
-
-  app.use("/api", apiRouter)
+  app.use("/api", apiApp)
 
   return app
 }
 
-function getServer(app: Express): Server {
-  const server = createServer(app)
-  const io = new SocketIO(server)
+// @ts-expect-error
+function getServer(app: App<Request, Response>): Server<typeof Request, typeof Response> {
+  // @ts-expect-error
+  const server = createServer<typeof Request, typeof Response>({
+    IncomingMessage: Request,
+    ServerResponse: Response,
+  })
+  server.on("request", app.attach)
+  const io = new SocketIO(server as Server)
   SocketManager.initialise(io)
 
   return server
 }
 
 async function main() {
-  const app = getExpressApp()
+  const app = getApp()
   const server = getServer(app)
 
   server.listen(listenConfig.port, listenConfig.host, () => {

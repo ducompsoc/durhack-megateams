@@ -4,14 +4,13 @@ import type { ConfigIn } from "./schema"
 export default {
   "csrf": {
     options: {
-      "cookieName": "__Host-psifi.x-csrf-token",
       "cookieOptions": {
+        name: "__Host-durhack-megateams.x-csrf-token",
         "secure": true,
       },
     },
   },
   "session": {
-    "proxy": true,
     "cookie": { "secure": true },
   },
 } satisfies DeepPartial<ConfigIn>

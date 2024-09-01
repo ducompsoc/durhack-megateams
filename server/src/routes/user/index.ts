@@ -1,29 +1,29 @@
-import { Router as ExpressRouter } from "express"
-import createHttpError from "http-errors"
+import { App } from "@otterhttp/app"
+import { ClientError, HttpStatus } from "@otterhttp/errors"
 
 import type { Request, Response } from "@server/types"
-import { handleMethodNotAllowed } from "@server/common/middleware"
+import { methodNotAllowed } from "@server/common/middleware"
 
 import { userHandlers } from "./user-handlers"
 
-export const userRouter = ExpressRouter()
+export const userApp = new App<Request, Response>()
 
-userRouter.use((request: Request, response: Response, next: () => void) => {
+userApp.use((request: Request, response: Response, next: () => void) => {
   if (!request.user) {
-    throw new createHttpError.Unauthorized()
+    throw new ClientError("", { statusCode: HttpStatus.Unauthorized })
   }
 
   next()
 })
 
-userRouter.route("/")
+userApp.route("/")
+  .all(methodNotAllowed(["GET", "PATCH"]))
   .get(userHandlers.getUser())
   .patch(userHandlers.patchUserDetails())
-  .all(handleMethodNotAllowed)
 
-userRouter
+userApp
   .route("/team")
+  .all(methodNotAllowed(["GET", "POST", "DELETE"]))
   .get(userHandlers.getTeam())
   .post(userHandlers.joinTeam())
   .delete(userHandlers.leaveTeam())
-  .all(handleMethodNotAllowed)

@@ -1,38 +1,23 @@
-import session, { MemoryStore, type SessionOptions, type Store } from "express-session"
-import * as constructor_session from "express-session"
-import MySQLStoreMeta, { type MySQLStore as MySQLStoreType } from "express-mysql-session"
-import * as process from "node:process"
+import session from "@otterhttp/session"
 
-import { mysqlSessionConfig, sessionConfig } from "@server/config";
+import { signCookie, unsignCookieOrThrow } from "@server/auth/cookies"
 
-// Augment express-session with a custom SessionData object
-declare module "express-session" {
-  interface SessionData {
-    generatedTeamName?: string
-    redirect_to?: string
-  }
+import { sessionConfig } from "@server/config"
+
+const { cookie: cookieOptions, ...sessionOptions } = sessionConfig
+
+export type DurHackSessionRecord = Record<string, unknown> & {
+  keycloakOAuth2FlowCodeVerifier?: string | undefined
+  redirectTo?: string | undefined
+  generatedTeamName?: string | undefined
 }
 
-function getMysqlSessionStore(): MySQLStoreType {
-  const MySQLStore = MySQLStoreMeta(constructor_session)
-  return new MySQLStore(mysqlSessionConfig)
-}
-
-function getMemorySessionStore(): MemoryStore {
-  return new MemoryStore()
-}
-
-function getSessionStore(): Store {
-  if (process.env.NODE_ENV !== "production") {
-    return getMemorySessionStore()
-  }
-
-  return getMysqlSessionStore()
-}
-
-const sessionStore = getSessionStore()
-
-const session_options: SessionOptions = Object.assign({}, sessionConfig)
-session_options.store = sessionStore
-
-export default session(session_options)
+export const getSession = session<DurHackSessionRecord>({
+  store: undefined,
+  ...sessionOptions,
+  cookie: {
+    ...cookieOptions,
+    sign: signCookie,
+    unsign: unsignCookieOrThrow,
+  },
+})

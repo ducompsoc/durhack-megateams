@@ -1,29 +1,32 @@
-import { Router as ExpressRouter } from "express"
+import { App } from "@otterhttp/app"
 
-import { handleFailedAuthentication, handleMethodNotAllowed, parseRouteId } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
+import { handleFailedAuthentication, methodNotAllowed, parseRouteId } from "@server/common/middleware"
 
 import { teamsHandlers } from "./teams-handlers"
 
-export const teamsRouter = ExpressRouter()
+export const teamsApp = new App<Request, Response>()
 
-teamsRouter
+teamsApp
   .route("/")
   .get(teamsHandlers.listTeamsAsAdmin(), teamsHandlers.listTeamsAsAnonymous())
   .post(teamsHandlers.createTeamAsAdmin(), teamsHandlers.createTeamAsHacker(), handleFailedAuthentication)
 
-teamsRouter.route("/generate-name").get(teamsHandlers.generateTeamName()).all(handleMethodNotAllowed)
+teamsApp.route("/generate-name")
+  .all(methodNotAllowed(["GET"]))
+  .get(teamsHandlers.generateTeamName())
 
-teamsRouter
+teamsApp
   .route("/:team_id/memberships")
+  .all(methodNotAllowed(["POST", "DELETE"]))
   .all(parseRouteId("team_id"))
   .post(teamsHandlers.addUserToTeamAsAdmin(), handleFailedAuthentication)
   .delete(teamsHandlers.removeUserFromTeamAsAdmin(), handleFailedAuthentication)
-  .all(handleMethodNotAllowed)
 
-teamsRouter
+teamsApp
   .route("/:team_id")
   .all(parseRouteId("team_id"))
+  .all(methodNotAllowed(["GET", "PATCH", "DELETE"]))
   .get(teamsHandlers.getTeamDetails())
   .patch(teamsHandlers.patchTeamAsAdmin(), handleFailedAuthentication)
   .delete(teamsHandlers.deleteTeam())
-  .all(handleMethodNotAllowed)

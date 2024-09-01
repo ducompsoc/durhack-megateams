@@ -1,4 +1,4 @@
-import createHttpError from "http-errors"
+import { HttpStatus, ClientError } from "@otterhttp/errors";
 import { z } from "zod"
 
 import type { Request, Response, Middleware } from "@server/types"
@@ -60,8 +60,9 @@ class PointHandlers {
       const parsedPayload = createPointPayloadSchema.parse(request.body)
 
       if (parsedPayload.originQrCodeId) {
-        throw new createHttpError.UnprocessableEntity(
+        throw new ClientError(
           "You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.",
+          { statusCode: HttpStatus.UnprocessableEntity, expected: true },
         )
       }
 

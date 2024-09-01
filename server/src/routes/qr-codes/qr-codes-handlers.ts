@@ -1,21 +1,19 @@
-import createHttpError from "http-errors"
+import { ClientError, ServerError, HttpStatus } from "@otterhttp/errors"
 import { v4 as uuid } from "uuid"
 import { z } from "zod"
-import assert from "node:assert/strict";
+import assert from "node:assert/strict"
 
 import type { Request, Response, Middleware } from "@server/types"
-import { NullError, ValueError } from "@server/common/errors"
+import { NullError } from "@server/common/errors"
 import { QRCategory, UserRole } from "@server/common/model-enums"
 import { prisma, type QrCode, type User } from "@server/database";
 import { requireLoggedIn, requireUserIsAdmin, requireUserIsOneOf } from "@server/common/decorators"
-import { megateamsConfig } from "@server/config";
+import { megateamsConfig } from "@server/config"
 
 const presets = new Map(Object.entries(megateamsConfig.QRPresets))
 
-const patch_fields = new Set(["state", "publicised"])
-
 class QRCodesHandlers {
-  static createQRPayload = z.object({
+  static createQRPayloadSchema = z.object({
     name: z.string(),
     category: z.nativeEnum(QRCategory),
     pointsValue: z.number().nonnegative(),
@@ -33,11 +31,12 @@ class QRCodesHandlers {
         .datetime()
         .transform(val => new Date(val)),
     ),
+    publicised: z.boolean(),
   })
 
   private async buildAndSaveQRCodeFromCreateAttributes(
     creator: User,
-    create_attributes: z.infer<typeof QRCodesHandlers.createQRPayload>,
+    create_attributes: Omit<z.infer<typeof QRCodesHandlers.createQRPayloadSchema>, "publicised">,
     publicised: boolean,
   ) {
     const publicisedFields = await this.getPublicisedFields(null, publicised)
@@ -55,11 +54,14 @@ class QRCodesHandlers {
     })
   }
 
+  static createQRCodePayloadSchema = z.object({
+
+  })
+
   @requireUserIsAdmin()
   createQRCode(): Middleware {
     return async (request: Request, response: Response) => {
-      const create_attributes = QRCodesHandlers.createQRPayload.parse(request.body)
-      const publicised = z.boolean().parse(request.body.publicised)
+      const { publicised, ...create_attributes } = QRCodesHandlers.createQRPayloadSchema.parse(request.body)
 
       const new_instance = await this.buildAndSaveQRCodeFromCreateAttributes(
         request.user as User,
@@ -80,18 +82,21 @@ class QRCodesHandlers {
     }
   }
 
+  static usePresetPayloadSchema = z.object({
+    name: z.string(),
+    publicised: z.boolean(),
+  })
+
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   usePreset(): Middleware {
     return async (request: Request, response: Response) => {
       const preset_id: string = request.params.preset_id
-      const name = z.string().parse(request.body.name)
+      const { name, publicised } = QRCodesHandlers.usePresetPayloadSchema.parse(request.body)
 
       if (!preset_id || !presets.has(preset_id) || !name) {
-        throw new createHttpError.NotFound()
+        throw new ClientError("", { statusCode: HttpStatus.NotFound, expected: true })
       }
       const preset = presets.get(preset_id)!
-
-      const publicised = z.boolean().parse(request.body.publicised)
 
       const expiry = new Date()
       expiry.setMinutes(expiry.getMinutes() + preset.minutesValid)
@@ -170,16 +175,18 @@ class QRCodesHandlers {
     return { challenge_rank: (maxRank ?? 0) + 1 }
   }
 
+  static patchQRCodeDetailsPayloadSchema = z.object({
+    state: z.boolean().optional(),
+    publicised: z.boolean().optional()
+  })
+
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   patchQRCodeDetails(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       const { qr_code_id } = response.locals
       if (typeof qr_code_id !== "number") throw new Error("Parsed `qr_code_id` not found.")
 
-      const invalid_fields = Object.keys(request.body).filter(key => !patch_fields.has(key))
-      if (invalid_fields.length > 0) {
-        throw new ValueError(`Invalid field name(s) provided: ${invalid_fields}`)
-      }
+      const { state, publicised } = QRCodesHandlers.patchQRCodeDetailsPayloadSchema.parse(request.body)
 
       const found_code = await prisma.qrCode.findUnique({
         where: { qrCodeId: qr_code_id },
@@ -188,14 +195,14 @@ class QRCodesHandlers {
 
       let fields: { challenge_rank: number | null } | undefined
 
-      if (Object.hasOwn(request.body, "publicised")) {
-        fields = await this.getPublicisedFields(found_code.challengeRank, request.body.publicised)
+      if (publicised != null) {
+        fields = await this.getPublicisedFields(found_code.challengeRank, publicised)
       }
 
       await prisma.qrCode.update({
         where: { qrCodeId: qr_code_id },
         data: {
-          state: request.body.state,
+          state,
           ...fields,
         }
       })
@@ -224,43 +231,45 @@ class QRCodesHandlers {
   @requireUserIsAdmin()
   createPreset(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   getPresetDetails(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   deletePreset(): Middleware {
     return (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
+
+  static redeemQRPayloadSchema = z.object({
+    uuid: z.string().uuid()
+  })
 
   @requireLoggedIn()
   redeemQR(): Middleware {
     return async (request: Request, response: Response) => {
-      if (!Object.hasOwn(request.body, "uuid")) {
-        throw new createHttpError.BadRequest()
-      }
+      const { uuid } = QRCodesHandlers.redeemQRPayloadSchema.parse(request.body)
       const user = request.user
       assert(user != null)
 
       let qr = null as (QrCode | null)
       await prisma.$transaction(async (context) => {
         qr = await context.qrCode.findUnique({
-          where: { payload: request.body.uuid },
+          where: { payload: uuid },
           include: { redeems: true },
         })
-        if (qr == null) throw new createHttpError.BadRequest()
+        if (qr == null) throw new ClientError()
 
         const qrCanBeRedeemed = await qr.canBeRedeemed(user)
-        if (!qrCanBeRedeemed) throw new createHttpError.BadRequest()
+        if (!qrCanBeRedeemed) throw new ClientError()
 
         await context.point.create({
           data: {
@@ -330,19 +339,19 @@ class QRCodesHandlers {
     }
   }
 
-  static reorderChallengeListPayloadSchema = z.array(
-    z.object({
-      id: z.number(),
-      rank: z.number(),
-    }),
-  )
+  static reorderChallengeListPayloadSchema = z.object({
+    challenges: z.array(
+      z.object({
+        id: z.number(),
+        rank: z.number(),
+      })
+    ),
+  })
 
   @requireUserIsAdmin()
   reorderChallengeList(): Middleware {
     return async (request: Request, response: Response) => {
-
-      if (!Object.hasOwn(request.body, "challenges")) throw new createHttpError.BadRequest()
-      const challenges = QRCodesHandlers.reorderChallengeListPayloadSchema.parse(request.body.challenges)
+      const { challenges } = QRCodesHandlers.reorderChallengeListPayloadSchema.parse(request.body)
 
       await prisma.$transaction([
         prisma.qrCode.updateMany({
@@ -366,21 +375,21 @@ class QRCodesHandlers {
   @requireUserIsAdmin()
   createChallenge(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   getQRCodeDetails(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   @requireUserIsAdmin()
   deleteQRCode(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 }

@@ -1,5 +1,5 @@
 import { type Prisma, PrismaClient } from "@prisma/client";
-import createHttpError from "http-errors";
+import { ClientError } from "@otterhttp/errors";
 
 import { megateamsConfig } from "@server/config";
 
@@ -12,6 +12,7 @@ export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined }> & {
 }
 export type Team = Prisma.TeamGetPayload<{ select: undefined }>
 export type User = Prisma.UserGetPayload<{ select: undefined }>
+export type TokenSet = Prisma.TokenSetGetPayload<{ select: undefined }>
 
 const basePrisma = new PrismaClient()
 export const prisma = basePrisma.$extends({
@@ -25,7 +26,7 @@ export const prisma = basePrisma.$extends({
           include: { points: true },
         });
 
-        if (!user) throw new createHttpError.NotFound();
+        if (!user) throw new ClientError("User not found", { statusCode: 404, exposeMessage: false });
         return prisma.point.sumPoints(user.points);
       },
     },

@@ -1,4 +1,4 @@
-import createHttpError from "http-errors"
+import { ClientError, HttpStatus } from "@otterhttp/errors";
 import { z } from "zod"
 
 import { patchUserPayloadSchema } from "@server/routes/users/users-handlers"
@@ -52,7 +52,7 @@ class UserHandlers {
       const team = user?.team
 
       if (!team) {
-        throw new createHttpError.NotFound("You are not in a team!")
+        throw new ClientError("You are not in a team", { statusCode: HttpStatus.NotFound, expected: true })
       }
 
       const payload = {
@@ -74,11 +74,12 @@ class UserHandlers {
     }
   }
 
-  static joinCodeSchema = z
-    .string()
-    .length(4)
-    .transform(val => Number.parseInt(val, 16))
-    .refine(val => !Number.isNaN(val))
+  static joinTeamPayloadSchema = z.object({
+    join_code: z.string()
+      .length(4)
+      .transform(val => Number.parseInt(val, 16))
+      .refine(val => !Number.isNaN(val))
+  })
 
   joinTeam(): Middleware {
     return async (request: Request, response: Response) => {
@@ -88,20 +89,20 @@ class UserHandlers {
       });
 
       if (user!.team) {
-        throw new createHttpError.Conflict("You are already in a team!")
+        throw new ClientError("You are already in a team", { statusCode: HttpStatus.Conflict, expected: true })
       }
 
-      const providedJoinCode = UserHandlers.joinCodeSchema.parse(request.body.join_code)
+      const { join_code } = UserHandlers.joinTeamPayloadSchema.parse(request.body)
       const team = await prisma.team.findUnique({
-        where: { joinCode: providedJoinCode }
+        where: { joinCode: join_code }
       })
 
       if (team == null) {
-        throw new createHttpError.NotFound('Team not found')
+        throw new ClientError("Join code not found", { statusCode: HttpStatus.NotFound, expected: true })
       }
 
       if (!(await prisma.team.isJoinableTeam({ where: team }))) {
-        throw new createHttpError.Conflict();
+        throw new ClientError("Team cannot be joined", { statusCode: HttpStatus.Conflict, expected: true })
       }
 
       await prisma.user.update({
@@ -126,7 +127,7 @@ class UserHandlers {
       const team = user?.team
 
       if (team == null) {
-        throw new createHttpError.NotFound("You are not in a team!")
+        throw new ClientError("You are not in a team", { statusCode: HttpStatus.NotFound, expected: true })
       }
 
       const updateUser = await prisma.user.update({

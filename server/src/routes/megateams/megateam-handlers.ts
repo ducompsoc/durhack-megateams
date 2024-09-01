@@ -1,4 +1,4 @@
-import createHttpError from "http-errors"
+import { ServerError, HttpStatus } from "@otterhttp/errors"
 import { z } from "zod"
 import { getMegateamsWithPointsAndMemberCount } from "@prisma/client/sql"
 
@@ -37,25 +37,25 @@ class MegateamsHandlers {
 
   createMegateam(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   getMegateamDetails(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   patchMegateamDetails(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 
   deleteMegateam(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      throw new createHttpError.NotImplemented()
+      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
     }
   }
 }

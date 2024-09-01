@@ -1,33 +1,28 @@
-import { Router as ExpressRouter } from "express"
-import bodyParser from "body-parser"
-import methodOverride from "method-override"
-import createHttpError from "http-errors"
-import cookieParser from "cookie-parser"
+import { App } from "@otterhttp/app"
+import { ClientError } from "@otterhttp/errors"
+import { json } from "@otterhttp/parsec"
 
 import type { Request, Response } from "@server/types"
-import { handleMethodNotAllowed } from "@server/common/middleware"
+import { methodNotAllowed } from "@server/common/middleware"
 import { doubleCsrfProtection } from "@server/auth/csrf"
-import { cookieParserConfig, csrfConfig } from "@server/config";
+import { csrfConfig } from "@server/config";
 
-import { authRouter } from "./auth"
-import { areasRouter } from "./areas"
-import { megateamsRouter } from "./megateams"
-import { pointsRouter } from "./points"
-import { qrCodesRouter } from "./qr-codes"
-import { teamsRouter } from "./teams"
-import { usersRouter } from "./users"
-import { userRouter } from "./user"
-import { discordRouter } from "./discord"
-import { apiErrorHandler } from "./error-handling"
+import { authApp } from "./auth"
+import { areasApp } from "./areas"
+import { megateamsApp } from "./megateams"
+import { pointsApp } from "./points"
+import { qrCodesApp } from "./qr-codes"
+import { teamsApp } from "./teams"
+import { usersApp } from "./users"
+import { userApp } from "./user"
+import { discordApp } from "./discord"
 
-export const apiRouter = ExpressRouter()
+export const apiApp = new App<Request, Response>()
 
-apiRouter.use(cookieParser(cookieParserConfig.secret))
-apiRouter.use(bodyParser.json())
-apiRouter.use(bodyParser.urlencoded({ extended: true }))
+apiApp.use(json())
 
 if (csrfConfig.enabled) {
-  apiRouter.use(doubleCsrfProtection)
+  apiApp.use(doubleCsrfProtection)
 }
 
 function rootRequestHandler(request: Request, response: Response) {
@@ -36,22 +31,21 @@ function rootRequestHandler(request: Request, response: Response) {
 }
 
 function routeFallthroughHandler() {
-  throw new createHttpError.NotFound("Unknown API route.")
+  throw new ClientError("Unknown API route.", { statusCode: 404, expected: true })
 }
 
-apiRouter.route("/").get(rootRequestHandler).all(handleMethodNotAllowed)
+apiApp.route("/")
+  .all(methodNotAllowed(["GET"]))
+  .get(rootRequestHandler)
 
-apiRouter.use("/auth", authRouter)
-apiRouter.use("/areas", areasRouter)
-apiRouter.use("/megateams", megateamsRouter)
-apiRouter.use("/points", pointsRouter)
-apiRouter.use("/qr_codes", qrCodesRouter)
-apiRouter.use("/teams", teamsRouter)
-apiRouter.use("/users", usersRouter)
-apiRouter.use("/user", userRouter)
-apiRouter.use("/discord", discordRouter)
+apiApp.use("/auth", authApp)
+apiApp.use("/areas", areasApp)
+apiApp.use("/megateams", megateamsApp)
+apiApp.use("/points", pointsApp)
+apiApp.use("/qr_codes", qrCodesApp)
+apiApp.use("/teams", teamsApp)
+apiApp.use("/users", usersApp)
+apiApp.use("/user", userApp)
+apiApp.use("/discord", discordApp)
 
-apiRouter.use(routeFallthroughHandler)
-
-apiRouter.use(methodOverride())
-apiRouter.use(apiErrorHandler)
+apiApp.use(routeFallthroughHandler)

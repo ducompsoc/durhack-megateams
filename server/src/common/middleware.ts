@@ -1,26 +1,40 @@
-import type { NextFunction } from "express";
-import createHttpError from "http-errors";
+import type { NextFunction } from "@otterhttp/app";
+import { ClientError, ServerError, HttpStatus } from "@otterhttp/errors";
 
 import { ValueError } from "@server/common/errors";
 import type { Middleware, Request, Response } from "@server/types";
+import { getSession } from "@server/auth/session";
 
-export function handleMethodNotAllowed() {
-  // The endpoint does support this method: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
-  throw new createHttpError.MethodNotAllowed();
+type HttpVerb = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | "PATCH"
+
+export function methodNotAllowed(allowedMethods: Iterable<HttpVerb>): Middleware {
+  const allowHeaderValue = Array.from(allowedMethods).join(", ")
+  const allowedMethodSet: Set<string> = new Set(allowedMethods)
+
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.method || !allowedMethodSet.has(req.method)) {
+      res.setHeader("Allow", allowHeaderValue)
+      res.sendStatus(405)
+      return
+    }
+
+    next()
+    return
+  }
 }
 
 export function handleNotImplemented() {
-  throw new createHttpError.NotImplemented()
+  throw new ServerError("", { statusCode: HttpStatus.NotImplemented });
 }
 
 export function handleFailedAuthentication(request: Request) {
   if (request.user) {
     // Re-authenticating will not allow access (i.e. you are not a high-enough privileged user):
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
-    throw new createHttpError.Forbidden()
+    throw new ClientError("", { statusCode: HttpStatus.Forbidden });
   }
   // Lacking any credentials at all: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
-  throw new createHttpError.Unauthorized()
+  throw new ClientError("", { statusCode: HttpStatus.Unauthorized });
 }
 
 function getRouteParameter(key: string) {
@@ -67,9 +81,21 @@ export function parseRouteId(key: string): Middleware {
 
 export function useSelfId(request: Request, response: Response, next: NextFunction): void {
   if (!request.user) {
-    throw new createHttpError.Unauthorized()
+    throw new ClientError("", { statusCode: HttpStatus.Unauthorized });
   }
 
   response.locals.user_id = request.user.keycloakUserId
+  next()
+}
+
+export async function rememberUserReferrerForRedirect(request: Request, response: Response, next: () => void) {
+  const referrer = request.query.referrer
+
+  if (referrer != null && !Array.isArray(referrer)) {
+    const session = await getSession(request, response)
+    session.redirectTo = referrer
+    await session.commit()
+  }
+
   next()
 }

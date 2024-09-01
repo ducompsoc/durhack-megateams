@@ -24,16 +24,8 @@ const config = await loadConfig({
 export const {
   listen: listenConfig,
   flags: configFlags,
-  passport: {
-    local: passportLocalConfig,
-    oauth2: passportOauth2Config,
-  },
-  mysql: {
-    data: mysqlDataConfig,
-    session: mysqlSessionConfig
-  },
   csrf: csrfConfig,
-  "cookie-parser": cookieParserConfig,
+  cookieSigning: cookieSigningConfig,
   jsonwebtoken: tokenVaultConfig,
   session: sessionConfig,
   discord: discordConfig,
