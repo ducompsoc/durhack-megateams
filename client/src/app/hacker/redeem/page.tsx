@@ -1,7 +1,5 @@
 "use client";
 
-import { fetchMegateamsApi } from "@/app/lib/api";
-import useUser from "@/app/lib/useUser";
 import {
   ArrowPathIcon,
   CheckIcon,
@@ -10,6 +8,11 @@ import {
 import Link from "next/link";
 import { redirect, useSearchParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
+
+import { fetchMegateamsApi } from "@/lib/api";
+import { useUser } from "@/lib/useUser";
+import { isHacker } from "@/lib/is-role";
+import { abortForRerender } from "@/lib/symbols";
 
 export default function RedeemPage() {
   const [qrPoints, setQrPoints] = useState<number | null>(null);
@@ -22,7 +25,7 @@ export default function RedeemPage() {
   }
 
   useEffect(() => {
-    async function tryRedeemQR() {
+    async function tryRedeemQR(signal: AbortSignal) {
       const uuid = searchParams.get("qr_id");
       if (uuid && uuid !== "invalid") {
         try {
@@ -30,30 +33,30 @@ export default function RedeemPage() {
             method: "POST",
             body: JSON.stringify({ uuid }),
             headers: { "Content-Type": "application/json" },
+            signal,
           });
           setQrPoints(result.points);
-        } catch {
+        } catch (error) {
+          if (error === abortForRerender) return
           setQrChecked(true);
         }
       }
       setQrChecked(true);
     }
-    tryRedeemQR();
+
+    const abortController = new AbortController()
+    void tryRedeemQR(abortController.signal);
+    return () => abortController.abort(abortForRerender);
   }, [searchParams]);
 
-  if (!isLoading && user?.role !== "hacker") {
-    if (qrChecked) {
-      return redirect("/");
-    } else {
-      const qr_id = searchParams.get("qr_id");
-      return redirect(
-        "/api/auth/login?" +
-          makeSearchParams({
-            referrer:
-              "/hacker/redeem?" + makeSearchParams({ qr_id: qr_id ?? "" }),
-          })
-      );
-    }
+  if (!isLoading && (user == null || !isHacker(user))) {
+    if (qrChecked) return redirect("/");
+
+    const qr_id = searchParams.get("qr_id");
+    const redemptionUrl = `/hacker/redeem?${makeSearchParams({ qr_id: qr_id ?? "" })}`
+    return redirect(
+      `/api/auth/keycloak/login?${makeSearchParams({ referrer: redemptionUrl })}`
+    );
   }
 
   function RedeemContainer({ children }: { children: ReactNode }) {

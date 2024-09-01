@@ -1,5 +1,5 @@
 import { App } from "@otterhttp/app"
-import { ClientError } from "@otterhttp/errors"
+import { ClientError, ServerError } from "@otterhttp/errors";
 import { json } from "@otterhttp/parsec"
 import type { UserinfoResponse } from "openid-client";
 import assert from "node:assert/strict";
@@ -13,6 +13,7 @@ import { getSession } from "@server/auth/session";
 import { adaptTokenSetToClient, adaptTokenSetToDatabase } from "@server/auth/adapt-token-set";
 import { keycloakClient } from "@server/auth/keycloak-client";
 import type { KeycloakUserInfo } from "@server/auth/keycloak-client";
+import { isNetworkError } from "@server/common/is-network-error";
 
 import { areasApp } from "./areas"
 import { authApp } from "./auth"
@@ -52,6 +53,12 @@ apiApp.use(async (request, response, next) => {
       })
     }
     catch (error) {
+      if (isNetworkError(error)) {
+        throw new ServerError(
+          "Encountered network error while attempting to refresh a token set",
+          { statusCode: 500, exposeMessage: false, cause: error }
+        )
+      }
       assert(error instanceof Error)
       console.error(`Failed to refresh access token for ${tokenSet.claims().email}: ${error.stack}`)
     }
@@ -70,6 +77,16 @@ apiApp.use(async (request, response, next) => {
     profile = await keycloakClient.userinfo<KeycloakUserInfo>(tokenSet.access_token)
   }
   catch (error) {
+    if (isNetworkError(error)) {
+      throw new ServerError(
+        "Encountered network error while attempting to fetch profile info",
+        { statusCode: 500, exposeMessage: false, cause: error }
+      )
+    }
+
+    assert(error instanceof Error)
+    console.error(`Failed to fetch profile info for ${tokenSet.claims().email}: ${error.stack}`)
+
     // if the access token is rejected, the user needs to log in again
     session.userId = undefined
     await session.commit()

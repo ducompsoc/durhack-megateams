@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,7 +13,8 @@ import { useMediaQuery } from "react-responsive";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
 import useSWR from "swr";
-import { fetchMegateamsApi } from "@/app/lib/api";
+
+import { fetchMegateamsApi } from "@/lib/api";
 
 ChartJS.register(
   CategoryScale,

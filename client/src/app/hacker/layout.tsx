@@ -1,22 +1,23 @@
 "use client";
 
+import * as React from "react";
+import useSWR from "swr";
 import {
   ChartBarIcon,
-  CogIcon,
   HomeIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import TabbedPage from "@/app/components/TabbedPage";
-import useUser from "@/app/lib/useUser";
-import useSWR from "swr";
-import { fetchMegateamsApi } from "../lib/api";
+
+import { TabbedPage } from "@/components/tabbed-page";
+import { useUser } from "@/lib/useUser";
+import { fetchMegateamsApi } from "@/lib/api";
 
 export default function HackerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoading } = useUser({ redirectTo: "/" });
+  const { isLoading } = useUser();
   const { data: { team } = { team: null } } = useSWR(
     "/user/team",
     fetchMegateamsApi
@@ -39,11 +40,6 @@ export default function HackerLayout({
       icon: UserGroupIcon,
       path: "/hacker/team",
     },
-    // {
-    //   icon: CogIcon,
-    //   path: "https://durhack.com/",
-    //   openNewWindow: true,
-    // },
   ];
 
   return (

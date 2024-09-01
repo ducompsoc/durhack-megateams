@@ -3,7 +3,7 @@ import type { ConfigIn } from "./schema"
 
 export default {
   listen: {
-    host: "localhost",
+    host: "127.0.0.1",
     port: 3101,
   },
   hostname: "http://localhost:3101",
@@ -87,6 +87,6 @@ export default {
     clientId: "not-a-real-client-id",
     clientSecret: "not-a-real-client-secret",
     responseTypes: ["code"],
-    redirectUris: ["https://live.durhack.com/api/auth/keycloak/callback"],
+    redirectUris: ["https://megateams.durhack.com/api/auth/keycloak/callback"],
   },
 } satisfies ConfigIn

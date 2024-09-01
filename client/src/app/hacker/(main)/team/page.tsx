@@ -1,13 +1,13 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import TeamBox from "./TeamBox";
 import { ExclamationTriangleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import ButtonModal from "@/app/components/ButtonModal";
 import useSWR from "swr";
-import { fetchMegateamsApi } from "@/app/lib/api";
-import { redirect } from "next/navigation";
+
+import { ButtonModal } from "@/components/button-modal";
+import { fetchMegateamsApi } from "@/lib/api";
+import { TeamBox } from "./team-box";
 
 export default function Team() {
   const [open, setOpen] = useState(false);

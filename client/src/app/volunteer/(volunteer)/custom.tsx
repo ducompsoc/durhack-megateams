@@ -1,6 +1,7 @@
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { fetchMegateamsApi } from "@/app/lib/api";
+
+import { fetchMegateamsApi } from "@/lib/api";
 
 export default function Custom({
   displayQR,

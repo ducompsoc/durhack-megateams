@@ -1,6 +1,7 @@
 "use client";
 
 import { io, type Socket } from "socket.io-client";
+
 import { fetchMegateamsApi } from "./api";
 
 class SocketManager {

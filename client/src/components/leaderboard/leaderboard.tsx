@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
-import MegaChart from "./MegaChart";
-import { getPositionMedal } from "@/app/lib/rankEmojis";
+import * as React from "react";
 import useSWR from "swr";
-import TeamName from "../TeamName";
-import { fetchMegateamsApi } from "@/app/lib/api";
+
+import { getPositionMedal } from "@/lib/rankEmojis";
+import TeamName from "@/components/team-name";
+import { fetchMegateamsApi } from "@/lib/api";
+
+import MegaChart from "./mega-chart";
 
 export default function Leaderboard() {
   const { data: { teams } = { teams: null } } = useSWR(

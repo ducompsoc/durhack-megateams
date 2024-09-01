@@ -1,15 +1,16 @@
 "use client";
 
-import ButtonModal from "@/app/components/ButtonModal";
-import { fetchMegateamsApi } from "@/app/lib/api";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import * as React from "react";
 import { useFormState } from "react-hooks-use-form-state";
 import ReactPaginate from "react-paginate";
 import Select from "react-select";
 import useSWR from "swr";
 
-export default function Admin() {
+import { ButtonModal } from "@/components/button-modal";
+import { fetchMegateamsApi } from "@/lib/api";
+
+export function AdminPage() {
   const { mutate: mutateUsers, data: usersData = { users: [] } } = useSWR<{
     users: any[];
   }>("/users");
@@ -17,12 +18,12 @@ export default function Admin() {
   const { data: { teams } = { teams: [] } } = useSWR<{
     teams: any[];
   }>("/teams");
-  const [message, setMessage] = useState("");
-  const [messageOpen, setMessageOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [searchTextActive, setSearchTextActive] = useState("");
-  const [itemOffset, setItemOffset] = useState(0);
-  const [pageNumber, setPageNumber] = useState(0);
+  const [message, setMessage] = React.useState("");
+  const [messageOpen, setMessageOpen] = React.useState(false);
+  const [searchText, setSearchText] = React.useState("");
+  const [searchTextActive, setSearchTextActive] = React.useState("");
+  const [itemOffset, setItemOffset] = React.useState(0);
+  const [pageNumber, setPageNumber] = React.useState(0);
 
   const lowerSearch = searchTextActive.toLowerCase();
   const filteredUsers = users.filter((users) => {

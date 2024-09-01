@@ -7,8 +7,10 @@ import {
   ScaleIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import TabbedPage from "../components/TabbedPage";
-import useUser from "../lib/useUser";
+
+import { TabbedPage } from "@/components/tabbed-page";
+import { useUser } from "@/lib/useUser";
+import { isAdmin as getIsAdmin, isVolunteer as getIsVolunteer } from "@/lib/is-role";
 import { redirect } from "next/navigation";
 
 export default function VolunteerLayout({
@@ -16,12 +18,13 @@ export default function VolunteerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useUser({ redirectTo: "/" });
+  const { user, isLoading } = useUser();
   if (isLoading) return <></>;
-  if (!["volunteer", "sponsor", "admin"].includes(user?.role))
-    return redirect("/");
-  const isAdmin = user?.role === "admin";
-  const isVolunteer = user?.role === "admin" || user?.role === "volunteer";
+  if (user == null) return redirect("/")
+
+  const isAdmin = getIsAdmin(user)
+  const isVolunteer = isAdmin || getIsVolunteer(user)
+  if (!isAdmin && !isVolunteer) return redirect("/");
 
   const tabs = [
     { icon: QrCodeIcon, path: "/volunteer" },

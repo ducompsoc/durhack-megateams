@@ -1,17 +1,20 @@
 "use client";
 
-import useUser from "@/app/lib/useUser";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
-const TeamsPage = dynamic(() => import("./TeamsPage"), {
-  ssr: false,
-});
+import { useUser } from "@/lib/useUser";
+import { isVolunteer } from "@/lib/is-role";
+
+const TeamsPage = dynamic(
+  () => import("./teams-page").then(mod => mod.TeamsPage),
+  { ssr: false, }
+);
 
 export default function Teams() {
-  const { user, isLoading } = useUser({ redirectTo: "/" });
+  const { user, isLoading } = useUser();
   if (isLoading) return <></>;
-  if (!["volunteer", "admin"].includes(user?.role)) return redirect("/volunteer");
+  if (user == null || !isVolunteer(user)) return redirect("/");
 
   return <TeamsPage />;
 }

@@ -1,9 +1,9 @@
-import TeamName from "@/app/components/TeamName";
+import TeamName from "@/components/team-name";
 import { ShareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import useSWR from "swr";
 
-export default function TeamBox({ grow = true }: { grow?: boolean }) {
+export function TeamBox({ grow = true }: { grow?: boolean }) {
   const [showTeamCode, setShowTeamCode] = useState(false);
   const { data: { team } = { team: null } } = useSWR("/user/team");
 

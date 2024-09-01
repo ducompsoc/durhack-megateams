@@ -1,24 +1,27 @@
 "use client";
 
+import useSWR from "swr";
 import {
   QrCodeIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import * as React from "react";
 import dynamic from "next/dynamic";
-import { getHackerEmoji, getPositionMedal } from "@/app/lib/rankEmojis";
-import TeamBox from "./team/TeamBox";
-import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
-import ButtonModal from "@/app/components/ButtonModal";
-import useUser from "@/app/lib/useUser";
-import useSWR from "swr";
+
+import { getHackerEmoji, getPositionMedal } from "@/lib/rankEmojis";
+import { ButtonModal } from "@/components/button-modal";
+import { useUser } from "@/lib/useUser";
+
+import { TeamBox } from "./team/team-box";
+import { TeamSetup } from "./team-setup";
+
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
 
 export default function HackerHome() {
-  const [scanning, setScanning] = useState(false);
+  const [scanning, setScanning] = React.useState(false);
   const router = useRouter();
   const { user } = useUser();
   const { data: { team } = { team: null } } = useSWR("/user/team");

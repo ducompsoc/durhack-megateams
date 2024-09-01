@@ -1,23 +1,28 @@
-import { fetchMegateamsApi } from "@/app/lib/api";
-import useUser from "@/app/lib/useUser";
 import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
 
-export default function TeamSetup() {
+import { fetchMegateamsApi } from "@/lib/api";
+import { useUser } from "@/lib/useUser";
+import { abortForRerender } from "@/lib/symbols";
+
+export function TeamSetup() {
   const { user } = useUser();
-  const [name, setName] = useState("");
+  const [name, setName] = useState<string | null>(null);
   const [createError, setCreateError] = useState("");
   const [joinError, setJoinError] = useState("");
   const [joinCode, setJoinCode] = useState("");
 
-  async function generateTeamName() {
+  async function getTeamName(refresh: boolean, signal?: AbortSignal) {
+    const params = new URLSearchParams();
+    if (refresh) params.set("refresh", "");
     try {
-      const { name } = await fetchMegateamsApi("/teams/generate-name");
+      const { name } = await fetchMegateamsApi(`/teams/generate-name?${params}`, { signal });
       setName(name);
       setCreateError("");
-    } catch {
-      setCreateError("Failed to generate team name!");
+    } catch (error) {
+      if (error === abortForRerender) return
+      setCreateError("Failed to fetch team name!");
     }
   }
 
@@ -29,7 +34,7 @@ export default function TeamSetup() {
         headers: { "Content-Type": "application/json" },
       });
       setJoinError("");
-      mutate("/user/team", { team: true });
+      await mutate("/user/team", { team: true });
     } catch {
       setJoinError("Failed to join team!");
     }
@@ -39,14 +44,16 @@ export default function TeamSetup() {
     try {
       await fetchMegateamsApi("/teams", { method: "POST" });
       setCreateError("");
-      mutate("/user/team", { team: true });
+      await mutate("/user/team", { team: true });
     } catch {
       setCreateError("Failed to create team!");
     }
   }
 
   useEffect(() => {
-    generateTeamName();
+    const controller = new AbortController();
+    void getTeamName(false, controller.signal);
+    return () => controller.abort(abortForRerender)
   }, []);
 
   return (
@@ -58,10 +65,10 @@ export default function TeamSetup() {
           <p>
             Name:
             <br />
-            <em>{name}</em>
+            <em>{name == null ? "..." : name}</em>
           </p>
           <span className="grow"></span>
-          <button onClick={() => generateTeamName()}>
+          <button onClick={() => getTeamName(true)}>
             <ArrowPathRoundedSquareIcon className="w-6 h-6" />
           </button>
         </div>
@@ -74,7 +81,7 @@ export default function TeamSetup() {
         <h2 className="font-semibold">Join Team</h2>
         <p>
           <i>
-            This is a 4 character code anyone on the team can view and share
+            This is a 4 character code anyone on an existing team can view and share
             with you.
           </i>
         </p>

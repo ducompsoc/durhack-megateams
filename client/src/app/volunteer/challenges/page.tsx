@@ -1,16 +1,18 @@
 "use client";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import useUser from "@/app/lib/useUser";
 import { redirect } from "next/navigation";
 import useSWR from "swr";
 import { useFormState } from "react-hooks-use-form-state";
 import { useState } from "react";
-import ButtonModal from "@/app/components/ButtonModal";
-import { fetchMegateamsApi } from "@/app/lib/api";
+
+import { useUser } from "@/lib/useUser";
+import { ButtonModal } from "@/components/button-modal";
+import { fetchMegateamsApi } from "@/lib/api";
+import { isAdmin } from "@/lib/is-role";
 
 export default function Challenges() {
-  const { user, isLoading } = useUser({ redirectTo: "/volunteer" });
+  const { user, isLoading } = useUser();
   const { data = { challenges: [] }, mutate: mutateChallenges } = useSWR<{
     challenges: any[];
   }>("/qr_codes/challenges");
@@ -22,7 +24,8 @@ export default function Challenges() {
   const [messageOpen, setMessageOpen] = useState(false);
 
   if (isLoading) return <></>;
-  if (user?.role !== "admin") return redirect("/");
+  if (!user) return redirect("/")
+  if (!isAdmin(user)) return redirect("/volunteer")
 
   async function updatePosition(oldPos: number, newPos: number) {
     try {

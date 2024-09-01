@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
-export default function ButtonModal({
+export function ButtonModal({
   show,
   content,
   buttons,

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
-import { fetchMegateamsApi } from "../lib/api";
-import useUser from "../lib/useUser";
-import ButtonModal from "./ButtonModal";
+import * as React from "react";
 import { SWRConfig } from "swr";
+
+import { fetchMegateamsApi } from "@/lib/api";
+import { useUser } from "@/lib/useUser";
+import { ButtonModal } from "./button-modal";
 
 interface Tab {
   path: string;
@@ -21,7 +22,7 @@ interface Tab {
   openNewWindow?: boolean;
 }
 
-export default function TabbedPage({
+export function TabbedPage({
   tabs,
   children,
   showTabs = true,
@@ -31,24 +32,24 @@ export default function TabbedPage({
   showTabs?: boolean;
 }) {
   const path = usePathname();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
   const { mutateUser } = useUser();
 
   async function signOut() {
     await fetchMegateamsApi("/auth/logout", { method: "POST" });
-    mutateUser(null);
+    await mutateUser(null);
   }
 
   return (
     <SWRConfig value={{ fetcher: fetchMegateamsApi }}>
       <div className="h-full flex flex-col text-black dark:text-neutral-200">
-        <div className="flex flex-row py-4 px-6 items-center justify-center justify-evenly">
+        <div className="flex flex-row py-4 px-6 items-center justify-evenly">
           <object data="/logo.svg" type="image/svg+xml" className="w-16 h-16">
             <img src="/logo.png" alt="DurHack Logo" />
           </object>
           <h1 className="text-3xl font-bold font-heading">DURHACK</h1>
           <button onClick={() => setOpen(true)}>
-            <ArrowRightOnRectangleIcon className="w-12 h-12" />
+            <ArrowRightStartOnRectangleIcon className="w-12 h-12" />
           </button>
         </div>
         <div className="p-6 pt-0 grow overflow-auto md:w-7/12 md:mx-auto">
@@ -85,7 +86,7 @@ export default function TabbedPage({
         content={
           <div className="sm:flex sm:items-start">
             <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-              <ArrowRightOnRectangleIcon
+              <ArrowRightStartOnRectangleIcon
                 className="h-6 w-6 text-red-600"
                 aria-hidden="true"
               />

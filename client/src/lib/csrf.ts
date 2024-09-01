@@ -1,4 +1,4 @@
-import { fetchMegateamsApi } from "@/app/lib/api";
+import { fetchMegateamsApi } from "./api";
 
 /**
  * Gets a CSRF token and saves the token hash to a cookie.

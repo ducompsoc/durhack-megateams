@@ -1,5 +1,3 @@
-import ButtonModal from "@/app/components/ButtonModal";
-import { fetchMegateamsApi } from "@/app/lib/api";
 import {
   ClockIcon,
   MagnifyingGlassIcon,
@@ -14,6 +12,9 @@ import { useFormState } from "react-hooks-use-form-state";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import useSWR from "swr";
 import { Dialog } from "@headlessui/react";
+
+import { ButtonModal } from "@/components/button-modal";
+import { fetchMegateamsApi } from "@/lib/api";
 
 export default function Manage({
   displayQR,

@@ -5,14 +5,16 @@ import { Fragment, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { exportComponentAsJPEG } from "react-component-export-image";
 import dateFormat from "dateformat";
-import useUser from "../../lib/useUser";
-import Preset from "./Preset";
-import Custom from "./Custom";
-import Manage from "./Manage";
 import { useMediaQuery } from "react-responsive";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
-import { socketManager } from "@/app/lib/socket";
+
+import { socketManager } from "@/lib/socket";
+import { useUser } from "@/lib/useUser";
+import Preset from "./preset";
+import Custom from "./custom";
+import Manage from "./manage";
+import { isAdmin, isVolunteer } from "@/lib/is-role";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
@@ -31,8 +33,8 @@ export default function Volunteer() {
   const { theme } = resolveConfig(tailwindConfig);
 
   const { user } = useUser();
-  const isAdmin = user?.role === "admin";
-  const isVolunteer = user?.role === "admin" || user?.role === "volunteer";
+  const userIsAdmin = user != null && isAdmin(user);
+  const userIsVolunteer = user != null && isVolunteer(user)
 
   function getClasses(name: string) {
     let classes =
@@ -73,7 +75,7 @@ export default function Volunteer() {
       name: "Preset",
       content: <Preset displayQR={displayQR} />,
     },
-    ...(isVolunteer
+    ...(userIsVolunteer
       ? [
           {
             name: "Custom",
@@ -81,7 +83,7 @@ export default function Volunteer() {
           },
         ]
       : []),
-    ...(isAdmin
+    ...(userIsAdmin
       ? [
           {
             name: "Manage",
