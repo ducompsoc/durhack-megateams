@@ -1,8 +1,10 @@
 import { Request as OtterRequest } from "@otterhttp/app"
-import type { User } from "@server/database"
+import type { Prisma } from "@prisma/client"
+import type { TokenSet as ClientTokenSet } from "openid-client"
 
 export class Request extends OtterRequest {
-  user?: User
+  user?: Prisma.UserGetPayload<{ include: { tokenSet: true } }>
+  userTokenSet?: ClientTokenSet
 
   get origin() {
     return `${this.protocol}://${this.host}`

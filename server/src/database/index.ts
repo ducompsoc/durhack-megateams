@@ -22,8 +22,7 @@ export const prisma = basePrisma.$extends({
       async getTotalPoints({ where }: { where: Prisma.Args<typeof basePrisma.user, "findUnique">["where"] }) {
         const user = await prisma.user.findUnique({
           where,
-          select: { keycloakUserId: true },
-          include: { points: true },
+          select: { keycloakUserId: true, points: true },
         })
 
         if (!user) throw new ClientError("User not found", { statusCode: 404, exposeMessage: false })

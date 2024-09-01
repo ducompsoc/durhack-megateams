@@ -1,16 +1,25 @@
 import { ClientError, HttpStatus } from "@otterhttp/errors"
 import { z } from "zod"
+import assert from "node:assert/strict";
 
 import { prisma } from "@server/database"
 import { patchUserPayloadSchema } from "@server/routes/users/users-handlers"
 import type { Middleware, Request, Response } from "@server/types"
+import { adaptTokenSetToClient } from "@server/auth/adapt-token-set";
 
 class UserHandlers {
   getUser(): Middleware {
     return async (request, response) => {
+      assert(request.user)
+      assert(request.user.tokenSet)
+      const tokenSet = adaptTokenSetToClient(request.user!.tokenSet)
+      const claims = tokenSet.claims()
+
       const payload = {
         id: request.user!.keycloakUserId,
-        // todo: include email, preferred name, and roles in this payload
+        email: claims.email,
+        preferred_name: claims.preferred_name,
+        roles: claims.groups,
         points: await prisma.user.getTotalPoints({
           where: request.user!,
         }),
