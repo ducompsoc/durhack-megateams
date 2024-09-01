@@ -25,7 +25,7 @@ function getApp(): App<Request, Response> {
         signedCookieMatcher: matchSignedCookie,
         cookieUnsigner: unsignCookieOrThrow,
       },
-      "trust proxy": ["localhost"],
+      "trust proxy": ["loopback"],
     },
   })
 
