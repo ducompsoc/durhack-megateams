@@ -12,6 +12,8 @@ import Team from "@server/database/tables/team"
 import Point from "@server/database/tables/point"
 import Megateam from "@server/database/tables/megateam"
 import Area from "@server/database/tables/area"
+import prisma from '@server/database/prisma';
+import { Prisma } from "@prisma/client"
 
 import { requireSelf } from "./user_util"
 
@@ -61,9 +63,20 @@ class UserHandlers {
    * @param response
    */
   async getUsersListDefault(request: Request, response: Response): Promise<void> {
-    const result = await User.findAll({
-      attributes: [["user_id", "id"], "preferred_name"],
-    })
+    
+    const userList = await prisma.user.findMany({
+      select: {
+        user_id: true,
+        preferred_name: true,
+      },
+    });
+    
+    const result = userList.map(user => ({
+      id: user.user_id,
+      preferred_name: user.preferred_name,
+    }));
+
+
     response.status(200)
     response.json({
       status: 200,

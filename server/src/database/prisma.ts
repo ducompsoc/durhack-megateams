@@ -20,7 +20,7 @@ const prisma = new PrismaClient().$extends({
         });
 
         if (!user) {
-          throw new createHttpError.NotFound();
+          throw new createHttpError.NotFound(`User Not Found : ${userId}`);
         }
         return prisma.point.sumPoints(user);
       },

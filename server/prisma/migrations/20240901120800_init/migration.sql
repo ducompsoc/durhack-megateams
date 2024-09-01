@@ -7,7 +7,7 @@ CREATE TABLE `Area` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    INDEX `megateam_id`(`megateam_id`),
+    INDEX `IDX_Area_megateam_id`(`megateam_id`),
     PRIMARY KEY (`area_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -31,8 +31,8 @@ CREATE TABLE `Point` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    INDEX `origin_qrcode_id`(`origin_qrcode_id`),
-    INDEX `redeemer_id`(`redeemer_id`),
+    INDEX `IDX_Point_origin_qrcode_id`(`origin_qrcode_id`),
+    INDEX `IDX_Point_redeemer_id`(`redeemer_id`),
     PRIMARY KEY (`point_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -52,8 +52,8 @@ CREATE TABLE `QRCode` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `challenge_rank`(`challenge_rank`),
-    INDEX `creator_id`(`creator_id`),
+    UNIQUE INDEX `UQ_QRCode_challenge_rank`(`challenge_rank`),
+    INDEX `IDX_QRCode_creator_id`(`creator_id`),
     PRIMARY KEY (`qrcode_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -67,9 +67,9 @@ CREATE TABLE `Team` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `join_code`(`join_code`),
-    UNIQUE INDEX `team_name`(`team_name`),
-    INDEX `area_id`(`area_id`),
+    UNIQUE INDEX `UQ_Team_join_code`(`join_code`),
+    UNIQUE INDEX `UQ_Team_team_name`(`team_name`),
+    INDEX `IDX_Team_area_id`(`area_id`),
     PRIMARY KEY (`team_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -85,25 +85,25 @@ CREATE TABLE `User` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `email`(`email`),
-    INDEX `team_id`(`team_id`),
+    UNIQUE INDEX `UQ_User_email`(`email`),
+    INDEX `IDX_User_team_id`(`team_id`),
     PRIMARY KEY (`user_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Area` ADD CONSTRAINT `Areas_ibfk_1` FOREIGN KEY (`megateam_id`) REFERENCES `Megateam`(`megateam_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE `Area` ADD CONSTRAINT `FK_Area_Megateam` FOREIGN KEY (`megateam_id`) REFERENCES `Megateam`(`megateam_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Point` ADD CONSTRAINT `Points_ibfk_1` FOREIGN KEY (`origin_qrcode_id`) REFERENCES `QRCode`(`qrcode_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Point` ADD CONSTRAINT `FK_Point_QRCode` FOREIGN KEY (`origin_qrcode_id`) REFERENCES `QRCode`(`qrcode_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Point` ADD CONSTRAINT `Points_ibfk_2` FOREIGN KEY (`redeemer_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Point` ADD CONSTRAINT `FK_Point_User` FOREIGN KEY (`redeemer_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `QRCode` ADD CONSTRAINT `QRCodes_ibfk_1` FOREIGN KEY (`creator_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `QRCode` ADD CONSTRAINT `FK_QRCode_User` FOREIGN KEY (`creator_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Team` ADD CONSTRAINT `Teams_ibfk_1` FOREIGN KEY (`area_id`) REFERENCES `Area`(`area_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Team` ADD CONSTRAINT `FK_Team_Area` FOREIGN KEY (`area_id`) REFERENCES `Area`(`area_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `User` ADD CONSTRAINT `Users_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `Team`(`team_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `User` ADD CONSTRAINT `FK_User_Team` FOREIGN KEY (`team_id`) REFERENCES `Team`(`team_id`) ON DELETE SET NULL ON UPDATE CASCADE;

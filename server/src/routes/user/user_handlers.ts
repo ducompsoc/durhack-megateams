@@ -10,11 +10,19 @@ import { Prisma } from "@prisma/client"
 class UserHandlers {
   async getUser(request: Request, response: Response) {
  
-    const totalPoints = await prisma.user.getTotalPoints(request.user!.id);
+    const points = await prisma.user!.getTotalPoints(request.user!.id)
 
     const payload = {
-        ...request.user!,
-        totalPoints: totalPoints,
+      id: request.user!.id,
+      team_id: request.user!.team_id,
+      email: request.user!.email,
+      preferred_name: request.user!.preferred_name,
+      role: request.user!.role,
+      initially_logged_in_at: request.user!.initially_logged_in_at,
+      last_logged_in_at: request.user!.last_logged_in_at,
+      createdAt: request.user!.createdAt,
+      updatedAt: request.user!.updatedAt,
+      points: points
     };
 
     response.status(200)
@@ -128,15 +136,13 @@ class UserHandlers {
       include: { Team: true }
     });
 
-    const team = user?.Team
-
-    if (!team) {
-      throw new createHttpError.NotFound("You are not in a team!")
+    if (!user || !user.Team) {
+      throw new createHttpError.NotFound("You are not in a team!");
     }
 
     const updateUser = await prisma.user.update({
       where: { user_id: request.user!.id },
-      data: { team_id: null }
+      data: { team_id: null },
     })
 
     response.json({
