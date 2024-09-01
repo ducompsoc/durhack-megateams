@@ -1,8 +1,8 @@
 import { App } from "@otterhttp/app"
 import { ClientError, HttpStatus } from "@otterhttp/errors"
 
-import type { Request, Response } from "@server/types"
 import { methodNotAllowed } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
 
 import { userHandlers } from "./user-handlers"
 
@@ -16,7 +16,8 @@ userApp.use((request: Request, response: Response, next: () => void) => {
   next()
 })
 
-userApp.route("/")
+userApp
+  .route("/")
   .all(methodNotAllowed(["GET", "PATCH"]))
   .get(userHandlers.getUser())
   .patch(userHandlers.patchUserDetails())

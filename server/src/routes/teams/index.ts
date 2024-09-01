@@ -1,7 +1,7 @@
 import { App } from "@otterhttp/app"
 
-import type { Request, Response } from "@server/types"
 import { handleFailedAuthentication, methodNotAllowed, parseRouteId } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
 
 import { teamsHandlers } from "./teams-handlers"
 
@@ -12,7 +12,8 @@ teamsApp
   .get(teamsHandlers.listTeamsAsAdmin(), teamsHandlers.listTeamsAsAnonymous())
   .post(teamsHandlers.createTeamAsAdmin(), teamsHandlers.createTeamAsHacker(), handleFailedAuthentication)
 
-teamsApp.route("/generate-name")
+teamsApp
+  .route("/generate-name")
   .all(methodNotAllowed(["GET"]))
   .get(teamsHandlers.generateTeamName())
 

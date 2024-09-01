@@ -1,14 +1,14 @@
-import { ClientError, ServerError, HttpStatus } from "@otterhttp/errors"
+import assert from "node:assert/strict"
+import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors"
 import { v4 as uuid } from "uuid"
 import { z } from "zod"
-import assert from "node:assert/strict"
 
-import type { Request, Response, Middleware } from "@server/types"
+import { requireLoggedIn, requireUserIsAdmin, requireUserIsOneOf } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { QRCategory, UserRole } from "@server/common/model-enums"
-import { prisma, type QrCode, type User } from "@server/database";
-import { requireLoggedIn, requireUserIsAdmin, requireUserIsOneOf } from "@server/common/decorators"
 import { megateamsConfig } from "@server/config"
+import { type QrCode, type User, prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 const presets = new Map(Object.entries(megateamsConfig.QRPresets))
 
@@ -23,13 +23,13 @@ class QRCodesHandlers {
       z
         .string()
         .datetime()
-        .transform(val => new Date(val)),
+        .transform((val) => new Date(val)),
     ),
     expiryTime: z.date().or(
       z
         .string()
         .datetime()
-        .transform(val => new Date(val)),
+        .transform((val) => new Date(val)),
     ),
     publicised: z.boolean(),
   })
@@ -50,13 +50,11 @@ class QRCodesHandlers {
         creatorUserId: creator.keycloakUserId,
         ...create_attributes,
         ...publicisedFields,
-      }
+      },
     })
   }
 
-  static createQRCodePayloadSchema = z.object({
-
-  })
+  static createQRCodePayloadSchema = z.object({})
 
   @requireUserIsAdmin()
   createQRCode(): Middleware {
@@ -169,7 +167,7 @@ class QRCodesHandlers {
     const maxRankResult = await prisma.qrCode.aggregate({
       _max: {
         challengeRank: true,
-      }
+      },
     })
     const maxRank = maxRankResult._max.challengeRank
     return { challenge_rank: (maxRank ?? 0) + 1 }
@@ -177,7 +175,7 @@ class QRCodesHandlers {
 
   static patchQRCodeDetailsPayloadSchema = z.object({
     state: z.boolean().optional(),
-    publicised: z.boolean().optional()
+    publicised: z.boolean().optional(),
   })
 
   @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
@@ -204,7 +202,7 @@ class QRCodesHandlers {
         data: {
           state,
           ...fields,
-        }
+        },
       })
 
       response.status(200)
@@ -250,7 +248,7 @@ class QRCodesHandlers {
   }
 
   static redeemQRPayloadSchema = z.object({
-    uuid: z.string().uuid()
+    uuid: z.string().uuid(),
   })
 
   @requireLoggedIn()
@@ -260,7 +258,7 @@ class QRCodesHandlers {
       const user = request.user
       assert(user != null)
 
-      let qr = null as (QrCode | null)
+      let qr = null as QrCode | null
       await prisma.$transaction(async (context) => {
         qr = await context.qrCode.findUnique({
           where: { payload: uuid },
@@ -306,10 +304,10 @@ class QRCodesHandlers {
 
     const data = challenges.map((challenge, i) => {
       const challengeRepresentation: {
-        title: string,
-        points: number,
-        rank: number,
-        id?: number,
+        title: string
+        points: number
+        rank: number
+        id?: number
       } = {
         title: challenge.name,
         points: challenge.pointsValue,
@@ -344,7 +342,7 @@ class QRCodesHandlers {
       z.object({
         id: z.number(),
         rank: z.number(),
-      })
+      }),
     ),
   })
 
@@ -355,14 +353,14 @@ class QRCodesHandlers {
 
       await prisma.$transaction([
         prisma.qrCode.updateMany({
-          data: { challengeRank: null }
+          data: { challengeRank: null },
         }),
         ...challenges.map((challenge) => {
           return prisma.qrCode.update({
             where: { qrCodeId: challenge.id },
             data: { challengeRank: challenge.rank },
           })
-        })
+        }),
       ])
 
       response.json({

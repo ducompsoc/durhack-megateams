@@ -2,7 +2,7 @@ import path from "node:path"
 import { getTokenVault } from "@durhack/token-vault"
 
 import { tokenVaultConfig } from "@server/config"
-import { prisma, type User } from "@server/database"
+import { type User, prisma } from "@server/database"
 
 function resolveFilePathFromProjectRoot(path_to_resolve: string): string {
   return path.resolve(path.join(import.meta.dirname, "..", path_to_resolve))

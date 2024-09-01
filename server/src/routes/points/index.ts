@@ -1,9 +1,9 @@
 import { App } from "@otterhttp/app"
 
-import type { Request, Response } from "@server/types"
 import { handleFailedAuthentication, methodNotAllowed, parseRouteId } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
 
-import { pointsHandlers } from "./points-handlers";
+import { pointsHandlers } from "./points-handlers"
 
 export const pointsApp = new App<Request, Response>()
 

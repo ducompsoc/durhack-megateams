@@ -1,8 +1,8 @@
 import { App } from "@otterhttp/app"
 import { ClientError, HttpStatus } from "@otterhttp/errors"
 
-import type { Request, Response } from "@server/types"
 import { methodNotAllowed } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
 
 import { discordHandlers } from "./discord-handlers"
 
@@ -16,10 +16,12 @@ discordApp.use((request: Request, response: Response, next: () => void) => {
   next()
 })
 
-discordApp.route("/")
+discordApp
+  .route("/")
   .all(methodNotAllowed(["GET"]))
   .get(discordHandlers.getDiscord())
 
-discordApp.route("/redirect")
+discordApp
+  .route("/redirect")
   .all(methodNotAllowed(["GET"]))
   .get(discordHandlers.handleRedirect())

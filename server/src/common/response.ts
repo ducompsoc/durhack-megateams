@@ -1,5 +1,5 @@
-import type { HttpError } from "@otterhttp/errors"
 import { STATUS_CODES } from "node:http"
+import type { HttpError } from "@otterhttp/errors"
 import type { ZodError } from "zod"
 
 import type { Response } from "@server/types"

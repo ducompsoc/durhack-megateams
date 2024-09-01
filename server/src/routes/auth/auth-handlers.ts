@@ -1,9 +1,9 @@
 import { TokenType } from "@durhack/token-vault/lib"
 
-import { requireLoggedIn } from "@server/common/decorators"
-import TokenVault from "@server/auth/tokens"
-import type { Middleware, Request, Response } from "@server/types";
 import { getSession } from "@server/auth/session"
+import TokenVault from "@server/auth/tokens"
+import { requireLoggedIn } from "@server/common/decorators"
+import type { Middleware, Request, Response } from "@server/types"
 
 class AuthHandlers {
   handleLoginSuccess(): Middleware {

@@ -1,11 +1,11 @@
-import { HttpError, ClientError, ServerError, HttpStatus } from "@otterhttp/errors";
 import type { NextFunction } from "@otterhttp/app"
+import { ClientError, HttpError, HttpStatus, ServerError } from "@otterhttp/errors"
 import { Prisma } from "@prisma/client"
 import { ZodError } from "zod"
 
-import type { Request, Response } from "@server/types"
-import { sendHttpErrorResponse, sendZodErrorResponse } from "@server/common/response"
 import { NullError, ValueError } from "@server/common/errors"
+import { sendHttpErrorResponse, sendZodErrorResponse } from "@server/common/response"
+import type { Request, Response } from "@server/types"
 
 export function apiErrorHandler(error: Error, _request: Request, response: Response, next: NextFunction) {
   if (response.headersSent) {
@@ -29,10 +29,9 @@ export function apiErrorHandler(error: Error, _request: Request, response: Respo
   }
 
   if (error instanceof Prisma.PrismaClientValidationError) {
-    const httpError = new ClientError(
-      "Something failed database client validation.",
-      { statusCode: HttpStatus.BadRequest },
-    )
+    const httpError = new ClientError("Something failed database client validation.", {
+      statusCode: HttpStatus.BadRequest,
+    })
     return sendHttpErrorResponse(response, httpError)
   }
 

@@ -1,8 +1,8 @@
-import { ClientError, HttpStatus } from "@otterhttp/errors";
+import { ClientError, HttpStatus } from "@otterhttp/errors"
 import { z } from "zod"
 
+import { prisma } from "@server/database"
 import { patchUserPayloadSchema } from "@server/routes/users/users-handlers"
-import { prisma } from '@server/database'
 import type { Middleware, Request, Response } from "@server/types"
 
 class UserHandlers {
@@ -12,10 +12,10 @@ class UserHandlers {
         id: request.user!.keycloakUserId,
         // todo: include email, preferred name, and roles in this payload
         points: await prisma.user.getTotalPoints({
-          where: request.user!
+          where: request.user!,
         }),
       }
-  
+
       response.status(200)
       response.json({ status: response.statusCode, message: "OK", data: payload })
     }
@@ -27,11 +27,11 @@ class UserHandlers {
 
       await prisma.user.update({
         where: request.user!,
-        data: parsed_payload
+        data: parsed_payload,
       })
 
       response.status(200)
-      response.json({status: response.statusCode, message: "OK"})
+      response.json({ status: response.statusCode, message: "OK" })
     }
   }
 
@@ -47,7 +47,7 @@ class UserHandlers {
             },
           },
         },
-      });
+      })
 
       const team = user?.team
 
@@ -58,7 +58,7 @@ class UserHandlers {
       const payload = {
         name: team.teamName,
         members:
-          team.members.map(member => ({
+          team.members.map((member) => ({
             // todo: include team member names in this payload using keycloak service account
             points: prisma.point.sumPoints(member.points),
           })) || [],
@@ -75,10 +75,11 @@ class UserHandlers {
   }
 
   static joinTeamPayloadSchema = z.object({
-    join_code: z.string()
+    join_code: z
+      .string()
       .length(4)
-      .transform(val => Number.parseInt(val, 16))
-      .refine(val => !Number.isNaN(val))
+      .transform((val) => Number.parseInt(val, 16))
+      .refine((val) => !Number.isNaN(val)),
   })
 
   joinTeam(): Middleware {
@@ -86,7 +87,7 @@ class UserHandlers {
       const user = await prisma.user.findUnique({
         where: request.user!,
         include: { team: true },
-      });
+      })
 
       if (user!.team) {
         throw new ClientError("You are already in a team", { statusCode: HttpStatus.Conflict, expected: true })
@@ -94,7 +95,7 @@ class UserHandlers {
 
       const { join_code } = UserHandlers.joinTeamPayloadSchema.parse(request.body)
       const team = await prisma.team.findUnique({
-        where: { joinCode: join_code }
+        where: { joinCode: join_code },
       })
 
       if (team == null) {
@@ -107,8 +108,8 @@ class UserHandlers {
 
       await prisma.user.update({
         where: request.user!,
-        data: { teamId: team.teamId }
-      });
+        data: { teamId: team.teamId },
+      })
 
       response.json({
         status: 200,
@@ -121,8 +122,8 @@ class UserHandlers {
     return async (request, response) => {
       const user = await prisma.user.findUnique({
         where: request.user!,
-        include: { team: true }
-      });
+        include: { team: true },
+      })
 
       const team = user?.team
 
@@ -132,7 +133,7 @@ class UserHandlers {
 
       const updateUser = await prisma.user.update({
         where: request.user!,
-        data: { teamId: null }
+        data: { teamId: null },
       })
 
       response.json({

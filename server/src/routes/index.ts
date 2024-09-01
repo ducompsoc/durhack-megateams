@@ -2,20 +2,20 @@ import { App } from "@otterhttp/app"
 import { ClientError } from "@otterhttp/errors"
 import { json } from "@otterhttp/parsec"
 
-import type { Request, Response } from "@server/types"
-import { methodNotAllowed } from "@server/common/middleware"
 import { doubleCsrfProtection } from "@server/auth/csrf"
-import { csrfConfig } from "@server/config";
+import { methodNotAllowed } from "@server/common/middleware"
+import { csrfConfig } from "@server/config"
+import type { Request, Response } from "@server/types"
 
-import { authApp } from "./auth"
 import { areasApp } from "./areas"
+import { authApp } from "./auth"
+import { discordApp } from "./discord"
 import { megateamsApp } from "./megateams"
 import { pointsApp } from "./points"
 import { qrCodesApp } from "./qr-codes"
 import { teamsApp } from "./teams"
-import { usersApp } from "./users"
 import { userApp } from "./user"
-import { discordApp } from "./discord"
+import { usersApp } from "./users"
 
 export const apiApp = new App<Request, Response>()
 
@@ -34,7 +34,8 @@ function routeFallthroughHandler() {
   throw new ClientError("Unknown API route.", { statusCode: 404, expected: true })
 }
 
-apiApp.route("/")
+apiApp
+  .route("/")
   .all(methodNotAllowed(["GET"]))
   .get(rootRequestHandler)
 

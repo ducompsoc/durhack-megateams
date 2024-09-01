@@ -1,9 +1,9 @@
-import { type Prisma, PrismaClient } from "@prisma/client";
-import { ClientError } from "@otterhttp/errors";
+import { ClientError } from "@otterhttp/errors"
+import { type Prisma, PrismaClient } from "@prisma/client"
 
-import { megateamsConfig } from "@server/config";
+import { megateamsConfig } from "@server/config"
 
-export type Area = Prisma.AreaGetPayload<{ select: undefined }>;
+export type Area = Prisma.AreaGetPayload<{ select: undefined }>
 export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
 export type Point = Prisma.PointGetPayload<{ select: undefined }>
 export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined }> & {
@@ -24,24 +24,21 @@ export const prisma = basePrisma.$extends({
           where,
           select: { keycloakUserId: true },
           include: { points: true },
-        });
+        })
 
-        if (!user) throw new ClientError("User not found", { statusCode: 404, exposeMessage: false });
-        return prisma.point.sumPoints(user.points);
+        if (!user) throw new ClientError("User not found", { statusCode: 404, exposeMessage: false })
+        return prisma.point.sumPoints(user.points)
       },
     },
     point: {
       sumPoints(points: Point[]) {
-        return points.reduce(
-          (total: number, point: Point) => total + point.value,
-          0
-        )
+        return points.reduce((total: number, point: Point) => total + point.value, 0)
       },
     },
     team: {
-      async isJoinableTeam({ where }: { where: { teamId: Team["teamId"] }}) {
+      async isJoinableTeam({ where }: { where: { teamId: Team["teamId"] } }) {
         const team_members = await basePrisma.user.count({ where })
-        return team_members < megateamsConfig.maxTeamMembers;
+        return team_members < megateamsConfig.maxTeamMembers
       },
     },
   },
@@ -65,9 +62,9 @@ export const prisma = basePrisma.$extends({
 
             if (qrCode.maxUses != null) {
               const numberOfUses = await prisma.point.count({
-                where: { originQrCodeId: qrCode.qrCodeId }
+                where: { originQrCodeId: qrCode.qrCodeId },
               })
-              if ( numberOfUses >= qrCode.maxUses) return false
+              if (numberOfUses >= qrCode.maxUses) return false
             }
 
             const redeemsByUser = await prisma.point.count({
@@ -78,15 +75,15 @@ export const prisma = basePrisma.$extends({
             })
             return redeemsByUser === 0
           }
-        }
+        },
       },
       redemptionUrl: {
         needs: { payload: true },
         compute(qrCode) {
           const redemptionUrlSearchParams = new URLSearchParams({ qr_id: qrCode.payload })
           return `${megateamsConfig.QRCodeRedemptionURL}?${redemptionUrlSearchParams.toString()}`
-        }
-      }
-    }
-  }
-});
+        },
+      },
+    },
+  },
+})

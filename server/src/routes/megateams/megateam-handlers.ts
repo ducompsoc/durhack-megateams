@@ -1,9 +1,9 @@
-import { ServerError, HttpStatus } from "@otterhttp/errors"
-import { z } from "zod"
+import { HttpStatus, ServerError } from "@otterhttp/errors"
 import { getMegateamsWithPointsAndMemberCount } from "@prisma/client/sql"
+import { z } from "zod"
 
-import type { Request, Response, Middleware } from "@server/types"
 import { prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 class MegateamsHandlers {
   static numberParser = z.coerce.number().catch(0)
@@ -13,17 +13,17 @@ class MegateamsHandlers {
       const result = await prisma.$queryRawTyped(getMegateamsWithPointsAndMemberCount())
 
       const mostMembers = Math.max(
-        ...result.map(megateam => MegateamsHandlers.numberParser.parse(megateam.memberCount)),
+        ...result.map((megateam) => MegateamsHandlers.numberParser.parse(megateam.memberCount)),
       )
 
-      const payload = result.map(megateam => {
+      const payload = result.map((megateam) => {
         const naivePoints = MegateamsHandlers.numberParser.parse(megateam.points)
         const members = MegateamsHandlers.numberParser.parse(megateam.memberCount)
-        const scaledPoints = members > 0 ? naivePoints * mostMembers / members : 0
+        const scaledPoints = members > 0 ? (naivePoints * mostMembers) / members : 0
         return {
           megateam_name: megateam.megateamName,
           megateam_description: megateam.megateamDescription,
-          points: scaledPoints
+          points: scaledPoints,
         }
       })
 

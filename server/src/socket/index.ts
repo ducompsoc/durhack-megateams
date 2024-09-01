@@ -1,5 +1,5 @@
-import type { Server, Socket } from "socket.io"
 import { TokenType } from "@durhack/token-vault/lib"
+import type { Server, Socket } from "socket.io"
 
 import TokenVault from "@server/auth/tokens"
 

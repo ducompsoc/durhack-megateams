@@ -1,10 +1,10 @@
-import { ClientError, HttpStatus } from "@otterhttp/errors";
-import { z } from "zod"
 import assert from "node:assert/strict"
+import { ClientError, HttpStatus } from "@otterhttp/errors"
+import { z } from "zod"
 
-import { discordConfig } from "@server/config";
-import type { Middleware, Request, Response } from "@server/types";
-import { prisma, type User } from "@server/database"
+import { discordConfig } from "@server/config"
+import { type User, prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 class DiscordHandlers {
   getDiscord(): Middleware {
@@ -14,7 +14,7 @@ class DiscordHandlers {
       assert(user.teamId != null)
 
       const team = await prisma.team.findUnique({
-        where: { teamId: user.teamId }
+        where: { teamId: user.teamId },
       })
 
       if (!team) {
@@ -22,8 +22,7 @@ class DiscordHandlers {
       }
 
       response.redirect(
-        `https://discord.com/oauth2/authorize?client_id=${discordConfig.clientId
-        }&redirect_uri=${encodeURIComponent(
+        `https://discord.com/oauth2/authorize?client_id=${discordConfig.clientId}&redirect_uri=${encodeURIComponent(
           discordConfig.redirectUri,
         )}&response_type=code&scope=identify%20guilds.join&state=dh`,
       )
@@ -53,7 +52,7 @@ class DiscordHandlers {
       assert(user.teamId != null)
 
       let team = await prisma.team.findUnique({
-        where: { teamId: user.teamId }
+        where: { teamId: user.teamId },
       })
 
       if (!team) {
@@ -81,7 +80,9 @@ class DiscordHandlers {
       })
 
       if (!discord_access_token_response.ok) {
-        throw new ClientError("Couldn't exchange discord access code for discord access token", { statusCode: HttpStatus.BadGateway })
+        throw new ClientError("Couldn't exchange discord access code for discord access token", {
+          statusCode: HttpStatus.BadGateway,
+        })
       }
 
       const { access_token } = DiscordHandlers.discord_access_token_schema.parse(
@@ -98,7 +99,7 @@ class DiscordHandlers {
         throw new ClientError("Failed to read your Discord profile.", { statusCode: HttpStatus.BadGateway })
       }
 
-      const discord_profile = (await discord_profile_response.json()) as { user: { id: string } };
+      const discord_profile = (await discord_profile_response.json()) as { user: { id: string } }
       const discord_user_id = discord_profile.user.id
       const guildID = discordConfig.guildID
 

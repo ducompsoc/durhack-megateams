@@ -1,10 +1,10 @@
-import { HttpStatus, ClientError } from "@otterhttp/errors";
+import { ClientError, HttpStatus } from "@otterhttp/errors"
 import { z } from "zod"
 
-import type { Request, Response, Middleware } from "@server/types"
-import { NullError } from "@server/common/errors"
 import { requireUserIsAdmin } from "@server/common/decorators"
+import { NullError } from "@server/common/errors"
 import { prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 const createPointPayloadSchema = z.object({
   value: z.number().positive(),
@@ -36,10 +36,10 @@ class PointHandlers {
         include: {
           redeemerUser: {
             select: {
-              keycloakUserId: true
-            }
-          }
-        }
+              keycloakUserId: true,
+            },
+          },
+        },
       })
 
       response.status(200)
@@ -60,10 +60,10 @@ class PointHandlers {
       const parsedPayload = createPointPayloadSchema.parse(request.body)
 
       if (parsedPayload.originQrCodeId) {
-        throw new ClientError(
-          "You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.",
-          { statusCode: HttpStatus.UnprocessableEntity, expected: true },
-        )
+        throw new ClientError("You should not specify an origin QR (`origin_qrcode_id`) when manually adding points.", {
+          statusCode: HttpStatus.UnprocessableEntity,
+          expected: true,
+        })
       }
 
       const new_instance = await prisma.point.create({
@@ -93,16 +93,16 @@ class PointHandlers {
               category: true,
               startTime: true,
               expiryTime: true,
-            }
+            },
           },
           redeemerUser: {
             select: {
               keycloakUserId: true,
               teamId: true,
               // todo: this also used to select preferred name
-            }
-          }
-        }
+            },
+          },
+        },
       })
       if (result == null) throw new NullError()
 

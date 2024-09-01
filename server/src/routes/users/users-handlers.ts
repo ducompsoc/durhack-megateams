@@ -1,9 +1,9 @@
 import { z } from "zod"
 
-import type { Request, Response, Middleware } from "@server/types"
+import { requireSelf, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
-import { requireUserIsAdmin, requireSelf } from "@server/common/decorators"
 import { prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 export const patchUserPayloadSchema = z.object({
   teamId: z.number().optional(),
@@ -14,11 +14,11 @@ class UsersHandlers {
    * Handles an unauthenticated or non-admin GET request to /users.
    * Returns a list of user IDs and preferred names that cannot be filtered.
    */
-  getUsersListDefault(): Middleware { 
+  getUsersListDefault(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       const result = await prisma.user.findMany({
         select: {
-          keycloakUserId: true
+          keycloakUserId: true,
           // todo: this used to provide preferred names
         },
       })
@@ -40,7 +40,7 @@ class UsersHandlers {
    * using URL search parameters.
    */
   @requireUserIsAdmin()
-  getUsersListAsAdmin(): Middleware { 
+  getUsersListAsAdmin(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       const result = await prisma.user.findMany({
         select: {
@@ -51,9 +51,9 @@ class UsersHandlers {
           team: {
             include: {
               area: {
-                include: { megateam: true }
-              }
-            }
+                include: { megateam: true },
+              },
+            },
           },
         },
       })
@@ -80,7 +80,7 @@ class UsersHandlers {
    * Handles an unauthenticated or non-admin GET request to /users/:id.
    * Returns the user's basic details including team affiliation, points, etc.
    */
-  getUserDetailsDefault(): Middleware { 
+  getUserDetailsDefault(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       const result = await prisma.user.findUnique({
         where: { keycloakUserId: request.params.user_id },
@@ -91,13 +91,13 @@ class UsersHandlers {
         include: {
           team: true,
           points: true,
-        }
+        },
       })
       if (result == null) throw new NullError()
 
       const payload = {
         ...result,
-        points: prisma.point.sumPoints(result.points)
+        points: prisma.point.sumPoints(result.points),
       }
 
       response.status(200)
@@ -121,7 +121,7 @@ class UsersHandlers {
 
     const payload = {
       ...result,
-      points: prisma.point.sumPoints(result.points)
+      points: prisma.point.sumPoints(result.points),
     }
 
     response.status(200)
@@ -137,7 +137,7 @@ class UsersHandlers {
    * Returns all the user's details, including Hackathons UK fields.
    */
   @requireUserIsAdmin()
-  getUserDetailsAsAdmin(): Middleware { 
+  getUserDetailsAsAdmin(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       await this.doGetAllUserDetails(request, response)
     }
@@ -148,7 +148,7 @@ class UsersHandlers {
    * Returns all the user's details, including Hackathons UK fields.
    */
   @requireSelf()
-  getMyUserDetails(): Middleware { 
+  getMyUserDetails(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       await this.doGetAllUserDetails(request, response)
     }
@@ -156,7 +156,6 @@ class UsersHandlers {
 
   static getPatchHandler(payload_schema: z.Schema) {
     return async (request: Request, response: Response): Promise<void> => {
-
       const parsed_payload = payload_schema.parse(request.body)
 
       const found_user = await prisma.user.update({
@@ -174,7 +173,7 @@ class UsersHandlers {
    * Allows editing of all fields excluding password.
    */
   @requireUserIsAdmin()
-  patchUserDetailsAsAdmin(): Middleware { 
+  patchUserDetailsAsAdmin(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       await UsersHandlers.getPatchHandler(patchUserPayloadSchema)(request, response)
     }
@@ -185,7 +184,7 @@ class UsersHandlers {
    * Allows editing of all MLH fields, email, etc.
    */
   @requireSelf()
-  patchMyUserDetails(): Middleware { 
+  patchMyUserDetails(): Middleware {
     return async (request: Request, response: Response, next: () => void): Promise<void> => {
       next()
     }
@@ -203,7 +202,7 @@ class UsersHandlers {
       })
 
       response.status(200)
-      response.json({status: response.statusCode, message: "OK"})
+      response.json({ status: response.statusCode, message: "OK" })
     }
   }
 }

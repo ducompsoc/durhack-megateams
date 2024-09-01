@@ -2,10 +2,10 @@ import type { NextFunction, Request, Response } from "@otterhttp/app"
 import { ClientError } from "@otterhttp/errors"
 import { type Client, generators } from "openid-client"
 
-import { hostname } from "@server/config"
-import { type User, prisma } from "@server/database"
 import { adaptTokenSetToDatabase } from "@server/auth/adapt-token-set"
 import { getSession } from "@server/auth/session"
+import { hostname } from "@server/config"
+import { type User, prisma } from "@server/database"
 import type { Middleware } from "@server/types"
 
 import { keycloakClient } from "./keycloak-client"
@@ -50,10 +50,11 @@ export class KeycloakHandlers {
       let codeVerifier: unknown
       try {
         codeVerifier = session.keycloakOAuth2FlowCodeVerifier
-        if (typeof codeVerifier !== "string") throw new ClientError("Code verifier not initialized", {
-          statusCode: 400,
-          exposeMessage: false,
-        })
+        if (typeof codeVerifier !== "string")
+          throw new ClientError("Code verifier not initialized", {
+            statusCode: 400,
+            exposeMessage: false,
+          })
       } finally {
         session.keycloakOAuth2FlowCodeVerifier = undefined
         await session.commit()

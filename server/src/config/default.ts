@@ -26,7 +26,7 @@ export default {
   session: {
     cookie: {
       name: "durhack-megateams-session",
-      secure: false
+      secure: false,
     },
   },
   megateams: {
@@ -88,5 +88,5 @@ export default {
     clientSecret: "not-a-real-client-secret",
     responseTypes: ["code"],
     redirectUris: ["https://live.durhack.com/api/auth/keycloak/callback"],
-  }
+  },
 } satisfies ConfigIn

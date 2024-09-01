@@ -1,7 +1,7 @@
 import { App } from "@otterhttp/app"
 
-import type { Request, Response } from "@server/types"
 import { handleFailedAuthentication, methodNotAllowed, parseRouteId } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
 
 import { qrCodesHandlers } from "./qr-codes-handlers"
 
@@ -26,7 +26,8 @@ qrCodesApp
   .post(qrCodesHandlers.usePreset(), handleFailedAuthentication)
   .delete(qrCodesHandlers.deletePreset(), handleFailedAuthentication)
 
-qrCodesApp.route("/redeem")
+qrCodesApp
+  .route("/redeem")
   .all(methodNotAllowed(["POST"]))
   .post(qrCodesHandlers.redeemQR())
 
@@ -38,7 +39,11 @@ qrCodesApp
 qrCodesApp
   .route("/challenges")
   .all(methodNotAllowed(["GET", "POST"]))
-  .get(qrCodesHandlers.getChallengeListAdmin(), qrCodesHandlers.getChallengeListAsAnonymous(), handleFailedAuthentication)
+  .get(
+    qrCodesHandlers.getChallengeListAdmin(),
+    qrCodesHandlers.getChallengeListAsAnonymous(),
+    handleFailedAuthentication,
+  )
   .post(qrCodesHandlers.createChallenge(), handleFailedAuthentication)
 
 qrCodesApp

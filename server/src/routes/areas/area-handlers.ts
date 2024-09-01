@@ -1,15 +1,15 @@
-import { ServerError, HttpStatus } from "@otterhttp/errors";
+import { HttpStatus, ServerError } from "@otterhttp/errors"
 
-import type { Middleware, Request, Response } from "@server/types";
 import { requireUserIsAdmin } from "@server/common/decorators"
 import { prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 class AreaHandlers {
   @requireUserIsAdmin()
   getAreasList(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       const result = await prisma.megateam.findMany({
-        include: { areas: true }
+        include: { areas: true },
       })
 
       response.json({
@@ -49,5 +49,5 @@ class AreaHandlers {
   }
 }
 
-const areaHandlers  = new AreaHandlers()
+const areaHandlers = new AreaHandlers()
 export { areaHandlers }

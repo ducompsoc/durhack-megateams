@@ -1,22 +1,27 @@
-import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors";
-import { uniqueNamesGenerator, adjectives, animals, type Config as UniqueNamesGeneratorConfig } from "unique-names-generator"
-import { z } from "zod"
-import { getRandomValues } from "node:crypto"
-import { getTeamsWithPoints, getTeamsWithEverything } from '@prisma/client/sql'
-import { Prisma } from "@prisma/client"
 import assert from "node:assert/strict"
+import { getRandomValues } from "node:crypto"
+import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors"
+import { Prisma } from "@prisma/client"
+import { getTeamsWithEverything, getTeamsWithPoints } from "@prisma/client/sql"
+import {
+  type Config as UniqueNamesGeneratorConfig,
+  adjectives,
+  animals,
+  uniqueNamesGenerator,
+} from "unique-names-generator"
+import { z } from "zod"
 
-import type { Request, Response, Middleware } from "@server/types"
-import { requireUserIsAdmin, requireLoggedIn } from "@server/common/decorators"
-import { prisma, type Team } from "@server/database";
-import { getSession } from "@server/auth/session";
+import { getSession } from "@server/auth/session"
+import { requireLoggedIn, requireUserIsAdmin } from "@server/common/decorators"
+import { type Team, prisma } from "@server/database"
+import type { Middleware, Request, Response } from "@server/types"
 
 class TeamsHandlers {
   static join_code_schema = z
     .string()
     .length(4)
-    .transform(val => Number.parseInt(val, 16))
-    .refine(val => !Number.isNaN(val))
+    .transform((val) => Number.parseInt(val, 16))
+    .refine((val) => !Number.isNaN(val))
 
   static namesGeneratorConfig: UniqueNamesGeneratorConfig = {
     dictionaries: [adjectives, adjectives, animals],
@@ -46,7 +51,7 @@ class TeamsHandlers {
       const payload = result.map((team) => ({
         name: team.teamName,
         points: Number.isNaN(team.points) ? 0 : Number(team.points),
-      }));
+      }))
 
       response.json({
         status: 200,
@@ -73,9 +78,9 @@ class TeamsHandlers {
           megateam: {
             megateam_id: team.megateamId,
             megateam_name: team.megateamName,
-          }
-        }
-      }));
+          },
+        },
+      }))
 
       response.json({
         status: 200,
@@ -86,7 +91,7 @@ class TeamsHandlers {
   }
 
   static patchTeamPayloadSchema = z.object({
-    area_code: z.number()
+    area_code: z.number(),
   })
 
   @requireUserIsAdmin()
@@ -101,8 +106,8 @@ class TeamsHandlers {
       await prisma.team.update({
         where: { teamId: team_id },
         data: {
-          areaId: payload.area_code
-        }
+          areaId: payload.area_code,
+        },
       })
 
       response.json({
@@ -146,10 +151,10 @@ class TeamsHandlers {
               teamName: generatedTeamName,
               joinCode: randomValue,
               members: {
-                connect: [ request.user! ],
-              }
+                connect: [request.user!],
+              },
             },
-          });
+          })
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
             tryIndex += 1

@@ -1,7 +1,7 @@
 import { App } from "@otterhttp/app"
 
-import type { Request, Response } from "@server/types"
 import { handleFailedAuthentication, methodNotAllowed } from "@server/common/middleware"
+import type { Request, Response } from "@server/types"
 
 import { usersHandlers } from "./users-handlers"
 

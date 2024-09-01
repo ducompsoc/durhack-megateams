@@ -1,15 +1,15 @@
-import { App } from "@otterhttp/app"
 import { type Server, createServer } from "node:http"
-import { Server as SocketIO } from "socket.io"
 import * as process from "node:process"
+import { App } from "@otterhttp/app"
+import { Server as SocketIO } from "socket.io"
 
-import { listenConfig } from "@server/config";
-import { matchSignedCookie, signCookie, unsignCookieOrThrow } from "@server/auth/cookies";
+import { matchSignedCookie, signCookie, unsignCookieOrThrow } from "@server/auth/cookies"
+import { listenConfig } from "@server/config"
 
 import { Request } from "./request"
 import { Response } from "./response"
-import SocketManager from "./socket"
 import { apiApp } from "./routes"
+import SocketManager from "./socket"
 import "./database"
 
 const environment = process.env.NODE_ENV
@@ -25,7 +25,7 @@ function getApp(): App<Request, Response> {
         signedCookieMatcher: matchSignedCookie,
         cookieUnsigner: unsignCookieOrThrow,
       },
-      "trust proxy": ["localhost"]
+      "trust proxy": ["localhost"],
     },
   })
 
@@ -53,11 +53,13 @@ async function main() {
   const server = getServer(app)
 
   server.listen(listenConfig.port, listenConfig.host, () => {
-    console.log(`> Server listening on http://${listenConfig.host}:${listenConfig.port} as ${dev ? "development" : environment}`)
+    console.log(
+      `> Server listening on http://${listenConfig.host}:${listenConfig.port} as ${dev ? "development" : environment}`,
+    )
   })
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error)
   process.exit(1)
 })

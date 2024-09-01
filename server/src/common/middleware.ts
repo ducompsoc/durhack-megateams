@@ -1,9 +1,9 @@
-import type { NextFunction } from "@otterhttp/app";
-import { ClientError, ServerError, HttpStatus } from "@otterhttp/errors";
+import type { NextFunction } from "@otterhttp/app"
+import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors"
 
-import { ValueError } from "@server/common/errors";
-import type { Middleware, Request, Response } from "@server/types";
-import { getSession } from "@server/auth/session";
+import { getSession } from "@server/auth/session"
+import { ValueError } from "@server/common/errors"
+import type { Middleware, Request, Response } from "@server/types"
 
 type HttpVerb = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | "PATCH"
 
@@ -24,17 +24,17 @@ export function methodNotAllowed(allowedMethods: Iterable<HttpVerb>): Middleware
 }
 
 export function handleNotImplemented() {
-  throw new ServerError("", { statusCode: HttpStatus.NotImplemented });
+  throw new ServerError("", { statusCode: HttpStatus.NotImplemented })
 }
 
 export function handleFailedAuthentication(request: Request) {
   if (request.user) {
     // Re-authenticating will not allow access (i.e. you are not a high-enough privileged user):
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
-    throw new ClientError("", { statusCode: HttpStatus.Forbidden });
+    throw new ClientError("", { statusCode: HttpStatus.Forbidden })
   }
   // Lacking any credentials at all: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
-  throw new ClientError("", { statusCode: HttpStatus.Unauthorized });
+  throw new ClientError("", { statusCode: HttpStatus.Unauthorized })
 }
 
 function getRouteParameter(key: string) {
@@ -74,14 +74,14 @@ function parseId(value: unknown): number {
 export function parseRouteId(key: string): Middleware {
   return (request, response, next) => {
     const id = getRouteParameter(key)
-    response.locals[key] = parseId(id);
+    response.locals[key] = parseId(id)
     next()
   }
 }
 
 export function useSelfId(request: Request, response: Response, next: NextFunction): void {
   if (!request.user) {
-    throw new ClientError("", { statusCode: HttpStatus.Unauthorized });
+    throw new ClientError("", { statusCode: HttpStatus.Unauthorized })
   }
 
   response.locals.user_id = request.user.keycloakUserId
