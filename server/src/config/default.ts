@@ -3,7 +3,7 @@ import type { ConfigIn } from "./schema"
 
 export default {
   listen: {
-    host: "127.0.0.1",
+    host: "localhost",
     port: 3101,
   },
   hostname: "http://localhost:3101",
