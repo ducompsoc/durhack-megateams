@@ -33,9 +33,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/volunteer", request.nextUrl))
     }
 
-    // otherwise, assume the user is a hacker (Keycloak should have a policy
-    // configured to only allow certain groups to log in to megateams)
-    return NextResponse.redirect(new URL("/hacker", request.nextUrl))
+    // if the user is a hacker, go to /hacker
+    if (isHacker(userProfile)) {
+      return NextResponse.redirect(new URL("/hacker", request.nextUrl))
+    }
+
+    // otherwise, the user is not permitted.
+    return NextResponse.redirect(new URL("/forbidden", request.nextUrl))
   }
 
   if (request.nextUrl.pathname.startsWith("/hacker")) {
