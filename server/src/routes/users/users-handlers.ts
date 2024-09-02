@@ -4,32 +4,51 @@ import { requireSelf, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
+import { getKeycloakAdminClient } from "@server/auth/keycloak-client";
 
 export const patchUserPayloadSchema = z.object({
-  teamId: z.number().optional(),
+  teamId: z.number().int().optional(),
 })
 
 class UsersHandlers {
+  static usersListDefaultQuerySchema = z.object({
+    count: z.coerce.number().int().positive().default(10),
+    first: z.coerce.number().int().positive().optional()
+  })
+
   /**
    * Handles an unauthenticated or non-admin GET request to /users.
    * Returns a list of user IDs and preferred names that cannot be filtered.
    */
   getUsersListDefault(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      const result = await prisma.user.findMany({
-        select: {
-          keycloakUserId: true,
-          // todo: this used to provide preferred names
-        },
-      })
+      const query = UsersHandlers.usersListDefaultQuerySchema.parse(request.query)
+      const adminClient = await getKeycloakAdminClient()
+      const [users, totalCount] = await Promise.all([
+        adminClient.users.find( { first: query.first, max: query.count }),
+        adminClient.users.count(),
+      ])
+
+      const payload = users.map((user) => ({
+        id: user.id,
+        preferred_name: user.attributes?.preferredNames?.[0]
+      }))
+
       response.status(200)
       response.json({
         status: 200,
         message: "OK",
-        users: result,
+        first: query.first,
+        count: payload.length,
+        total_count: totalCount,
+        data: payload,
       })
     }
   }
+
+  static usersListAdminQuerySchema = UsersHandlers.usersListDefaultQuerySchema.extend({
+    query: z.string().optional(),
+  })
 
   /**
    * Handles an authenticated admin GET request to /users.
@@ -39,39 +58,51 @@ class UsersHandlers {
   @requireUserIsAdmin()
   getUsersListAsAdmin(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      /*
-      todo: joe thinks this whole handler needs a rework.
-           It should query the Keycloak admin API for a 'page' (sub-list) of users that match the (email) search term,
-           look those up in the database for 'points' totals, defaulting to 0, and return that.
-       */
-      const result = await prisma.user.findMany({
-        select: {
-          keycloakUserId: true,
-          points: true,
-          team: {
-            include: {
-              area: {
-                include: { megateam: true },
+      const query = UsersHandlers.usersListAdminQuerySchema.parse(request.query)
+      const adminClient = await getKeycloakAdminClient()
+      const [users, totalCount] = await Promise.all([
+        adminClient.users.find({ first: query.first, max: query.count, q: query.query }),
+        adminClient.users.count({ q: query.query }),
+      ])
+
+      const databaseUsers = await Promise.all(
+        users.map(user => prisma.user.findUnique({
+          where: { keycloakUserId: user.id },
+          select: {
+            points: true,
+            team: {
+              include: {
+                area: {
+                  include: { megateam: true },
+                },
               },
             },
           },
-        },
-      })
+        }))
+      )
 
-      const payload = result.map((user) => ({
-        id: user.keycloakUserId,
-        // todo: this used to provide preferred name and email too (see above note)
-        points: prisma.point.sumPoints(user.points),
-        team_name: user.team?.teamName,
-        team_id: user.team?.teamId,
-        megateam_name: user.team?.area?.megateam?.megateamName,
-      }))
+      const payload = users.map((user, index) => {
+        const databaseUser = databaseUsers[index]
+
+        return {
+          id: user.id,
+          email: user.email,
+          preferred_name: user.attributes?.preferredNames?.[0],
+          points: prisma.point.sumPoints(databaseUser?.points ?? []),
+          team_name: databaseUser?.team?.teamName ?? null,
+          team_id: databaseUser?.team?.teamId ?? null,
+          megateam_name: databaseUser?.team?.area?.megateam?.megateamName ?? null,
+        };
+      });
 
       response.status(200)
       response.json({
         status: 200,
         message: "OK",
-        users: payload,
+        first: query.first,
+        count: payload.length,
+        total_count: totalCount,
+        data: payload,
       })
     }
   }
@@ -82,20 +113,25 @@ class UsersHandlers {
    */
   getUserDetailsDefault(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      const result = await prisma.user.findUnique({
+      const adminClient = await getKeycloakAdminClient()
+
+      const userProfile = await adminClient.users.findOne({ id: request.params.user_id })
+      if (userProfile?.id == null ) throw new NullError()
+
+      const databaseResult = await prisma.user.findUnique({
         where: { keycloakUserId: request.params.user_id },
         select: {
           keycloakUserId: true,
-          // todo: this also retrieved preferred name
           team: true,
           points: true,
         },
       })
-      if (result == null) throw new NullError()
 
       const payload = {
-        ...result,
-        points: prisma.point.sumPoints(result.points),
+        id: userProfile.id,
+        preferred_name: userProfile.attributes?.preferredNames?.[0],
+        team: databaseResult?.team ?? null,
+        points: prisma.point.sumPoints(databaseResult?.points ?? []),
       }
 
       response.status(200)
@@ -108,18 +144,28 @@ class UsersHandlers {
   }
 
   private async doGetAllUserDetails(request: Request, response: Response): Promise<void> {
+    const adminClient = await getKeycloakAdminClient()
+
+    const userProfile = await adminClient.users.findOne({ id: request.params.user_id })
+    if (userProfile?.id == null) throw new NullError()
+
+    const groups = await adminClient.users.listGroups({ id: userProfile.id })
+
     const result = await prisma.user.findUnique({
       where: { keycloakUserId: request.params.user_id },
-      include: {
+      select: {
         team: true,
         points: true,
       },
     })
-    if (result == null) throw new NullError()
 
     const payload = {
-      ...result,
-      points: prisma.point.sumPoints(result.points),
+      id: userProfile.id,
+      email: userProfile.email,
+      preferred_name: userProfile.attributes?.preferredNames?.[0],
+      roles: groups.map((group) => group.path),
+      team: result?.team ?? null,
+      points: prisma.point.sumPoints(result?.points ?? []),
     }
 
     response.status(200)

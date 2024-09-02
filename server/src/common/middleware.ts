@@ -37,10 +37,6 @@ export function handleFailedAuthentication(request: Request) {
   throw new ClientError("", { statusCode: HttpStatus.Unauthorized })
 }
 
-function getRouteParameter(key: string) {
-  return (request: Request): unknown => request.params[key]
-}
-
 function getQueryParameter(key: string) {
   return (request: Request): unknown => request.query[key]
 }
@@ -73,7 +69,7 @@ function parseId(value: unknown): number {
  */
 export function parseRouteId(key: string): Middleware {
   return (request, response, next) => {
-    const id = getRouteParameter(key)
+    const id = request.params[key]
     response.locals[key] = parseId(id)
     next()
   }

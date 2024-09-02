@@ -5,6 +5,7 @@ import { requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
+import { getKeycloakAdminClient } from "@server/auth/keycloak-client";
 
 const createPointPayloadSchema = z.object({
   value: z.number().positive(),
@@ -76,6 +77,7 @@ class PointHandlers {
   /**
    * Returns the details of a point entry in the database and linked QR code and user attributes.
    */
+  @requireUserIsAdmin()
   getPointDetails(): Middleware {
     return async (_request: Request, response: Response): Promise<void> => {
       const { point_id } = response.locals
@@ -96,7 +98,7 @@ class PointHandlers {
           redeemerUser: {
             select: {
               keycloakUserId: true,
-              teamId: true,
+              team: true,
               // todo: this also used to select preferred name
             },
           },
@@ -104,8 +106,19 @@ class PointHandlers {
       })
       if (result == null) throw new NullError()
 
+      const adminClient = await getKeycloakAdminClient()
+      const userProfile = await adminClient.users.findOne({ id: result.redeemerUser.keycloakUserId })
+      const payload = {
+        ...result,
+        redeemerUser: {
+          ...result.redeemerUser,
+          email: userProfile?.email,
+          preferred_name: userProfile?.attributes?.preferredNames?.[0]
+        }
+      }
+
       response.status(200)
-      response.json({ status: response.statusCode, message: "OK", data: result })
+      response.json({ status: response.statusCode, message: "OK", data: payload })
     }
   }
 

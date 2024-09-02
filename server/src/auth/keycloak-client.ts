@@ -17,7 +17,10 @@ export const keycloakIssuer = await Issuer.discover(keycloakConfig.url)
 
 const keycloakClientConfig = adaptClientConfig(keycloakConfig)
 export const keycloakClient = new keycloakIssuer.Client(keycloakClientConfig)
-const keycloakAdminClient = new KeycloakAdminClient()
+const keycloakAdminClient = new KeycloakAdminClient({
+  baseUrl: keycloakConfig.adminBaseUrl,
+  realmName: "durhack",
+})
 
 async function fetchKeycloakClientCredentials() {
   return await keycloakClient.grant({
