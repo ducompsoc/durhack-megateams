@@ -79,7 +79,6 @@ export function requireLoggedIn() {
  * Decorator that ensures `request.user.roles` contains one of the provided roles.
  */
 export function requireUserHasOne(...roles: UserRole[]) {
-  // todo: use keycloak token set for this
   return requireCondition((request: Request): boolean => {
     if (request.userProfile?.groups == null) return false
     return request.userProfile.groups.some((role) => {
