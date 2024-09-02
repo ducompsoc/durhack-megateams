@@ -10,7 +10,7 @@ export const pointsApp = new App<Request, Response>()
 pointsApp
   .route("/")
   .all(methodNotAllowed(["GET", "POST"]))
-  .get(pointsHandlers.getPointsList())
+  .get(pointsHandlers.getPointsList(), handleFailedAuthentication)
   .post(pointsHandlers.createPoint(), handleFailedAuthentication)
 
 pointsApp
