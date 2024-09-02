@@ -11,6 +11,7 @@ export type DurHackSessionRecord = Record<string, unknown> & {
   keycloakOAuth2FlowCodeVerifier?: string | undefined
   redirectTo?: string | undefined
   generatedTeamName?: string | undefined
+  csrfTokenInitialized?: boolean | undefined
 }
 
 export const getSession = session<DurHackSessionRecord>({

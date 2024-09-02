@@ -16,7 +16,12 @@ const options = {
 export const { generateToken, doubleCsrfProtection } = doubleCsrf(options)
 
 export async function handleGetCsrfToken(request: Request, response: Response): Promise<void> {
-  const csrfToken = await generateToken(request, response)
+  const session = await getSession(request, response)
+  const csrfToken = await generateToken(request, response, { validateOnReuse: session.csrfTokenInitialized ?? false })
+  if (!session.csrfTokenInitialized) {
+    session.csrfTokenInitialized = true
+    await session.commit()
+  }
   response.status(200)
   response.json({ status: 200, message: "Token generation OK", token: csrfToken })
 }
