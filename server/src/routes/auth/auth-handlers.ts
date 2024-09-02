@@ -4,11 +4,12 @@ import { getSession } from "@server/auth/session"
 import TokenVault from "@server/auth/tokens"
 import { requireLoggedIn } from "@server/common/decorators"
 import type { Middleware, Request, Response } from "@server/types"
+import { UserRole } from "@server/common/model-enums";
 
 class AuthHandlers {
   handleLoginSuccess(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
-      if (!request.user) {
+      if (!request.userProfile) {
         await response.redirect("/")
         return
       }
@@ -21,7 +22,10 @@ class AuthHandlers {
         return
       }
 
-      // todo: if the user has 'volunteer' or 'admin' role, redirect to /volunteer
+      if (request.userProfile.groups.some((userRole) => userRole === UserRole.admin || userRole === UserRole.volunteer)) {
+        await response.redirect("/volunteer")
+        return
+      }
 
       await response.redirect("/hacker")
       return
