@@ -79,16 +79,17 @@ model Team {
 }
 
 model User {
-  keycloakUserId   String    @id @map("keycloak_user_id") @db.Uuid()
-  teamId           Int?      @map("team_id")
-  initialLoginTime DateTime? @map("initial_login_time")
-  lastLoginTime    DateTime? @map("last_login_time")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-  team             Team?     @relation(fields: [teamId], references: [teamId])
+  keycloakUserId   String          @id @map("keycloak_user_id") @db.Uuid()
+  teamId           Int?            @map("team_id")
+  initialLoginTime DateTime?       @map("initial_login_time")
+  lastLoginTime    DateTime?       @map("last_login_time")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  team             Team?           @relation(fields: [teamId], references: [teamId])
   points           Point[]
   createdQrCodes   QrCode[]
   tokenSet         TokenSet?
+  sessions         SessionRecord[]
 
   @@index([teamId])
 }
@@ -104,6 +105,18 @@ model TokenSet {
   scope        String?
   accessExpiry DateTime? @map("access_expiry") @db.Timestamp(0)
   sessionState String?   @map("session_state")
+
+  @@index([userId])
+}
+
+model SessionRecord {
+  sessionRecordId Int      @id @default(autoincrement()) @map("session_record_id")
+  userId          String?  @map("user_id") @db.Uuid
+  user            User?    @relation(fields: [userId], references: [keycloakUserId])
+  data            Json
+  expiresAt       DateTime
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
 }
