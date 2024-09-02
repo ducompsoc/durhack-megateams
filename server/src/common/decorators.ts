@@ -35,8 +35,12 @@ export function requireCondition(condition: Condition) {
 }
 
 export function userHasRole(role: UserRole): Condition {
-  // todo: use keycloak token set for this
-  return (request: Request) => false
+  return (request: Request) => {
+    if (request.userProfile?.groups == null) return false
+    return request.userProfile.groups.some((userRole) => {
+      return role === userRole
+    });
+  }
 }
 
 export function userIsLoggedIn(): Condition {
@@ -44,21 +48,21 @@ export function userIsLoggedIn(): Condition {
 }
 
 /**
- * Decorator that ensures `request.user.role` is `UserRole.admin`.
+ * Decorator that ensures `request.user.roles` contains `UserRole.admin`.
  */
 export function requireUserIsAdmin() {
   return requireCondition(userHasRole(UserRole.admin))
 }
 
 /**
- * Decorator that ensures `request.user.role` is `UserRole.volunteer`.
+ * Decorator that ensures `request.user.roles` contains `UserRole.volunteer`.
  */
 export function requireUserIsVolunteer() {
   return requireCondition(userHasRole(UserRole.volunteer))
 }
 
 /**
- * Decorator that ensures `request.user.role` is `UserRole.sponsor`.
+ * Decorator that ensures `request.user.roles` contains `UserRole.sponsor`.
  */
 export function requireUserIsSponsor() {
   return requireCondition(userHasRole(UserRole.sponsor))
@@ -72,11 +76,16 @@ export function requireLoggedIn() {
 }
 
 /**
- * Decorator that ensures `request.user.role` is one of the provided roles.
+ * Decorator that ensures `request.user.roles` contains one of the provided roles.
  */
-export function requireUserIsOneOf(...roles: UserRole[]) {
+export function requireUserHasOne(...roles: UserRole[]) {
   // todo: use keycloak token set for this
-  return requireCondition((request: Request): boolean => false)
+  return requireCondition((request: Request): boolean => {
+    if (request.userProfile?.groups == null) return false
+    return request.userProfile.groups.some((role) => {
+      return roles.some((checkAgainstRole) => role === checkAgainstRole)
+    })
+  });
 }
 
 /**
