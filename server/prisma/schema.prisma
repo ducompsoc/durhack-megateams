@@ -110,7 +110,7 @@ model TokenSet {
 }
 
 model SessionRecord {
-  sessionRecordId Int      @id @default(autoincrement()) @map("session_record_id")
+  sessionRecordId String   @id @map("session_record_id")
   userId          String?  @map("user_id") @db.Uuid
   user            User?    @relation(fields: [userId], references: [keycloakUserId])
   data            Json

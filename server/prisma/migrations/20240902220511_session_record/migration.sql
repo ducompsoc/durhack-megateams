@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "SessionRecord" (
-    "session_record_id" SERIAL NOT NULL,
+    "session_record_id" TEXT NOT NULL,
     "user_id" UUID,
     "data" JSONB NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
