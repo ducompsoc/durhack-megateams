@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors"
-import { v4 as uuid } from "uuid"
+import { v7 as uuid } from "uuid"
 import { z } from "zod"
 
 import { requireLoggedIn, requireUserIsAdmin, requireUserHasOne } from "@server/common/decorators"
@@ -41,7 +41,6 @@ class QRCodesHandlers {
   ) {
     const publicisedFields = await this.getPublicisedFields(null, publicised)
 
-    // todo: update to uuid v7
     const payload = uuid()
 
     return await prisma.qrCode.create({
