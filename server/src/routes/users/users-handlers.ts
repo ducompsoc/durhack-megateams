@@ -13,7 +13,7 @@ export const patchUserPayloadSchema = z.object({
 class UsersHandlers {
   static usersListDefaultQuerySchema = z.object({
     count: z.coerce.number().int().positive().default(10),
-    first: z.coerce.number().int().positive().optional()
+    first: z.coerce.number().int().nonnegative().optional()
   })
 
   /**
