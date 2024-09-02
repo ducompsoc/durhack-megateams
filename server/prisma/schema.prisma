@@ -110,13 +110,13 @@ model TokenSet {
 }
 
 model SessionRecord {
-  sessionRecordId String   @id @map("session_record_id")
-  userId          String?  @map("user_id") @db.Uuid
-  user            User?    @relation(fields: [userId], references: [keycloakUserId])
+  sessionRecordId String    @id @map("session_record_id")
+  userId          String?   @map("user_id") @db.Uuid
+  user            User?     @relation(fields: [userId], references: [keycloakUserId])
   data            Json
-  expiresAt       DateTime
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   @@index([userId])
 }

@@ -3,7 +3,7 @@ CREATE TABLE "SessionRecord" (
     "session_record_id" TEXT NOT NULL,
     "user_id" UUID,
     "data" JSONB NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "expiresAt" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
