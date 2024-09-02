@@ -41,7 +41,7 @@ CREATE TABLE "QrCode" (
     "qr_code_id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "category" "QRCodes_category" NOT NULL DEFAULT 'workshop',
-    "payload" VARCHAR(255) NOT NULL,
+    "payload" UUID NOT NULL,
     "points_value" INTEGER NOT NULL,
     "max_uses" INTEGER,
     "state" BOOLEAN NOT NULL,
@@ -107,6 +107,9 @@ CREATE INDEX "Point_redeemer_user_id_idx" ON "Point"("redeemer_user_id");
 CREATE UNIQUE INDEX "QrCode_challenge_rank_key" ON "QrCode"("challenge_rank");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "QrCode_payload_key" ON "QrCode"("payload");
+
+-- CreateIndex
 CREATE INDEX "QrCode_creator_id_idx" ON "QrCode"("creator_id");
 
 -- CreateIndex
@@ -120,6 +123,9 @@ CREATE INDEX "Team_area_id_idx" ON "Team"("area_id");
 
 -- CreateIndex
 CREATE INDEX "User_team_id_idx" ON "User"("team_id");
+
+-- CreateIndex
+CREATE INDEX "TokenSet_user_id_idx" ON "TokenSet"("user_id");
 
 -- AddForeignKey
 ALTER TABLE "Area" ADD CONSTRAINT "Area_megateam_id_fkey" FOREIGN KEY ("megateam_id") REFERENCES "Megateam"("megateam_id") ON DELETE NO ACTION ON UPDATE CASCADE;
