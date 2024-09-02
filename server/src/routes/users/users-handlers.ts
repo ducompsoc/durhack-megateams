@@ -47,8 +47,6 @@ class UsersHandlers {
       const result = await prisma.user.findMany({
         select: {
           keycloakUserId: true,
-        },
-        include: {
           points: true,
           team: {
             include: {
@@ -89,8 +87,6 @@ class UsersHandlers {
         select: {
           keycloakUserId: true,
           // todo: this also retrieved preferred name
-        },
-        include: {
           team: true,
           points: true,
         },

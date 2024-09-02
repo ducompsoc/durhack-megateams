@@ -3,7 +3,7 @@ import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors"
 import { v4 as uuid } from "uuid"
 import { z } from "zod"
 
-import { requireLoggedIn, requireUserIsAdmin, requireUserIsOneOf } from "@server/common/decorators"
+import { requireLoggedIn, requireUserIsAdmin, requireUserHasOne } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { QRCategory, UserRole } from "@server/common/model-enums"
 import { megateamsConfig } from "@server/config"
@@ -85,7 +85,7 @@ class QRCodesHandlers {
     publicised: z.boolean(),
   })
 
-  @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
+  @requireUserHasOne(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   usePreset(): Middleware {
     return async (request: Request, response: Response) => {
       const preset_id: string = request.params.preset_id
@@ -178,7 +178,7 @@ class QRCodesHandlers {
     publicised: z.boolean().optional(),
   })
 
-  @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
+  @requireUserHasOne(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   patchQRCodeDetails(): Middleware {
     return async (request: Request, response: Response): Promise<void> => {
       const { qr_code_id } = response.locals
@@ -214,7 +214,7 @@ class QRCodesHandlers {
     }
   }
 
-  @requireUserIsOneOf(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
+  @requireUserHasOne(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   getPresetsList(): Middleware {
     return (_request: Request, response: Response) => {
       response.status(200)

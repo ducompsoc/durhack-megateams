@@ -32,8 +32,6 @@ class PointHandlers {
         select: {
           pointId: true,
           value: true,
-        },
-        include: {
           redeemerUser: {
             select: {
               keycloakUserId: true,
