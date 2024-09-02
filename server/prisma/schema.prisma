@@ -104,6 +104,8 @@ model TokenSet {
   scope        String?
   accessExpiry DateTime? @map("access_expiry") @db.Timestamp(0)
   sessionState String?   @map("session_state")
+
+  @@index([userId])
 }
 
 enum QRCodes_category {
