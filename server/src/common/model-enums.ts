@@ -1,8 +1,8 @@
 export enum UserRole {
-  hacker = "hacker",
-  sponsor = "sponsor",
-  volunteer = "volunteer",
-  admin = "admin",
+  hacker = "/hackers",
+  sponsor = "/sponsors",
+  volunteer = "/volunteers",
+  admin = "/admins",
 }
 
 export enum Ethnicity {
