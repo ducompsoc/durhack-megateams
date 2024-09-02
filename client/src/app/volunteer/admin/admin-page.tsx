@@ -11,49 +11,48 @@ import { ButtonModal } from "@/components/button-modal";
 import { fetchMegateamsApi } from "@/lib/api";
 
 export function AdminPage() {
-  const { mutate: mutateUsers, data: usersData = { users: [] } } = useSWR<{
-    users: any[];
-  }>("/users");
-  const [users, setUsers, resetForm] = useFormState(usersData.users);
-  const { data: { teams } = { teams: [] } } = useSWR<{
-    teams: any[];
-  }>("/teams");
+  const itemsPerPage = 10;
+
   const [message, setMessage] = React.useState("");
   const [messageOpen, setMessageOpen] = React.useState(false);
-  const [searchText, setSearchText] = React.useState("");
-  const [searchTextActive, setSearchTextActive] = React.useState("");
+  const [localSearchQuery, setLocalSearchQuery] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [itemOffset, setItemOffset] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(0);
 
-  const lowerSearch = searchTextActive.toLowerCase();
-  const filteredUsers = users.filter((users) => {
-    if (users.preferred_name.toLowerCase().includes(lowerSearch)) return true;
-    if (users.email.toLowerCase().includes(lowerSearch)) return true;
-    return false;
-  });
+  const { mutate: mutateUsers, data: usersData = { data: [], total_count: 0 } } = useSWR<{
+    data: any[]
+    total_count: number
+  }>(`/users?first=${itemOffset}&count=${itemsPerPage}&query=${searchQuery}`);
+  const [users, setUsers, resetForm] = useFormState(usersData.data);
 
-  const itemsPerPage = 50;
-  const endOffset = itemOffset + itemsPerPage;
-  const currentItems = filteredUsers.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(filteredUsers.length / itemsPerPage);
+  const { data: { teams } = { teams: [] } } = useSWR<{
+    teams: any[];
+  }>("/teams");
+
+  const pageCount = Math.ceil(usersData.total_count / itemsPerPage);
 
   function handlePageClick(event: { selected: number }) {
-    const newOffset = (event.selected * itemsPerPage) % filteredUsers.length;
+    const newOffset = event.selected * itemsPerPage
     setItemOffset(newOffset);
     setPageNumber(event.selected);
   }
 
-  function handleSearchText(text: string) {
-    setSearchText(text);
+  function onSearchTextChanged(text: string) {
+    // when the search text is changed, update the local search query in case of a rerender, but don't actually fetch anything yet
+    setLocalSearchQuery(text);
+
+    // if the search text changes to blank string, trigger a fetch and reset page number
     if (!text) {
-      setSearchTextActive(text);
+      setSearchQuery("");
       setItemOffset(0);
       setPageNumber(0);
     }
   }
 
   function search() {
-    setSearchTextActive(searchText);
+    // when the search text field is submitted / the magnifying glass is clicked, trigger a fetch and reset page number
+    setSearchQuery(localSearchQuery);
     setItemOffset(0);
     setPageNumber(0);
   }
@@ -66,7 +65,7 @@ export function AdminPage() {
       try {
         await fetchMegateamsApi("/points", {
           method: "POST",
-          body: JSON.stringify({ value: parseInt(points), redeemer_id: id }),
+          body: JSON.stringify({ value: parseInt(points), redeemerUserId: id }),
           headers: { "Content-Type": "application/json" },
         });
         await mutateUsers();
@@ -106,8 +105,8 @@ export function AdminPage() {
               type="text"
               className="dh-input w-full pl-10"
               placeholder="Search for users..."
-              value={searchText}
-              onChange={(e) => handleSearchText(e.target.value)}
+              value={localSearchQuery}
+              onChange={(e) => onSearchTextChanged(e.target.value)}
             />
             <MagnifyingGlassIcon className="w-6 h-6 absolute ml-2" />
             <button className="dh-btn ml-2" onClick={search}>
@@ -127,7 +126,7 @@ export function AdminPage() {
           forcePage={pageNumber}
           className="dh-paginate my-6"
         />
-        {currentItems.map(
+        {usersData.data.map(
           (
             {
               preferred_name,
