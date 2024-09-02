@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Area {
-  areaId       Int      @id @default(autoincrement())
+  areaId       Int      @id @default(autoincrement()) @map("area_id")
   megateamId   Int      @map("megateam_id")
   areaName     String   @map("area_name") @db.VarChar(255)
   areaLocation String   @map("area_location") @db.VarChar(255)
