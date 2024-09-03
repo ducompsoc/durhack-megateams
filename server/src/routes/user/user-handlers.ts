@@ -89,7 +89,7 @@ class UserHandlers {
       response.json({
         status: 200,
         message: "OK",
-        team: payload,
+        data: payload,
       })
     }
   }
