@@ -8,7 +8,7 @@ async function getUserProfile(request: NextRequest): Promise<User | null> {
   const sessionCookie = request.cookies.get("durhack-megateams-session")
   if (sessionCookie != null) {
     const userProfileResponse = await fetch(
-      new URL('http://localhost:8081/api/user'),
+      new URL('/api/user', request.nextUrl),
       {
         headers: { cookie: request.headers.get("cookie")! }
       }
