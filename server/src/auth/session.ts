@@ -63,7 +63,7 @@ class PrismaSessionStore implements SessionStore {
   }
 }
 
-export type DurHackSessionRecord = Record<string, unknown> & {
+export type MegateamsSessionRecord = Record<string, unknown> & {
   userId?: string | undefined
   keycloakOAuth2FlowCodeVerifier?: string | undefined
   redirectTo?: string | undefined
@@ -71,7 +71,7 @@ export type DurHackSessionRecord = Record<string, unknown> & {
   csrfTokenInitialized?: boolean | undefined
 }
 
-export const getSession = session<DurHackSessionRecord>({
+export const getSession = session<MegateamsSessionRecord>({
   store: new PrismaSessionStore(),
   ...sessionOptions,
   cookie: {
