@@ -1,11 +1,14 @@
-import TeamName from "@/components/team-name";
+"use client"
+
 import { ShareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import useSWR from "swr";
+
+import TeamName from "@/components/team-name";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 export function TeamBox({ grow = true }: { grow?: boolean }) {
   const [showTeamCode, setShowTeamCode] = useState(false);
-  const { data: { team } = { team: null } } = useSWR("/user/team");
+  const { team } = useMegateamsContext()
 
   function toggleTeamCode() {
     setShowTeamCode(!showTeamCode);

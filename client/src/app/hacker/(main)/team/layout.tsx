@@ -1,17 +1,16 @@
 "use client";
 
 import * as React from "react"
-import useSWR from "swr";
 import { redirect } from "next/navigation";
 
-import { fetchMegateamsApi } from "@/lib/api";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 export default function HackerTeamLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: { team }, isLoading: teamIsLoading } = useSWR("/user/team", fetchMegateamsApi);
+  const { team, teamIsLoading } = useMegateamsContext();
 
   if (teamIsLoading) return <></>;
   if (team == null) return redirect("/hacker");

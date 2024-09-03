@@ -6,13 +6,13 @@ import useSWR from "swr";
 import { useFormState } from "react-hooks-use-form-state";
 import { useState } from "react";
 
-import { useUser } from "@/lib/useUser";
 import { ButtonModal } from "@/components/button-modal";
 import { fetchMegateamsApi } from "@/lib/api";
 import { isAdmin } from "@/lib/is-role";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 export default function Challenges() {
-  const { user, isLoading } = useUser();
+  const { user, userIsLoading } = useMegateamsContext();
   const { data = { challenges: [] }, mutate: mutateChallenges } = useSWR<{
     challenges: any[];
   }>("/qr_codes/challenges");
@@ -23,7 +23,7 @@ export default function Challenges() {
   const [message, setMessage] = useState("");
   const [messageOpen, setMessageOpen] = useState(false);
 
-  if (isLoading) return <></>;
+  if (userIsLoading) return <></>;
   if (!user) return redirect("/")
   if (!isAdmin(user)) return redirect("/volunteer")
 

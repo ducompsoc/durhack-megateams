@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
-import type { User } from "@/lib/useUser"
+import type { User } from "@/hooks/use-user"
 import { isVolunteer, isHacker, isAdmin } from "@/lib/is-role";
 
 async function getUserProfile(request: NextRequest): Promise<User | null> {

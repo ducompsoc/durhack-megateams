@@ -3,26 +3,26 @@
 import { Fragment, useState } from "react";
 import { ExclamationTriangleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import useSWR from "swr";
 
 import { ButtonModal } from "@/components/button-modal";
 import { fetchMegateamsApi } from "@/lib/api";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
+
 import { TeamBox } from "./team-box";
 
 export default function Team() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
-  const { data: { team } = { team: null }, mutate: mutateTeam } =
-    useSWR("/user/team");
+  const { team, mutateTeam } = useMegateamsContext()
 
-  const members: [{ preferredNames: string; points: number }] = team?.members ?? [];
+  const members: { preferredNames: string; points: number }[] = team?.members ?? [];
   members.sort((a, b) => b.points - a.points);
 
   async function leaveTeam() {
     try {
       await fetchMegateamsApi("/user/team", { method: "DELETE" });
       setError("");
-      mutateTeam({ team: null });
+      await mutateTeam(null);
     } catch {
       setError("Failed to leave team!");
     }

@@ -10,11 +10,12 @@ import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
 
 import { socketManager } from "@/lib/socket";
-import { useUser } from "@/lib/useUser";
+import { isAdmin, isVolunteer } from "@/lib/is-role";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
+
 import Preset from "./preset";
 import Custom from "./custom";
 import Manage from "./manage";
-import { isAdmin, isVolunteer } from "@/lib/is-role";
 
 export default function Volunteer() {
   const [current, setCurrent] = useState("Preset");
@@ -32,7 +33,7 @@ export default function Volunteer() {
   });
   const { theme } = resolveConfig(tailwindConfig);
 
-  const { user } = useUser();
+  const { user } = useMegateamsContext();
   const userIsAdmin = user != null && isAdmin(user);
   const userIsVolunteer = user != null && isVolunteer(user)
 

@@ -8,7 +8,8 @@ import * as React from "react";
 import { SWRConfig } from "swr";
 
 import { fetchMegateamsApi } from "@/lib/api";
-import { useUser } from "@/lib/useUser";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
+
 import { ButtonModal } from "./button-modal";
 
 interface Tab {
@@ -33,7 +34,7 @@ export function TabbedPage({
 }) {
   const path = usePathname();
   const [open, setOpen] = React.useState(false);
-  const { mutateUser } = useUser();
+  const { mutateUser } = useMegateamsContext();
 
   async function signOut() {
     await fetchMegateamsApi("/auth/logout", { method: "POST" });

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import useSWR from "swr";
 import {
   ChartBarIcon,
   HomeIcon,
@@ -9,23 +8,17 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { TabbedPage } from "@/components/tabbed-page";
-import { useUser } from "@/lib/useUser";
-import { fetchMegateamsApi } from "@/lib/api";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 export default function HackerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoading } = useUser();
-  const { data: { team } = { team: null } } = useSWR(
-    "/user/team",
-    fetchMegateamsApi
-  );
+  const { team, userIsLoading, teamIsLoading } = useMegateamsContext();
 
-  const hasTeam = team !== null;
-
-  if (isLoading) return <></>;
+  if (userIsLoading || teamIsLoading) return <></>;
+  const hasTeam = team !== null
 
   const tabs = [
     {

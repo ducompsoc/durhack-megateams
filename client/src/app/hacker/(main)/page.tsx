@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 import { getHackerEmoji, getPositionMedal } from "@/lib/rankEmojis";
 import { ButtonModal } from "@/components/button-modal";
-import { useUser } from "@/lib/useUser";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 import { TeamBox } from "./team/team-box";
 import { TeamSetup } from "./team-setup";
@@ -23,8 +23,7 @@ const Scanner = dynamic(() => import("qrcode-scanner-react"), {
 export default function HackerHome() {
   const [scanning, setScanning] = React.useState(false);
   const router = useRouter();
-  const { user } = useUser();
-  const { data: { team } = { team: null } } = useSWR("/user/team");
+  const { user, team } = useMegateamsContext();
   const { data: { challenges } = { challenges: null } } = useSWR("/qr_codes/challenges");
   const { data: { megateams } = { megateams: null } } = useSWR("/megateams");
   const { data: { teams } = { teams: null } } = useSWR("/teams");

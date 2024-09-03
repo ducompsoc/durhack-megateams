@@ -10,15 +10,15 @@ import { redirect, useSearchParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
 import { fetchMegateamsApi } from "@/lib/api";
-import { useUser } from "@/lib/useUser";
 import { isHacker } from "@/lib/is-role";
 import { abortForRerender } from "@/lib/symbols";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 export default function RedeemPage() {
   const [qrPoints, setQrPoints] = useState<number | null>(null);
   const [qrChecked, setQrChecked] = useState(false);
   const searchParams = useSearchParams();
-  const { user, isLoading } = useUser();
+  const { user, userIsLoading } = useMegateamsContext();
 
   function makeSearchParams(params: Record<string, string>) {
     return new URLSearchParams(params).toString();
@@ -49,7 +49,7 @@ export default function RedeemPage() {
     return () => abortController.abort(abortForRerender);
   }, [searchParams]);
 
-  if (!isLoading && (user == null || !isHacker(user))) {
+  if (!userIsLoading && (user == null || !isHacker(user))) {
     if (qrChecked) return redirect("/");
 
     const qr_id = searchParams.get("qr_id");

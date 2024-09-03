@@ -1,6 +1,6 @@
 import useSWR from "swr";
 
-import { makeMegateamsApiRequest } from "./api";
+import { makeMegateamsApiRequest } from "@/lib/api";
 
 export type User = {
   id: string
@@ -17,16 +17,9 @@ async function userFetcher(url: string): Promise<User | null> {
   if (response.status === 401) return null;
   if (!response.ok) throw new Error("Couldn't fetch user!");
 
-  return (await response.json()).data;
+  return (await response.json()).data as User;
 }
 
 export function useUser() {
-  const {
-    data: user,
-    error,
-    mutate: mutateUser,
-    isLoading,
-  } = useSWR("/user", userFetcher);
-
-  return { user: user, mutateUser, error, isLoading };
+  return useSWR<User | null, unknown | undefined>("/user", userFetcher);
 }

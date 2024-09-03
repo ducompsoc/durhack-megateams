@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { mutate } from "swr";
 
 import { fetchMegateamsApi } from "@/lib/api";
-import { useUser } from "@/lib/useUser";
 import { abortForRerender } from "@/lib/symbols";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
 
 export function TeamSetup() {
-  const { user } = useUser();
+  const { user, mutateTeam } = useMegateamsContext();
   const [name, setName] = useState<string | null>(null);
   const [createError, setCreateError] = useState("");
   const [joinError, setJoinError] = useState("");
@@ -28,13 +28,13 @@ export function TeamSetup() {
 
   async function joinTeam() {
     try {
-      await fetchMegateamsApi("/user/team", {
+      const response = await fetchMegateamsApi("/user/team", {
         method: "POST",
         body: JSON.stringify({ join_code: joinCode }),
         headers: { "Content-Type": "application/json" },
       });
       setJoinError("");
-      await mutate("/user/team", { team: true });
+      await mutateTeam();
     } catch {
       setJoinError("Failed to join team!");
     }
@@ -44,7 +44,7 @@ export function TeamSetup() {
     try {
       await fetchMegateamsApi("/teams", { method: "POST" });
       setCreateError("");
-      await mutate("/user/team", { team: true });
+      await mutateTeam();
     } catch {
       setCreateError("Failed to create team!");
     }
