@@ -22,7 +22,6 @@ function redirectToRoot(request: NextRequest) {
   return NextResponse.redirect(new URL("/", request.nextUrl))
 }
 
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
     const userProfile = await getUserProfile(request);
