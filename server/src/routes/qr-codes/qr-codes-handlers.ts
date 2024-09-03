@@ -93,7 +93,8 @@ class QRCodesHandlers {
       if (!preset_id || !presets.has(preset_id) || !name) {
         throw new ClientError("", { statusCode: HttpStatus.NotFound, expected: true })
       }
-      const preset = presets.get(preset_id)!
+      const preset = presets.get(preset_id)
+      assert(preset)
 
       const expiry = new Date()
       expiry.setMinutes(expiry.getMinutes() + preset.minutesValid)
@@ -128,6 +129,7 @@ class QRCodesHandlers {
   @requireUserIsAdmin()
   getQRCodeList(): Middleware {
     return async (_request: Request, response: Response): Promise<void> => {
+      // todo: this needs to be paginated
       const result = await prisma.qrCode.findMany({
         include: { redeems: true, creator: true },
         orderBy: { createdAt: "desc" },
