@@ -2,6 +2,7 @@ import { ClientError } from "@otterhttp/errors"
 import { type Prisma, PrismaClient } from "@prisma/client"
 
 import { megateamsConfig } from "@server/config"
+import { decodeTeamJoinCode } from "@server/common/decode-team-join-code";
 
 export type Area = Prisma.AreaGetPayload<{ select: undefined }>
 export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
@@ -10,7 +11,9 @@ export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined }> & {
   canBeRedeemed(user: Pick<User, "keycloakUserId">): Promise<boolean>
   redemptionUrl: string
 }
-export type Team = Prisma.TeamGetPayload<{ select: undefined }>
+export type Team = Prisma.TeamGetPayload<{ select: undefined }> & {
+  joinCodeString: string
+}
 export type User = Prisma.UserGetPayload<{ select: undefined }>
 export type TokenSet = Prisma.TokenSetGetPayload<{ select: undefined }>
 
@@ -36,12 +39,20 @@ export const prisma = basePrisma.$extends({
     },
     team: {
       async isJoinableTeam({ where }: { where: { teamId: Team["teamId"] } }) {
-        const team_members = await basePrisma.user.count({ where })
+        const team_members = await basePrisma.user.count({ where: { team: { is: where } } })
         return team_members < megateamsConfig.maxTeamMembers
-      },
+      }
     },
   },
   result: {
+    team: {
+      joinCodeString: {
+        needs: { joinCode: true },
+        compute(team) {
+          return decodeTeamJoinCode(team.joinCode)
+        },
+      },
+    },
     qrCode: {
       canBeRedeemed: {
         needs: {

@@ -99,7 +99,6 @@ class PointHandlers {
             select: {
               keycloakUserId: true,
               team: true,
-              // todo: this also used to select preferred name
             },
           },
         },

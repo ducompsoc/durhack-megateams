@@ -29,6 +29,8 @@ export function apiErrorHandler(error: Error, _request: Request, response: Respo
   }
 
   if (error instanceof Prisma.PrismaClientValidationError) {
+    console.error(error)
+
     const httpError = new ClientError("Something failed database client validation.", {
       statusCode: HttpStatus.BadRequest,
     })

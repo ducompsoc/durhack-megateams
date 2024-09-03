@@ -15,7 +15,7 @@ export default function Team() {
   const { data: { team } = { team: null }, mutate: mutateTeam } =
     useSWR("/user/team");
 
-  const members: [{ name: string; points: number }] = team?.members ?? [];
+  const members: [{ preferredNames: string; points: number }] = team?.members ?? [];
   members.sort((a, b) => b.points - a.points);
 
   async function leaveTeam() {
@@ -36,11 +36,11 @@ export default function Team() {
         <div className="mt-4 dh-box p-2">
           <p className="font-semibold text-center">Team Members</p>
           <div className="grid grid-cols-[auto_auto] my-4 mx-4 gap-y-2 gap-x-2">
-            {members.map(({ name, points }, i) => (
+            {members.map(({ preferredNames, points }, i) => (
               <Fragment key={i}>
                 <div className="flex items-center">
                   <UserIcon className="w-4 h-4 mr-2" />
-                  <p>{name}</p>
+                  <p>{preferredNames}</p>
                 </div>
                 <p className="text-gray-600 dark:text-neutral-400">
                   {points} points

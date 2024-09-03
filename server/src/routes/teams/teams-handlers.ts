@@ -15,6 +15,7 @@ import { getSession } from "@server/auth/session"
 import { requireLoggedIn, requireUserIsAdmin } from "@server/common/decorators"
 import { type Team, prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
+import { decodeTeamJoinCode } from "@server/common/decode-team-join-code";
 
 class TeamsHandlers {
   static join_code_schema = z
@@ -72,7 +73,7 @@ class TeamsHandlers {
       const payload = result.map((team) => ({
         team_id: team.teamId,
         name: team.teamName,
-        join_code: team.joinCode,
+        join_code: decodeTeamJoinCode(team.joinCode),
         points: Number.isNaN(team.points) ? 0 : Number(team.points),
         member_count: Number.isNaN(team.memberCount) ? 0 : Number(team.memberCount),
         area: {
@@ -130,7 +131,9 @@ class TeamsHandlers {
   @requireLoggedIn()
   createTeamAsHacker(): Middleware {
     return async (request: Request, response: Response) => {
-      if (request.user!.teamId != null) {
+      assert(request.user)
+
+      if (request.user.teamId != null) {
         throw new ClientError("You are already in a team", {
           statusCode: HttpStatus.Conflict,
           expected: true,
@@ -154,7 +157,7 @@ class TeamsHandlers {
               teamName: generatedTeamName,
               joinCode: randomValue,
               members: {
-                connect: [request.user!],
+                connect: [request.user],
               },
             },
           })
