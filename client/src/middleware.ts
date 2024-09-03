@@ -2,13 +2,14 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import type { User } from "@/hooks/use-user"
 import { isVolunteer, isHacker, isAdmin } from "@/lib/is-role";
+import {siteConfig} from "@/config/site";
 
 async function getUserProfile(request: NextRequest): Promise<User | null> {
   let userProfile: { data: User } | undefined
   const sessionCookie = request.cookies.get("durhack-megateams-session")
   if (sessionCookie != null) {
     const userProfileResponse = await fetch(
-      new URL('/api/user', request.nextUrl),
+      new URL('/api/user', siteConfig.url),
       {
         headers: { cookie: request.headers.get("cookie")! }
       }
