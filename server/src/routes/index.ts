@@ -1,19 +1,19 @@
+import assert from "node:assert/strict"
 import { App } from "@otterhttp/app"
-import { ClientError, ServerError } from "@otterhttp/errors";
+import { ClientError, ServerError } from "@otterhttp/errors"
 import { json } from "@otterhttp/parsec"
-import type { UserinfoResponse } from "openid-client";
-import assert from "node:assert/strict";
+import type { UserinfoResponse } from "openid-client"
 
+import { adaptTokenSetToClient, adaptTokenSetToDatabase } from "@server/auth/adapt-token-set"
 import { doubleCsrfProtection } from "@server/auth/csrf"
+import { keycloakClient } from "@server/auth/keycloak-client"
+import type { KeycloakUserInfo } from "@server/auth/keycloak-client"
+import { getSession } from "@server/auth/session"
+import { isNetworkError } from "@server/common/is-network-error"
 import { methodNotAllowed } from "@server/common/middleware"
 import { csrfConfig } from "@server/config"
+import { prisma } from "@server/database"
 import type { Request, Response } from "@server/types"
-import { prisma } from "@server/database";
-import { getSession } from "@server/auth/session";
-import { adaptTokenSetToClient, adaptTokenSetToDatabase } from "@server/auth/adapt-token-set";
-import { keycloakClient } from "@server/auth/keycloak-client";
-import type { KeycloakUserInfo } from "@server/auth/keycloak-client";
-import { isNetworkError } from "@server/common/is-network-error";
 
 import { areasApp } from "./areas"
 import { authApp } from "./auth"
@@ -51,13 +51,13 @@ apiApp.use(async (request, response, next) => {
         where: { userId: user.keycloakUserId },
         data: adaptTokenSetToDatabase(tokenSet),
       })
-    }
-    catch (error) {
+    } catch (error) {
       if (isNetworkError(error)) {
-        throw new ServerError(
-          "Encountered network error while attempting to refresh a token set",
-          { statusCode: 500, exposeMessage: false, cause: error }
-        )
+        throw new ServerError("Encountered network error while attempting to refresh a token set", {
+          statusCode: 500,
+          exposeMessage: false,
+          cause: error,
+        })
       }
       assert(error instanceof Error)
       console.error(`Failed to refresh access token for ${tokenSet.claims().email}: ${error.stack}`)
@@ -75,13 +75,13 @@ apiApp.use(async (request, response, next) => {
   let profile: UserinfoResponse<KeycloakUserInfo> | undefined
   try {
     profile = await keycloakClient.userinfo<KeycloakUserInfo>(tokenSet.access_token)
-  }
-  catch (error) {
+  } catch (error) {
     if (isNetworkError(error)) {
-      throw new ServerError(
-        "Encountered network error while attempting to fetch profile info",
-        { statusCode: 500, exposeMessage: false, cause: error }
-      )
+      throw new ServerError("Encountered network error while attempting to fetch profile info", {
+        statusCode: 500,
+        exposeMessage: false,
+        cause: error,
+      })
     }
 
     assert(error instanceof Error)

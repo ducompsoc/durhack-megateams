@@ -12,10 +12,10 @@ import {
 import { z } from "zod"
 
 import { getSession } from "@server/auth/session"
+import { decodeTeamJoinCode } from "@server/common/decode-team-join-code"
 import { requireLoggedIn, requireUserIsAdmin } from "@server/common/decorators"
 import { type Team, prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
-import { decodeTeamJoinCode } from "@server/common/decode-team-join-code";
 
 class TeamsHandlers {
   static join_code_schema = z

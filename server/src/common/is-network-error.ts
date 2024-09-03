@@ -1,13 +1,6 @@
-import { hasCode, isString } from "@server/common/type-guards";
+import { hasCode, isString } from "@server/common/type-guards"
 
-const networkErrorCodes = new Set([
-  "ETIMEDOUT",
-  "ENETUNREACH",
-  "ENETDOWN",
-  "ENETRESET",
-  "ECONNREFUSED",
-  "ECONNRESET"
-])
+const networkErrorCodes = new Set(["ETIMEDOUT", "ENETUNREACH", "ENETDOWN", "ENETRESET", "ECONNREFUSED", "ECONNRESET"])
 
 export function isNetworkError(value: unknown): value is Error {
   if (!(value instanceof Error)) return false

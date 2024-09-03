@@ -1,6 +1,6 @@
-import { type ClientMetadata, Issuer } from "openid-client"
-import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import assert from "node:assert/strict"
+import KeycloakAdminClient from "@keycloak/keycloak-admin-client"
+import { type ClientMetadata, Issuer } from "openid-client"
 
 import { keycloakConfig } from "@server/config"
 

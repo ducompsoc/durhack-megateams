@@ -1,10 +1,10 @@
 import { z } from "zod"
 
+import { getKeycloakAdminClient } from "@server/auth/keycloak-client"
 import { requireSelf, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
-import { getKeycloakAdminClient } from "@server/auth/keycloak-client";
 
 export const patchUserPayloadSchema = z.object({
   teamId: z.number().int().optional(),
@@ -13,7 +13,7 @@ export const patchUserPayloadSchema = z.object({
 class UsersHandlers {
   static usersListDefaultQuerySchema = z.object({
     count: z.coerce.number().int().positive().default(10),
-    first: z.coerce.number().int().nonnegative().optional()
+    first: z.coerce.number().int().nonnegative().optional(),
   })
 
   /**
@@ -25,13 +25,13 @@ class UsersHandlers {
       const query = UsersHandlers.usersListDefaultQuerySchema.parse(request.query)
       const adminClient = await getKeycloakAdminClient()
       const [users, totalCount] = await Promise.all([
-        adminClient.users.find( { first: query.first, max: query.count }),
+        adminClient.users.find({ first: query.first, max: query.count }),
         adminClient.users.count(),
       ])
 
       const payload = users.map((user) => ({
         id: user.id,
-        preferred_name: user.attributes?.preferredNames?.[0]
+        preferred_name: user.attributes?.preferredNames?.[0],
       }))
 
       response.status(200)
@@ -66,19 +66,21 @@ class UsersHandlers {
       ])
 
       const databaseUsers = await Promise.all(
-        users.map(user => prisma.user.findUnique({
-          where: { keycloakUserId: user.id },
-          select: {
-            points: true,
-            team: {
-              include: {
-                area: {
-                  include: { megateam: true },
+        users.map((user) =>
+          prisma.user.findUnique({
+            where: { keycloakUserId: user.id },
+            select: {
+              points: true,
+              team: {
+                include: {
+                  area: {
+                    include: { megateam: true },
+                  },
                 },
               },
             },
-          },
-        }))
+          }),
+        ),
       )
 
       const payload = users.map((user, index) => {
@@ -92,8 +94,8 @@ class UsersHandlers {
           team_name: databaseUser?.team?.teamName ?? null,
           team_id: databaseUser?.team?.teamId ?? null,
           megateam_name: databaseUser?.team?.area?.megateam?.megateamName ?? null,
-        };
-      });
+        }
+      })
 
       response.status(200)
       response.json({
@@ -116,7 +118,7 @@ class UsersHandlers {
       const adminClient = await getKeycloakAdminClient()
 
       const userProfile = await adminClient.users.findOne({ id: request.params.user_id })
-      if (userProfile?.id == null ) throw new NullError()
+      if (userProfile?.id == null) throw new NullError()
 
       const databaseResult = await prisma.user.findUnique({
         where: { keycloakUserId: request.params.user_id },

@@ -1,8 +1,8 @@
 import { ClientError } from "@otterhttp/errors"
 import { type Prisma, PrismaClient } from "@prisma/client"
 
+import { decodeTeamJoinCode } from "@server/common/decode-team-join-code"
 import { megateamsConfig } from "@server/config"
-import { decodeTeamJoinCode } from "@server/common/decode-team-join-code";
 
 export type Area = Prisma.AreaGetPayload<{ select: undefined }>
 export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
@@ -41,7 +41,7 @@ export const prisma = basePrisma.$extends({
       async isJoinableTeam({ where }: { where: { teamId: Team["teamId"] } }) {
         const team_members = await basePrisma.user.count({ where: { team: { is: where } } })
         return team_members < megateamsConfig.maxTeamMembers
-      }
+      },
     },
   },
   result: {

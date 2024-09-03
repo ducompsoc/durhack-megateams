@@ -3,8 +3,8 @@ import { TokenType } from "@durhack/token-vault/lib"
 import { getSession } from "@server/auth/session"
 import TokenVault from "@server/auth/tokens"
 import { requireLoggedIn } from "@server/common/decorators"
+import { UserRole } from "@server/common/model-enums"
 import type { Middleware, Request, Response } from "@server/types"
-import { UserRole } from "@server/common/model-enums";
 
 class AuthHandlers {
   handleLoginSuccess(): Middleware {
@@ -22,7 +22,9 @@ class AuthHandlers {
         return
       }
 
-      if (request.userProfile.groups.some((userRole) => userRole === UserRole.admin || userRole === UserRole.volunteer)) {
+      if (
+        request.userProfile.groups.some((userRole) => userRole === UserRole.admin || userRole === UserRole.volunteer)
+      ) {
         await response.redirect("/volunteer")
         return
       }

@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client"
 
 import { signCookie, unsignCookieOrThrow } from "@server/auth/cookies"
 import { sessionConfig } from "@server/config"
-import { prisma } from "@server/database";
+import { prisma } from "@server/database"
 
 const { cookie: cookieOptions, ...sessionOptions } = sessionConfig
 
@@ -13,8 +13,7 @@ class PrismaSessionStore implements SessionStore {
       await prisma.sessionRecord.delete({
         where: { sessionRecordId: sid },
       })
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         // if the record didn't exist to be deleted, that's fine
         if (error.code === "P2025") return
@@ -30,10 +29,7 @@ class PrismaSessionStore implements SessionStore {
     if (!sessionRecord) return null
     const sessionData = sessionRecord.data as SessionData | null
     if (sessionData == null) return null
-    if (
-      sessionData.cookie.expires &&
-      sessionData.cookie.expires.getTime() <= Date.now()
-    ) {
+    if (sessionData.cookie.expires && sessionData.cookie.expires.getTime() <= Date.now()) {
       await this.destroy(sid)
       return null
     }

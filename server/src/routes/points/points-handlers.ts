@@ -1,11 +1,11 @@
 import { ClientError, HttpStatus } from "@otterhttp/errors"
 import { z } from "zod"
 
+import { getKeycloakAdminClient } from "@server/auth/keycloak-client"
 import { requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
-import { getKeycloakAdminClient } from "@server/auth/keycloak-client";
 
 const createPointPayloadSchema = z.object({
   value: z.number().positive(),
@@ -112,8 +112,8 @@ class PointHandlers {
         redeemerUser: {
           ...result.redeemerUser,
           email: userProfile?.email,
-          preferred_name: userProfile?.attributes?.preferredNames?.[0]
-        }
+          preferred_name: userProfile?.attributes?.preferredNames?.[0],
+        },
       }
 
       response.status(200)

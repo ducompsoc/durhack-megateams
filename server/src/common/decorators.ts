@@ -39,7 +39,7 @@ export function userHasRole(role: UserRole): Condition {
     if (request.userProfile?.groups == null) return false
     return request.userProfile.groups.some((userRole) => {
       return role === userRole
-    });
+    })
   }
 }
 
@@ -84,7 +84,7 @@ export function requireUserHasOne(...roles: UserRole[]) {
     return request.userProfile.groups.some((role) => {
       return roles.some((checkAgainstRole) => role === checkAgainstRole)
     })
-  });
+  })
 }
 
 /**

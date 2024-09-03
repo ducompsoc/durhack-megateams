@@ -1,11 +1,11 @@
+import assert from "node:assert/strict"
 import { ClientError, HttpStatus } from "@otterhttp/errors"
 import { z } from "zod"
-import assert from "node:assert/strict";
 
+import { getKeycloakAdminClient } from "@server/auth/keycloak-client"
 import { prisma } from "@server/database"
 import { patchUserPayloadSchema } from "@server/routes/users/users-handlers"
 import type { Middleware, Request, Response } from "@server/types"
-import { getKeycloakAdminClient } from "@server/auth/keycloak-client";
 
 class UserHandlers {
   getUser(): Middleware {
@@ -67,9 +67,9 @@ class UserHandlers {
       }
 
       const adminClient = await getKeycloakAdminClient()
-      const teamMemberProfiles = await Promise.all(team.members.map((member) =>
-        adminClient.users.findOne({ id: member.keycloakUserId })
-      ))
+      const teamMemberProfiles = await Promise.all(
+        team.members.map((member) => adminClient.users.findOne({ id: member.keycloakUserId })),
+      )
 
       const payload = {
         name: team.teamName,
@@ -80,11 +80,11 @@ class UserHandlers {
             return {
               preferredNames: memberName,
               points: prisma.point.sumPoints(member.points),
-            };
+            }
           }) || [],
         megateam_name: team.area?.megateam.megateamName || null,
         join_code: team.joinCodeString,
-      };
+      }
 
       response.json({
         status: 200,
@@ -126,7 +126,7 @@ class UserHandlers {
       }
 
       if (!(await prisma.team.isJoinableTeam({ where: { teamId: team.teamId } }))) {
-        throw new ClientError("Team cannot be joined", { statusCode: HttpStatus.Conflict, expected: true });
+        throw new ClientError("Team cannot be joined", { statusCode: HttpStatus.Conflict, expected: true })
       }
 
       await prisma.user.update({
@@ -136,7 +136,7 @@ class UserHandlers {
             connect: { teamId: team.teamId },
           },
         },
-      });
+      })
 
       response.json({
         status: 200,

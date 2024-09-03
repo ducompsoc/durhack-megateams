@@ -3,11 +3,11 @@ import { ClientError } from "@otterhttp/errors"
 import { type Client, generators } from "openid-client"
 
 import { adaptTokenSetToDatabase } from "@server/auth/adapt-token-set"
+import { keycloakClient } from "@server/auth/keycloak-client"
 import { getSession } from "@server/auth/session"
 import { hostname } from "@server/config"
 import { type User, prisma } from "@server/database"
 import type { Middleware } from "@server/types"
-import { keycloakClient } from "@server/auth/keycloak-client"
 
 export class KeycloakHandlers {
   client: Client

@@ -3,7 +3,7 @@ import { ClientError, HttpStatus, ServerError } from "@otterhttp/errors"
 import { v7 as uuid } from "uuid"
 import { z } from "zod"
 
-import { requireLoggedIn, requireUserIsAdmin, requireUserHasOne } from "@server/common/decorators"
+import { requireLoggedIn, requireUserHasOne, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { QRCategory, UserRole } from "@server/common/model-enums"
 import { megateamsConfig } from "@server/config"
