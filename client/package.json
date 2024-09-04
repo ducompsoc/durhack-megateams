@@ -38,7 +38,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "dateformat": "^5.0.3",
     "eslint-config-next": "13.4.5",
-    "next": "^14.2.5",
+    "next": "^14.2.7",
     "postcss": "^8.4.41",
     "qrcode-scanner-react": "^0.2.3",
     "react": "18.2.0",
