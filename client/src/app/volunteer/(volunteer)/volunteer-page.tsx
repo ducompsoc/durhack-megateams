@@ -35,11 +35,10 @@ export default function Volunteer() {
 
   const { user } = useMegateamsContext();
   const userIsAdmin = user != null && isAdmin(user);
-  const userIsVolunteer = user != null && isVolunteer(user)
+  const userIsVolunteer = user != null && isVolunteer(user);
 
   function getClasses(name: string) {
-    let classes =
-      "font-semibold pb-4 px-4 inline-flex items-center border-b-[3px] text-sm";
+    let classes = "font-semibold pb-4 px-4 inline-flex items-center border-b-[3px] text-sm";
     if (name === current) {
       classes += " border-accent text-accent";
     } else {
@@ -60,15 +59,28 @@ export default function Volunteer() {
     });
   }
 
-  async function displayQR(name: string, url: string, category: string) {
-    // Should use socket to subscribe to QR updates
-    if (await socketManager.ensureConnected()) {
-      console.log("Socket is authenticated")
-      // setQR({ name, url, category, preset: category === "preset" });
-      // setOpen(true);
-    } else {
-      console.log("Failed to get socket")
-    }
+  async function displayQR(id: number, preset = false) {
+    if (!(await socketManager.ensureConnected())) return console.error("Failed to get socket");
+
+    socketManager.onQRChange((qr: any) => {
+      if (qr) {
+        setQR({
+          name: qr.name,
+          url: qr.redemptionUrl,
+          category: qr.category,
+          preset,
+        });
+        setOpen(true);
+      } else {
+        closeQR();
+      }
+    });
+    socketManager.listenForQR(id);
+  }
+
+  function closeQR() {
+    socketManager.stopListeningForQR();
+    setOpen(false);
   }
 
   const tabs = [
@@ -99,26 +111,17 @@ export default function Volunteer() {
       <div className="flex flex-col h-full">
         <nav className="flex justify-center">
           {tabs.map((tab) => (
-            <button
-              onClick={() => setCurrent(tab.name)}
-              className={getClasses(tab.name)}
-              key={tab.name}
-            >
+            <button onClick={() => setCurrent(tab.name)} className={getClasses(tab.name)} key={tab.name}>
               {tab.name}
             </button>
           ))}
         </nav>
         <div className="mt-4">
-          {tabs.map(
-            (tab) =>
-              tab.name === current && (
-                <Fragment key={tab.name}>{tab.content}</Fragment>
-              )
-          )}
+          {tabs.map((tab) => tab.name === current && <Fragment key={tab.name}>{tab.content}</Fragment>)}
         </div>
       </div>
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={setOpen}>
+        <Dialog as="div" className="relative z-10" onClose={closeQR}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -165,7 +168,7 @@ export default function Volunteer() {
                     <button
                       type="button"
                       className="mt-2 sm:mr-2 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={() => setOpen(false)}
+                      onClick={closeQR}
                     >
                       Close
                     </button>

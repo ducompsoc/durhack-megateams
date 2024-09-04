@@ -19,7 +19,7 @@ import { fetchMegateamsApi } from "@/lib/api";
 export default function Manage({
   displayQR,
 }: {
-  displayQR: (name: string, url: string, category: string) => void;
+  displayQR: (id: number) => void;
 }) {
   const { mutate: mutateCodes, data: codesData = { codes: [] } } = useSWR<{
     codes: any[];
@@ -158,7 +158,7 @@ export default function Manage({
                 className="dh-btn disabled:bg-gray-300 dark:disabled:bg-neutral-500"
                 disabled={!code.enabled || qrState.disabled}
                 onClick={() =>
-                  displayQR(code.name, code.redemption_url, code.category)
+                  displayQR(code.id)
                 }
               >
                 View

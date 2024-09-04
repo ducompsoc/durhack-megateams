@@ -8,7 +8,8 @@ export type Area = Prisma.AreaGetPayload<{ select: undefined }>
 export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
 export type Point = Prisma.PointGetPayload<{ select: undefined }>
 export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined }> & {
-  canBeRedeemed(user: Pick<User, "keycloakUserId">): Promise<boolean>
+  canBeRedeemedByUser(user: Pick<User, "keycloakUserId">): Promise<boolean>
+  canBeRedeemed(): Promise<boolean>
   redemptionUrl: string
 }
 export type Team = Prisma.TeamGetPayload<{ select: undefined }> & {
@@ -63,7 +64,7 @@ export const prisma = basePrisma.$extends({
           maxUses: true,
         },
         compute(qrCode) {
-          return async (user: Pick<User, "keycloakUserId">): Promise<boolean> => {
+          return async (): Promise<boolean> => {
             const now = new Date()
 
             if (now < qrCode.startTime) return false
@@ -76,6 +77,22 @@ export const prisma = basePrisma.$extends({
               })
               if (numberOfUses >= qrCode.maxUses) return false
             }
+
+            return true
+          }
+        },
+      },
+      canBeRedeemedByUser: {
+        needs: {
+          qrCodeId: true,
+          state: true,
+          startTime: true,
+          expiryTime: true,
+          maxUses: true,
+        },
+        compute(qrCode: QrCode) {
+          return async (user: Pick<User, "keycloakUserId">): Promise<boolean> => {
+            if (!(await qrCode.canBeRedeemed())) return false;
 
             const redeemsByUser = await prisma.point.count({
               where: {

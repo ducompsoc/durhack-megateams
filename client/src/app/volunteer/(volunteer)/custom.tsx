@@ -6,7 +6,7 @@ import { fetchMegateamsApi } from "@/lib/api";
 export default function Custom({
   displayQR,
 }: {
-  displayQR: (name: string, url: string, category: string) => void;
+  displayQR: (id: number) => void;
 }) {
   const now = currentDate();
   const nowPlusFive = currentDate(5);
@@ -56,7 +56,7 @@ export default function Custom({
       setStartDate(now);
       setEndDate(nowPlusFive);
       setError("");
-      displayQR(qr.name, qr.redemption_url, qr.category);
+      displayQR(qr.qrCodeId);
     } catch {
       setError("Failed to create QR code!");
     }

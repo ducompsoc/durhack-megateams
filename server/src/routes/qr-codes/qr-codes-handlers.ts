@@ -9,6 +9,7 @@ import { QRCategory, UserRole } from "@server/common/model-enums"
 import { megateamsConfig } from "@server/config"
 import { type QrCode, type User, prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
+import SocketManager from "@server/socket"
 
 const presets = new Map(Object.entries(megateamsConfig.QRPresets))
 
@@ -162,8 +163,8 @@ class QRCodesHandlers {
   }
 
   private async getPublicisedFields(existing_rank: number | null, publicised: boolean) {
-    if (!publicised) return { challenge_rank: null }
-    if (existing_rank != null) return { challenge_rank: existing_rank }
+    if (!publicised) return { challengeRank: null }
+    if (existing_rank != null) return { challengeRank: existing_rank }
 
     const maxRankResult = await prisma.qrCode.aggregate({
       _max: {
@@ -171,7 +172,7 @@ class QRCodesHandlers {
       },
     })
     const maxRank = maxRankResult._max.challengeRank
-    return { challenge_rank: (maxRank ?? 0) + 1 }
+    return { challengeRank: (maxRank ?? 0) + 1 }
   }
 
   static patchQRCodeDetailsPayloadSchema = z.object({
@@ -192,7 +193,7 @@ class QRCodesHandlers {
       })
       if (found_code == null) throw new NullError()
 
-      let fields: { challenge_rank: number | null } | undefined
+      let fields: { challengeRank: number | null } | undefined
 
       if (publicised != null) {
         fields = await this.getPublicisedFields(found_code.challengeRank, publicised)
@@ -255,19 +256,19 @@ class QRCodesHandlers {
   @requireLoggedIn()
   redeemQR(): Middleware {
     return async (request: Request, response: Response) => {
-      const { uuid } = QRCodesHandlers.redeemQRPayloadSchema.parse(request.body)
+      const { uuid: payload } = QRCodesHandlers.redeemQRPayloadSchema.parse(request.body)
       const user = request.user
       assert(user != null)
 
       let qr = null as QrCode | null
       await prisma.$transaction(async (context) => {
         qr = await context.qrCode.findUnique({
-          where: { payload: uuid },
+          where: { payload },
           include: { redeems: true },
         })
         if (qr == null) throw new ClientError()
 
-        const qrCanBeRedeemed = await qr.canBeRedeemed(user)
+        const qrCanBeRedeemed = await qr.canBeRedeemedByUser(user)
         if (!qrCanBeRedeemed) throw new ClientError()
 
         await context.point.create({
@@ -277,9 +278,12 @@ class QRCodesHandlers {
             redeemerUserId: user.keycloakUserId,
           },
         })
+
+        await context.qrCode.update({ data: { payload: uuid() }, where: { payload } })
       })
 
       assert(qr != null)
+      await SocketManager.emitQR(qr.qrCodeId);
 
       response.json({
         status: 200,

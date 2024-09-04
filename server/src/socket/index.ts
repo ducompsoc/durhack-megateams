@@ -1,14 +1,26 @@
 import { TokenType } from "@durhack/token-vault/lib"
-import type { Server, Socket } from "socket.io"
+import { Server, Socket } from "socket.io"
 
 import TokenVault from "@server/auth/tokens"
-
-import type { User } from "@server/database"
+import { type User, prisma } from "@server/database"
+import { UserRole } from "@server/common/model-enums"
 
 type JWTPayload = Awaited<ReturnType<typeof TokenVault.decodeToken>>["payload"]
 
+async function emitQR(id: number, emitter: Socket | Server) {
+  const qr = await prisma.qrCode.findUnique({where: { qrCodeId: id }})
+  if (!qr) return
+
+  const payload = (await qr.canBeRedeemed()) ? { ...qr } : false
+
+  if (emitter instanceof Socket) return emitter.emit("qr", payload)
+
+  emitter.to(`qr:${id}`).emit("qr", payload)
+}
+
 class SocketConnection {
   declare connectedUser?: User
+  declare userRoles?: UserRole[]
   declare manager: SocketManager
   declare socket: Socket
 
@@ -21,6 +33,19 @@ class SocketConnection {
   private addSocketEventListeners() {
     this.socket.on("authenticate", this.onAuthenticate.bind(this))
     this.socket.on("disconnect", this.onDisconnect.bind(this))
+    this.socket.on("qr", this.onQR.bind(this))
+  }
+
+  private isElevatedRole() {
+    if (!this.connectedUser) return false
+    if (this.userRoles?.length === 1 && this.userRoles[0] === UserRole.hacker) return false
+    return true;
+  }
+
+  private async onQR(id: number) {
+    if (!this.isElevatedRole()) return
+    this.socket.join(`qr:${id}`)
+    await emitQR(id, this.socket)
   }
 
   private async onAuthenticate(token: unknown, cb: (res: boolean) => void) {
@@ -42,9 +67,10 @@ class SocketConnection {
       return cb(false)
     }
 
-    if (!scope.includes("socket:state")) return cb(false)
+    if (scope.length === 0) return cb(false)
 
     this.connectedUser = user
+    this.userRoles = scope as UserRole[]
 
     cb(true)
   }
@@ -80,6 +106,11 @@ class SocketManager {
   private onConnection(socket: Socket) {
     if (!this.server) return
     this.connections.add(new SocketConnection(this, socket))
+  }
+
+  async emitQR(id: number) {
+    if (!this.server) return
+    await emitQR(id, this.server)
   }
 }
 

@@ -47,7 +47,7 @@ class AuthHandlers {
   handleGetSocketToken(): Middleware {
     return async (request: Request, response: Response) => {
       const token = await TokenVault.createToken(TokenType.accessToken, request.user!, {
-        scope: ["socket:state"],
+        scope: request.userProfile?.groups ?? [],
         lifetime: 1800,
         claims: {
           client_id: "megateams-socket",
