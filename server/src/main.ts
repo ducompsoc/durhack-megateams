@@ -5,13 +5,13 @@ import { Server as SocketIO } from "socket.io"
 
 import { matchSignedCookie, signCookie, unsignCookieOrThrow } from "@server/auth/cookies"
 import { listenConfig } from "@server/config"
+import { apiErrorHandler } from "@server/routes/error-handling"
 
 import { Request } from "./request"
 import { Response } from "./response"
 import { apiApp } from "./routes"
 import SocketManager from "./socket"
 import "./database"
-import { apiErrorHandler } from "@server/routes/error-handling"
 
 const environment = process.env.NODE_ENV
 const dev = environment !== "production"
