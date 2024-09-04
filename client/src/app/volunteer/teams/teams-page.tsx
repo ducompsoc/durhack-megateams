@@ -64,20 +64,20 @@ export function TeamsPage() {
 
   function changeArea(team: any, area: any) {
     const newTeams = [...teams];
-    team.area.area_id = area.id;
+    team.area.area_id = area.areaId;
     setTeams(newTeams);
   }
 
   function getMegateam(megateam_name: string) {
     const filteredMegateams = megateams.filter(
-      ({ name }) => name === megateam_name
+      ({ megateamName }) => megateamName === megateam_name
     );
     return filteredMegateams.length ? filteredMegateams[0] : null;
   }
 
   function getArea(megateam: any, area_id: number) {
     const filteredAreas =
-      megateam?.areas?.filter((area: any) => area.id === area_id) ?? [];
+      megateam?.areas?.filter((area: any) => area.areaId === area_id) ?? [];
     return filteredAreas.length ? filteredAreas[0] : null;
   }
 
@@ -142,15 +142,15 @@ export function TeamsPage() {
               </p>
               <select
                 className="by-2 dh-input w-full"
-                value={megateam?.name ?? ""}
+                value={megateam?.megateamName ?? ""}
                 onChange={(e) => changeMegateam(team, e.target.value)}
               >
                 <option disabled value="">
                   Assign a megateam!
                 </option>
-                {megateams.map(({ name }) => (
-                  <option key={name} value={name}>
-                    {name}
+                {megateams.map(({ megateamName }) => (
+                  <option key={megateamName} value={megateamName}>
+                    {megateamName}
                   </option>
                 ))}
               </select>
@@ -160,8 +160,8 @@ export function TeamsPage() {
                 classNamePrefix="dh-select"
                 menuPortalTarget={document.body}
                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                getOptionLabel={(option: any) => option.name}
-                getOptionValue={(option: any) => option.id}
+                getOptionLabel={(option: any) => option.areaName}
+                getOptionValue={(option: any) => option.areaId}
                 value={area}
                 onChange={(area) => changeArea(team, area)}
               />
