@@ -36,9 +36,7 @@ function getApp(): App<Request, Response> {
   return app
 }
 
-// @ts-expect-error
 function getServer(app: App<Request, Response>): Server<typeof Request, typeof Response> {
-  // @ts-expect-error
   const server = createServer<typeof Request, typeof Response>({
     IncomingMessage: Request,
     ServerResponse: Response,
