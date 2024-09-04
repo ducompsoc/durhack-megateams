@@ -1,10 +1,10 @@
-import * as process from "node:process"
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants"
 
 export const siteConfig = {
   url: "https://megateams.durhack.com",
 }
 
-if (process.env.NODE_ENV === "development") {
+if (PHASE_DEVELOPMENT_SERVER) {
   Object.assign(siteConfig, {
     url: "http://megateams.durhack.com",
   })
