@@ -51,7 +51,6 @@ model QrCode {
   category      QRCodes_category @default(workshop)
   payload       String           @unique @db.Uuid
   pointsValue   Int              @map("points_value")
-  maxUses       Int?             @map("max_uses")
   state         Boolean
   creatorUserId String           @map("creator_id") @db.Uuid
   createdAt     DateTime         @default(now()) @map("created_at")
@@ -59,6 +58,7 @@ model QrCode {
   redeems       Point[]
   creator       User             @relation(fields: [creatorUserId], references: [keycloakUserId], onDelete: NoAction)
   challenge     Challenge?       @relation(fields: [challengeId], references: [challengeId], onDelete: NoAction)
+  claimLimit    Boolean          @map("claim_limit")
 
   @@index([creatorUserId])
   @@index([challengeId])
@@ -74,6 +74,8 @@ model Challenge {
   startTime   DateTime @map("start_time")
   expiryTime  DateTime @map("expiry_time")
   quests      Quest[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 }
 
 model Quest {
@@ -83,6 +85,8 @@ model Quest {
   dependencyMode Quest_dependency_mode @default(AND)
   points         Int                   @default(0)
   challenges     Challenge[]
+  createdAt      DateTime              @default(now()) @map("created_at")
+  updatedAt      DateTime              @updatedAt @map("updated_at")
 }
 
 model Team {

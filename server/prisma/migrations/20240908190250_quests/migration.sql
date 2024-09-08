@@ -3,7 +3,9 @@
 
   - You are about to drop the column `challenge_rank` on the `QrCode` table. All the data in the column will be lost.
   - You are about to drop the column `expiry_time` on the `QrCode` table. All the data in the column will be lost.
+  - You are about to drop the column `max_uses` on the `QrCode` table. All the data in the column will be lost.
   - You are about to drop the column `start_time` on the `QrCode` table. All the data in the column will be lost.
+  - Added the required column `claim_limit` to the `QrCode` table without a default value. This is not possible if the table is not empty.
 
 */
 -- CreateEnum
@@ -15,8 +17,10 @@ DROP INDEX "QrCode_challenge_rank_key";
 -- AlterTable
 ALTER TABLE "QrCode" DROP COLUMN "challenge_rank",
 DROP COLUMN "expiry_time",
+DROP COLUMN "max_uses",
 DROP COLUMN "start_time",
-ADD COLUMN     "challenge_id" INTEGER;
+ADD COLUMN     "challenge_id" INTEGER,
+ADD COLUMN     "claim_limit" BOOLEAN NOT NULL;
 
 -- CreateTable
 CREATE TABLE "Challenge" (
@@ -27,6 +31,8 @@ CREATE TABLE "Challenge" (
     "points" INTEGER NOT NULL,
     "start_time" TIMESTAMP(3) NOT NULL,
     "expiry_time" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Challenge_pkey" PRIMARY KEY ("challenge_id")
 );
@@ -38,6 +44,8 @@ CREATE TABLE "Quest" (
     "description" VARCHAR(255),
     "dependencyMode" "Quest_dependency_mode" NOT NULL DEFAULT 'AND',
     "points" INTEGER NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Quest_pkey" PRIMARY KEY ("quest_id")
 );
