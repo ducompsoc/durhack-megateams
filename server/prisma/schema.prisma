@@ -65,17 +65,18 @@ model QrCode {
 }
 
 model Challenge {
-  challengeId Int       @id @default(autoincrement()) @map("challenge_id")
+  challengeId Int              @id @default(autoincrement()) @map("challenge_id")
   qrCodes     QrCode[]
-  claimLimit  Boolean   @map("claim_limit")
-  name        String    @db.VarChar(255)
-  description String    @db.VarChar(255)
+  claimLimit  Boolean          @map("claim_limit")
+  name        String           @db.VarChar(255)
+  description String           @db.VarChar(255)
   points      Int
-  startTime   DateTime? @map("start_time")
-  expiryTime  DateTime? @map("expiry_time")
+  startTime   DateTime?        @map("start_time")
+  expiryTime  DateTime?        @map("expiry_time")
   quests      Quest[]
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  category    QRCodes_category @default(workshop)
 }
 
 model Quest {

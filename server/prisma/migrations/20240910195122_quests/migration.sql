@@ -33,6 +33,7 @@ CREATE TABLE "Challenge" (
     "expiry_time" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "category" "QRCodes_category" NOT NULL DEFAULT 'workshop',
 
     CONSTRAINT "Challenge_pkey" PRIMARY KEY ("challenge_id")
 );
