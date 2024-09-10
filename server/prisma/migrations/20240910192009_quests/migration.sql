@@ -29,8 +29,8 @@ CREATE TABLE "Challenge" (
     "name" VARCHAR(255) NOT NULL,
     "description" VARCHAR(255) NOT NULL,
     "points" INTEGER NOT NULL,
-    "start_time" TIMESTAMP(3) NOT NULL,
-    "expiry_time" TIMESTAMP(3) NOT NULL,
+    "start_time" TIMESTAMP(3),
+    "expiry_time" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
