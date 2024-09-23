@@ -4,7 +4,7 @@ import type { ConfigIn } from "./schema"
 export default {
   listen: {
     host: "localhost",
-    port: 3101, // Megateams project has ports 3000-3099
+    port: 3101, // Megateams project has ports 3100-3199
   },
   origin: "http://megateams.durhack-dev.com",
   flags: {},
