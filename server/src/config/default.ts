@@ -3,10 +3,10 @@ import type { ConfigIn } from "./schema"
 
 export default {
   listen: {
-    host: "127.0.0.1",
-    port: 3101,
+    host: "localhost",
+    port: 3101, // Megateams project has ports 3000-3099
   },
-  hostname: "http://localhost:3101",
+  origin: "http://megateams.durhack-dev.com",
   flags: {},
   csrf: {
     enabled: true,
@@ -14,6 +14,7 @@ export default {
     options: {
       cookieOptions: {
         name: "durhack-megateams.x-csrf-token",
+        domain: "megateams.durhack-dev.com",
         sameSite: "strict",
         path: "/",
         secure: false,
@@ -26,12 +27,14 @@ export default {
   session: {
     cookie: {
       name: "durhack-megateams-session",
+      domain: "megateams.durhack-dev.com",
+      sameSite: "lax",
+      path: "/",
       secure: false,
     },
   },
   megateams: {
     maxTeamMembers: 4,
-    QRCodeRedemptionURL: "https://megateams.durhack.com/hacker/redeem",
     QRPresets: {
       chat: {
         name: "Chat - 5p",
@@ -53,7 +56,7 @@ export default {
     apiEndpoint: "https://discord.com/api/v10",
     clientId: "yourDiscordAppClientIdHere",
     clientSecret: "yourDiscordAppClientSecretHere",
-    redirectUri: "https://megateams.durhack.com/api/discord/redirect",
+    redirectUri: "http://megateams.durhack-dev.com/api/discord/redirect",
     botToken: "yourDiscordBotTokenHere",
     guildID: "yourDiscordGuildIDHere",
     inviteLink: "https://discord.gg/xyz",
@@ -62,8 +65,8 @@ export default {
   jsonwebtoken: {
     accessTokenLifetime: 1800,
     refreshTokenLifetime: 1209600,
-    issuer: "https://megateams.durhack.com",
-    audience: "https://megateams.durhack.com",
+    issuer: "http://megateams.durhack-dev.com",
+    audience: "http://megateams.durhack-dev.com",
     authorities: [
       {
         for: TokenType.accessToken,
@@ -83,11 +86,12 @@ export default {
     ],
   },
   keycloak: {
-    url: "https://auth.durhack.com/realms/durhack",
+    realm: "durhack-dev",
+    baseUrl: "https://auth.durhack.com",
     adminBaseUrl: "https://admin.auth.durhack.com",
     clientId: "not-a-real-client-id",
     clientSecret: "not-a-real-client-secret",
     responseTypes: ["code"],
-    redirectUris: ["https://megateams.durhack.com/api/auth/keycloak/callback"],
+    redirectUris: ["http://megateams.durhack-dev.com/api/auth/keycloak/callback"],
   },
 } satisfies ConfigIn
