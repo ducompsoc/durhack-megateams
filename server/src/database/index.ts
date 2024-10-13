@@ -2,7 +2,7 @@ import { ClientError } from "@otterhttp/errors"
 import { type Prisma, PrismaClient } from "@prisma/client"
 
 import { decodeTeamJoinCode } from "@server/common/decode-team-join-code"
-import { megateamsConfig } from "@server/config"
+import { megateamsConfig, origin } from "@server/config"
 
 export type Area = Prisma.AreaGetPayload<{ select: undefined }>
 export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
@@ -108,7 +108,7 @@ export const prisma = basePrisma.$extends({
         needs: { payload: true },
         compute(qrCode) {
           const redemptionUrlSearchParams = new URLSearchParams({ qr_id: qrCode.payload })
-          return `${megateamsConfig.QRCodeRedemptionURL}?${redemptionUrlSearchParams.toString()}`
+          return `${origin}/hacker/redeem?${redemptionUrlSearchParams.toString()}`
         },
       },
     },
