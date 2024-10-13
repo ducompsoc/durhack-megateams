@@ -65,12 +65,24 @@ class PointHandlers {
         })
       }
 
-      const new_instance = await prisma.point.create({
-        data: parsedPayload,
+      const adminClient = await getKeycloakAdminClient()
+      const userProfile = await adminClient.users.findOne({ id: parsedPayload.redeemerUserId })
+
+      if (userProfile == null) {
+        throw new ClientError(`User ID ${parsedPayload.redeemerUserId} does not correspond to a keycloak user.`, {
+          statusCode: HttpStatus.UnprocessableEntity,
+          expected: true,
+        })
+      }
+
+      await prisma.user.upsert({
+        where: { keycloakUserId: parsedPayload.redeemerUserId },
+        create: { keycloakUserId: parsedPayload.redeemerUserId, points: { create: parsedPayload } },
+        update: { points: { create: parsedPayload } },
       })
 
       response.status(200)
-      response.json({ status: response.statusCode, message: "OK", data: new_instance })
+      response.json({ status: response.statusCode, message: "OK" })
     }
   }
 
