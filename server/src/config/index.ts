@@ -30,7 +30,7 @@ export const {
   session: sessionConfig,
   discord: discordConfig,
   keycloak: keycloakConfig,
-  hostname,
+  origin,
   megateams: megateamsConfig,
 } = config
 

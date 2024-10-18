@@ -5,7 +5,7 @@ import { type Client, generators } from "openid-client"
 import { adaptTokenSetToDatabase } from "@server/auth/adapt-token-set"
 import { keycloakClient } from "@server/auth/keycloak-client"
 import { getSession } from "@server/auth/session"
-import { hostname } from "@server/config"
+import { origin } from "@server/config"
 import { type User, prisma } from "@server/database"
 import type { Middleware } from "@server/types"
 
@@ -41,7 +41,7 @@ export class KeycloakHandlers {
     }
   }
 
-  static redirectUri = new URL("/api/auth/keycloak/callback", hostname).toString()
+  static redirectUri = new URL("/api/auth/keycloak/callback", origin).toString()
 
   oauth2FlowCallback(): Middleware {
     return async (request: Request & { user?: User }, response: Response, next: NextFunction) => {

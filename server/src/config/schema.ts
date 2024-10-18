@@ -10,6 +10,7 @@ export const cookie_options_schema = z.object({
   sameSite: z.union([z.literal("none"), z.literal("lax"), z.literal("strict")]).optional(),
   path: z.string().optional(),
   secure: z.boolean(),
+  domain: z.string().optional(),
 })
 
 export const doubleCsrfOptionsSchema = z.object({
@@ -29,7 +30,8 @@ export const sessionOptionsSchema = z.object({
 })
 
 export const keycloakOptionsSchema = z.object({
-  url: z.string().url(),
+  realm: z.string(),
+  baseUrl: z.string().url(),
   adminBaseUrl: z.string().url(),
   clientId: z.string(),
   clientSecret: z.string(),
@@ -50,7 +52,7 @@ export const discordOptionsSchema = z.object({
 
 export const configSchema = z.object({
   listen: listenOptionsSchema,
-  hostname: z.string().url(),
+  origin: z.string().url(),
   flags: z.object({}),
   csrf: z.object({
     enabled: z.boolean(),
@@ -62,7 +64,6 @@ export const configSchema = z.object({
   session: sessionOptionsSchema,
   megateams: z.object({
     maxTeamMembers: z.number().positive(),
-    QRCodeRedemptionURL: z.string().url(),
   }),
   discord: discordOptionsSchema,
   keycloak: keycloakOptionsSchema,

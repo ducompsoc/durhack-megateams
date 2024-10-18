@@ -6,6 +6,6 @@ export const siteConfig = {
 
 if (PHASE_DEVELOPMENT_SERVER) {
   Object.assign(siteConfig, {
-    url: "http://megateams.durhack.com",
+    url: "http://megateams.durhack-dev.com",
   })
 }
