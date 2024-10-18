@@ -32,22 +32,6 @@ export default {
   megateams: {
     maxTeamMembers: 4,
     QRCodeRedemptionURL: "https://megateams.durhack.com/hacker/redeem",
-    QRPresets: {
-      chat: {
-        name: "Chat - 5p",
-        description: "Speak to a sponsor for 5 points",
-        points: 5,
-        uses: 1,
-        minutesValid: 2,
-      },
-      workshop: {
-        name: "Workshop - 10p",
-        description: "Attend a sponsor workshop for 10 points",
-        points: 10,
-        uses: 50,
-        minutesValid: 10,
-      },
-    },
   },
   discord: {
     apiEndpoint: "https://discord.com/api/v10",

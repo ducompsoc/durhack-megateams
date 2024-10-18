@@ -6,12 +6,9 @@ import { z } from "zod"
 import { requireLoggedIn, requireUserHasOne, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { QRCategory, UserRole } from "@server/common/model-enums"
-import { megateamsConfig } from "@server/config"
 import { type QrCode, type User, prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
 import SocketManager from "@server/socket"
-
-const presets = new Map(Object.entries(megateamsConfig.QRPresets))
 
 class QRCodesHandlers {
   static createQRPayloadSchema = z.object({
@@ -264,16 +261,21 @@ class QRCodesHandlers {
       await prisma.$transaction(async (context) => {
         qr = await context.qrCode.findUnique({
           where: { payload },
-          include: { redeems: true },
+          include: { challenge: true },
         })
         if (qr == null) throw new ClientError()
 
         const qrCanBeRedeemed = await qr.canBeRedeemedByUser(user)
         if (!qrCanBeRedeemed) throw new ClientError()
 
+        let value = qr.pointsValue
+        if (qr.challenge != null) {
+          value = qr.challenge.points
+        }
+
         await context.point.create({
           data: {
-            value: qr.pointsValue,
+            value,
             originQrCodeId: qr.qrCodeId,
             redeemerUserId: user.keycloakUserId,
           },

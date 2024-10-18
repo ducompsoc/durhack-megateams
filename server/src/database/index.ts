@@ -1,17 +1,19 @@
 import { ClientError } from "@otterhttp/errors"
 import { type Prisma, PrismaClient } from "@prisma/client"
+import assert from "node:assert/strict"
 
 import { decodeTeamJoinCode } from "@server/common/decode-team-join-code"
 import { megateamsConfig } from "@server/config"
+import { getChallengePointsByUser } from "@prisma/client/sql"
 
 export type Area = Prisma.AreaGetPayload<{ select: undefined }>
 export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
 export type Point = Prisma.PointGetPayload<{ select: undefined }>
-export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined }> & {
+export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined; include: { challenge: true } }> & {
   canBeRedeemedByUser(user: Pick<User, "keycloakUserId">): Promise<boolean>
   canBeRedeemed(): Promise<boolean>
   redemptionUrl: string
-}
+};
 export type Team = Prisma.TeamGetPayload<{ select: undefined }> & {
   joinCodeString: string
 }
@@ -59,23 +61,20 @@ export const prisma = basePrisma.$extends({
         needs: {
           qrCodeId: true,
           state: true,
-          startTime: true,
-          expiryTime: true,
-          maxUses: true,
+          challengeId: true
         },
         compute(qrCode) {
           return async (): Promise<boolean> => {
-            const now = new Date()
-
-            if (now < qrCode.startTime) return false
-            if (now >= qrCode.expiryTime) return false
             if (!qrCode.state) return false
 
-            if (qrCode.maxUses != null) {
-              const numberOfUses = await prisma.point.count({
-                where: { originQrCodeId: qrCode.qrCodeId },
+            if (qrCode.challengeId != null) {
+              const challenge = await prisma.challenge.findUnique({
+                where: { challengeId: qrCode.challengeId }
               })
-              if (numberOfUses >= qrCode.maxUses) return false
+              assert(challenge != null)
+              const now = new Date()
+              if (challenge.startTime != null && now < challenge.startTime) return false
+              if (challenge.expiryTime != null && now >= challenge.expiryTime) return false
             }
 
             return true
@@ -86,21 +85,37 @@ export const prisma = basePrisma.$extends({
         needs: {
           qrCodeId: true,
           state: true,
-          startTime: true,
-          expiryTime: true,
-          maxUses: true,
+          challengeId: true,
+          claimLimit: true
         },
         compute(qrCode: QrCode) {
           return async (user: Pick<User, "keycloakUserId">): Promise<boolean> => {
             if (!(await qrCode.canBeRedeemed())) return false;
 
-            const redeemsByUser = await prisma.point.count({
-              where: {
-                originQrCodeId: qrCode.qrCodeId,
-                redeemerUserId: user.keycloakUserId,
-              },
-            })
-            return redeemsByUser === 0
+            if (qrCode.claimLimit) {
+              const redeemsByUser = await prisma.point.count({
+                where: {
+                  originQrCodeId: qrCode.qrCodeId,
+                  redeemerUserId: user.keycloakUserId,
+                },
+              })
+              if (redeemsByUser !== 0) return false
+            }
+
+            if (qrCode.challengeId != null) {
+              const challenge = await prisma.challenge.findUnique({
+                where: { challengeId: qrCode.challengeId }
+              })
+              assert(challenge != null)
+              if (challenge.claimLimit) {
+                const points = await prisma.$queryRawTyped(
+                  getChallengePointsByUser(challenge.challengeId, user.keycloakUserId)
+                )
+                if (Number(points[0].points) !== 0) return false
+              }
+            }
+
+            return true
           }
         },
       },
