@@ -24,6 +24,7 @@ import { qrCodesApp } from "./qr-codes"
 import { teamsApp } from "./teams"
 import { userApp } from "./user"
 import { usersApp } from "./users"
+import { questsApp } from "./quests"
 
 export const apiApp = new App<Request, Response>()
 
@@ -126,5 +127,6 @@ apiApp.use("/teams", teamsApp)
 apiApp.use("/users", usersApp)
 apiApp.use("/user", userApp)
 apiApp.use("/discord", discordApp)
+apiApp.use("/quests", questsApp)
 
 apiApp.use(routeFallthroughHandler)
