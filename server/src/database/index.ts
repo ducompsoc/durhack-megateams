@@ -19,7 +19,7 @@ export type Team = Prisma.TeamGetPayload<{ select: undefined }> & {
 }
 export type User = Prisma.UserGetPayload<{ select: undefined }>
 export type TokenSet = Prisma.TokenSetGetPayload<{ select: undefined }>
-export { QRCodes_category } from "@prisma/client"
+export { QRCodes_category, Quest_dependency_mode } from "@prisma/client"
 
 const basePrisma = new PrismaClient()
 export const prisma = basePrisma.$extends({
