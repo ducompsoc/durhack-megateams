@@ -5,23 +5,24 @@ import { z } from "zod"
 
 import { requireLoggedIn, requireUserHasOne, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
-import { QRCategory, UserRole } from "@server/common/model-enums"
-import { type QrCode, type User, prisma } from "@server/database"
+import { UserRole } from "@server/common/model-enums"
+import { QRCodes_category, type QrCode, type User, prisma } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
 import SocketManager from "@server/socket"
 
 class QRCodesHandlers {
   static createQRPayloadSchema = z.object({
     name: z.string(),
-    category: z.nativeEnum(QRCategory),
+    category: z.nativeEnum(QRCodes_category),
     pointsValue: z.number().nonnegative(),
     claimLimit: z.boolean(),
     state: z.boolean(),
+    challengeId: z.number().optional(),
   })
 
   private async buildAndSaveQRCodeFromCreateAttributes(
     creator: User,
-    create_attributes: Omit<z.infer<typeof QRCodesHandlers.createQRPayloadSchema>, "publicised">,
+    create_attributes: z.infer<typeof QRCodesHandlers.createQRPayloadSchema>,
   ) {
     const payload = uuid()
 
@@ -33,8 +34,6 @@ class QRCodesHandlers {
       },
     })
   }
-
-  static createQRCodePayloadSchema = z.object({})
 
   @requireUserIsAdmin()
   createQRCode(): Middleware {
@@ -77,8 +76,9 @@ class QRCodesHandlers {
         name: challenge.name,
         pointsValue: challenge.points,
         claimLimit: challenge.claimLimit,
-        category: QRCategory.preset,
+        category: challenge.category,
         state: true,
+        challengeId: challenge_id
       }
 
       let qr_code = await prisma.qrCode.findFirst({ where: { challengeId: challenge_id, creatorUserId: user.keycloakUserId } })
@@ -213,17 +213,62 @@ class QRCodesHandlers {
     }
   }
 
-  @requireUserIsAdmin()
+  @requireUserHasOne(UserRole.admin, UserRole.volunteer, UserRole.sponsor)
   getChallengeList(): Middleware {
-    return async (request: Request, response: Response) => {
-      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
+    return async (_request: Request, response: Response): Promise<void> => {
+      const now = new Date()
+      // todo: this needs to be paginated
+      const result = await prisma.challenge.findMany({
+        where: { startTime: { lt: now }, expiryTime: { gt: now } },
+        orderBy: { expiryTime: "asc" },
+      })
+
+      const payload = result.map((challenge) => ({
+        id: challenge.challengeId,
+        name: challenge.name,
+        category: challenge.category,
+        claim_limit: challenge.claimLimit,
+        value: challenge.points,
+        description: challenge.description,
+        start_time: challenge.startTime,
+        expiry_time: challenge.expiryTime,
+      }))
+
+      response.status(200)
+      response.json({
+        status: 200,
+        message: "OK",
+        challenges: payload,
+      })
     }
   }
+
+  static createChallengePayloadSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    category: z.nativeEnum(QRCodes_category),
+    points: z.number().nonnegative(),
+    claimLimit: z.boolean(),
+    challengeId: z.number().optional(),
+    startTime: z.date(),
+    expiryTime: z.date(),
+  })
 
   @requireUserIsAdmin()
   createChallenge(): Middleware {
     return async (request: Request, response: Response) => {
-      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
+      const create_attributes = QRCodesHandlers.createChallengePayloadSchema.parse(request.body)
+
+      const new_instance = await prisma.challenge.create({ data: create_attributes })
+
+      response.status(200)
+      response.json({
+        status: response.statusCode,
+        message: "OK",
+        data: {
+          ...new_instance
+        },
+      })
     }
   }
 }
