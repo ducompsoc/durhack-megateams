@@ -6,7 +6,7 @@ DurHack's 'Guilds' platform, built in-house by the DurHack team (2023-present).
 
 ## Stack
 - `client` is a Next.js app using TypeScript and TailwindCSS, runs on Node.js
-- `server` is an otterhttp (similar to Experss) app using TypeScript, runs on Node.js
+- `server` is an otterhttp (similar to Express) app using TypeScript, runs on Node.js
   - `server` requires access to a postgresql database for persistence/session management
 - Nginx is used to direct incoming requests to the appropriate app
 
