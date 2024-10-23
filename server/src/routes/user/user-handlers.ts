@@ -16,7 +16,7 @@ class UserHandlers {
       const payload = {
         id: request.user.keycloakUserId,
         email: request.userProfile.email,
-        preferred_name: request.userProfile.preferred_name,
+        preferred_name: request.userProfile.preferred_names ?? request.userProfile.first_names,
         roles: request.userProfile.groups,
         points: await prisma.user.getTotalPoints({
           where: request.user,
@@ -76,7 +76,8 @@ class UserHandlers {
         members:
           team.members.map((member, index) => {
             const memberProfile = teamMemberProfiles[index]
-            const memberName = memberProfile?.attributes?.preferredNames?.[0]
+            const memberName =
+              memberProfile?.attributes?.preferredNames?.[0] ?? memberProfile?.attributes?.firstNames?.[0];
             return {
               preferredNames: memberName,
               points: prisma.point.sumPoints(member.points),

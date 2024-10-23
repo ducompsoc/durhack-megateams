@@ -23,7 +23,7 @@ export default function Leaderboard() {
   return (
     <div className="flex flex-col h-full">
       <div className="dh-box p-2">
-        <h2 className="font-semibold">Megateams Leaderboard</h2>
+        <h2 className="font-semibold">Guilds Leaderboard</h2>
         <div className="bg-purple-200 border border-accent mt-2 rounded p-4 dark:bg-purple-500/30">
           <div className="md:w-[50%] md:ml-auto md:mr-auto">
             <MegaChart />

@@ -52,7 +52,7 @@ export default function MegaChart() {
   });
 
   const dataset = {
-    labels: megateams?.map((team: any) => team.megateam_name),
+    labels: megateams?.map((team: any) => team.megateam_name.split(" ")[0]),
     datasets: [
       {
         label: "Points",

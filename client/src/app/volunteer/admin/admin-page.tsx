@@ -144,7 +144,7 @@ export function AdminPage() {
                 {preferred_name} - {email}
               </p>
               <p className="mb-2">
-                {points} points | {megateam_name || "No megateam assigned!"}
+                {points} points | {megateam_name || "No guild assigned!"}
               </p>
               <Select
                 className="mb-4 dh-select"

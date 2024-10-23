@@ -45,10 +45,8 @@ export function TabbedPage({
     <SWRConfig value={{ fetcher: fetchMegateamsApi }}>
       <div className="h-full flex flex-col text-black dark:text-neutral-200">
         <div className="flex flex-row py-4 px-6 items-center justify-evenly">
-          <object data="/logo.svg" type="image/svg+xml" className="w-16 h-16">
-            <img src="/logo.png" alt="DurHack Logo" />
-          </object>
-          <h1 className="text-3xl font-bold font-heading">DURHACK</h1>
+          <img src="/logo.svg" alt="DurHack Logo" className="w-16 h-16" />
+          <h1 className="text-3xl font-heading">DURHACK</h1>
           <button onClick={() => setOpen(true)}>
             <ArrowRightOnRectangleIcon className="w-12 h-12" />
           </button>

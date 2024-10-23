@@ -96,7 +96,7 @@ export function TeamsPage() {
         setMessage("Failed to update team!");
       }
     } else {
-      setMessage("Please select a Megateam and Area!");
+      setMessage("Please select a Guild and Area!");
     }
     setMessageOpen(true);
   }
@@ -146,7 +146,7 @@ export function TeamsPage() {
                 onChange={(e) => changeMegateam(team, e.target.value)}
               >
                 <option disabled value="">
-                  Assign a megateam!
+                  Assign a guild!
                 </option>
                 {megateams.map(({ megateamName }) => (
                   <option key={megateamName} value={megateamName}>

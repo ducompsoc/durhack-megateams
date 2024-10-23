@@ -46,5 +46,6 @@ export async function getKeycloakAdminClient() {
 
 export type KeycloakUserInfo = {
   groups: string[]
-  preferred_name: string
+  preferred_names: string
+  first_names: string
 }

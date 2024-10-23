@@ -103,8 +103,6 @@ class PointHandlers {
               qrCodeId: true,
               name: true,
               category: true,
-              startTime: true,
-              expiryTime: true,
             },
           },
           redeemerUser: {
@@ -124,7 +122,7 @@ class PointHandlers {
         redeemerUser: {
           ...result.redeemerUser,
           email: userProfile?.email,
-          preferred_name: userProfile?.attributes?.preferredNames?.[0],
+          preferred_name: userProfile?.attributes?.preferredNames?.[0] ?? userProfile?.attributes?.firstNames?.[0],
         },
       }
 
