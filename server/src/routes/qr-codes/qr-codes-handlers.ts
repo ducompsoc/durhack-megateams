@@ -6,7 +6,7 @@ import { z } from "zod"
 import { requireLoggedIn, requireUserHasOne, requireUserIsAdmin } from "@server/common/decorators"
 import { NullError } from "@server/common/errors"
 import { UserRole } from "@server/common/model-enums"
-import { QRCodes_category, type QrCode, type User, prisma } from "@server/database"
+import { QRCodes_category, type QrCode, type User, type Challenge, prisma, Quest_dependency_mode } from "@server/database"
 import type { Middleware, Request, Response } from "@server/types"
 import SocketManager from "@server/socket"
 
@@ -164,6 +164,51 @@ class QRCodesHandlers {
     }
   }
 
+  async checkForQuestCompletion(user: User, challenge: Challenge, context: typeof prisma) {
+    const quests = await context.quest.findMany({
+      where: {
+        challenges: { some: { challengeId: challenge.challengeId } },
+        usersCompleted: { none: { keycloakUserId: user.keycloakUserId } }
+      },
+      include: {
+        challenges: {
+          include: {
+            qrCodes: {
+              include: {
+                redeems: { where: { redeemerUserId: user.keycloakUserId } },
+              },
+            },
+          },
+        },
+      }
+    });
+
+    for (const quest of quests) {
+      const completedCount = quest.challenges.reduce(
+        (count, challenge) => challenge.qrCodes.reduce((count, code) => count + code.redeems.length, count),
+        0
+      );
+      const completed =
+        quest.dependencyMode === Quest_dependency_mode.AND
+          ? completedCount === quest.challenges.length
+          : completedCount > 0;
+
+      if (completed) {
+        await context.quest.update({
+          where: { questId: quest.questId },
+          data: { usersCompleted: { connect: [{ keycloakUserId: user.keycloakUserId }] } }
+        })
+
+        if (quest.points > 0) {
+          await context.point.create({ data: {
+            value: quest.points,
+            redeemerUserId: user.keycloakUserId
+          } })
+        }
+      }
+    }
+  }
+
   static redeemQRPayloadSchema = z.object({
     uuid: z.string().uuid(),
   })
@@ -189,6 +234,7 @@ class QRCodesHandlers {
         let value = qr.pointsValue
         if (qr.challenge != null) {
           value = qr.challenge.points
+          await this.checkForQuestCompletion(user, qr.challenge, context as typeof prisma)
         }
 
         await context.point.create({

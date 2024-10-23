@@ -1,4 +1,4 @@
-import { HttpStatus, ServerError } from "@otterhttp/errors"
+import assert from "node:assert/strict"
 import { z } from "zod"
 
 import { requireUserHasOne, requireUserIsAdmin } from "@server/common/decorators"
@@ -39,8 +39,43 @@ class QuestsHandlers {
 
   @requireUserHasOne(UserRole.hacker)
   getQuestListHacker(): Middleware {
-    return (request: Request, response: Response) => {
-      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
+    return async (request: Request, response: Response) => {
+      const user = request.user
+      assert(user != null)
+
+      const result = await prisma.quest.findMany({
+        include: {
+          challenges: {
+            include: {
+              qrCodes: {
+                include: {
+                  redeems: { where: { redeemerUserId: user.keycloakUserId } },
+                },
+              },
+            },
+          },
+          usersCompleted: { where: { keycloakUserId: user.keycloakUserId } }
+        }
+      });
+
+      const payload = result.map((quest) => ({
+        name: quest.name,
+        description: quest.description,
+        dependency_mode: quest.dependencyMode,
+        value: quest.points,
+        completed: quest.usersCompleted.length > 0,
+        challenges: quest.challenges.map(challenge => ({
+          name: challenge.name,
+          description: challenge.description,
+          completed: challenge.qrCodes.reduce((count, code) => count + code.redeems.length, 0) > 0
+        }))
+      }))
+
+      response.json({
+        status: 200,
+        message: "OK",
+        quests: payload,
+      })
     }
   }
 
@@ -75,11 +110,26 @@ class QuestsHandlers {
 
   @requireUserIsAdmin()
   patchQuestDetails(): Middleware {
-    return (request: Request, response: Response) => {
+    return async (request: Request, response: Response) => {
       const { quest_id } = response.locals
       if (typeof quest_id !== "number") throw new Error("Parsed `quest_id` not found.")
+      
+      const update_attributes = QuestsHandlers.createQuestPayloadSchema.parse(request.body)
 
-      throw new ServerError("", { statusCode: HttpStatus.NotImplemented, expected: true })
+      const new_instance = await prisma.quest.update({
+        where: { questId: quest_id },
+        data: {
+          ...update_attributes,
+          challenges: { set: update_attributes.challenges.map((id) => ({ challengeId: id })) },
+        },
+      });
+
+      response.status(200)
+      response.json({
+        status: response.statusCode,
+        message: "OK",
+        data: { ...new_instance },
+      })
     }
   }
 }
