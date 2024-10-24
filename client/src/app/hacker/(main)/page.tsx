@@ -1,28 +1,30 @@
 "use client";
 
+import useSWR from "swr";
 import {
   QrCodeIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import * as React from "react";
 import dynamic from "next/dynamic";
-import { getHackerEmoji, getPositionMedal } from "@/app/lib/rankEmojis";
-import TeamBox from "./team/TeamBox";
-import TeamSetup from "./TeamSetup";
 import { useRouter } from "next/navigation";
-import ButtonModal from "@/app/components/ButtonModal";
-import useUser from "@/app/lib/useUser";
-import useSWR from "swr";
+
+import { getHackerEmoji, getPositionMedal } from "@/lib/rankEmojis";
+import { ButtonModal } from "@/components/button-modal";
+import { useMegateamsContext } from "@/hooks/use-megateams-context";
+
+import { TeamBox } from "./team/team-box";
+import { TeamSetup } from "./team-setup";
+import { QuestList } from "./quest-list";
+
 const Scanner = dynamic(() => import("qrcode-scanner-react"), {
   ssr: false,
 });
 
 export default function HackerHome() {
-  const [scanning, setScanning] = useState(false);
+  const [scanning, setScanning] = React.useState(false);
   const router = useRouter();
-  const { user } = useUser();
-  const { data: { team } = { team: null } } = useSWR("/user/team");
-  const { data: { challenges } = { challenges: null } } = useSWR("/qr_codes/challenges");
+  const { user, team } = useMegateamsContext();
   const { data: { megateams } = { megateams: null } } = useSWR("/megateams");
   const { data: { teams } = { teams: null } } = useSWR("/teams");
 
@@ -78,7 +80,7 @@ export default function HackerHome() {
             <TeamBox />
             {hasMegateam && (
               <div className="dh-box p-2 text-center grow basis-0 ml-4 flex flex-col">
-                <h2 className="font-semibold mb-2">Megateam</h2>
+                <h2 className="font-semibold mb-2">Guild</h2>
                 <div className="flex flex-col md:flex-row items-center justify-evenly md:justify-center md:gap-x-4 grow">
                   <object
                     data={`/${team?.megateam_name}/icon.svg`}
@@ -113,34 +115,20 @@ export default function HackerHome() {
                   </div>
                 </div>
                 <div className="grow">
-                  <h2 className="font-semibold mb-2">Megateam Points</h2>
+                  <h2 className="font-semibold mb-2">Guild Points</h2>
                   <p>
                     {megateam_points} {getPositionMedal(megateam_rank)}
                   </p>
                 </div>
               </div>
-              <div className="dh-box p-2 mt-4">
-                <h2 className="font-semibold mb-2 text-center">Challenges</h2>
-                {!challenges ? (
-                  <p className="text-center">No challenges have been published yet. Check back soon!</p>
-                ) : (
-                  <div className="grid grid-cols-[min-content_1fr_auto] mx-2 gap-y-2">
-                    {challenges?.map((challenge: any, i: number) => (
-                      <React.Fragment key={i}>
-                        <p className="mr-2 text-right">{i + 1}.</p>
-                        <p>{challenge.title}</p>
-                        <p>{challenge.points} points</p>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <h2 className="font-semibold mt-4 mb-2 text-center">Quests</h2>
+              <QuestList />
             </>
           ) : (
             <div className="dh-box p-4 text-center flex flex-col items-center mt-4">
               <p className="flex items-center font-semibold mb-2">
                 <ExclamationTriangleIcon className="w-6 h-6 mr-2" />
-                No Megateam Assigned
+                No Guild Assigned
               </p>
               <p>
                 Please speak to a volunteer to ensure your team&apos;s points

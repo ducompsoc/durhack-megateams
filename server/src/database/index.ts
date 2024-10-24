@@ -1,104 +1,133 @@
-import config from "config"
-import mysql, { ConnectionOptions as MySqlConnectionOptions } from "mysql2/promise"
-import { Sequelize, SequelizeOptions } from "sequelize-typescript"
-import { Model, WhereOptions, Attributes, OrderItem, FindOptions } from "sequelize"
-import { Request } from "express"
-import createHttpError from "http-errors"
+import { ClientError } from "@otterhttp/errors"
+import { type Prisma, PrismaClient } from "@prisma/client"
+import { getChallengePointsByUser } from "@prisma/client/sql"
+import assert from "node:assert/strict"
 
-import { mysql_options_schema, sequelize_options_schema } from "@server/common/schema/config"
+import { decodeTeamJoinCode } from "@server/common/decode-team-join-code"
+import { megateamsConfig, origin } from "@server/config"
 
-import { User, Team, Area, Megateam, Point, QRCode } from "./tables"
-
-export interface SequelizeQueryTransform<M extends Model> {
-  condition: WhereOptions<Attributes<M>>
-  replacements?: Map<string, string>
-  orders?: OrderItem[]
+export type Area = Prisma.AreaGetPayload<{ select: undefined }>
+export type Megateam = Prisma.MegateamGetPayload<{ select: undefined }>
+export type Point = Prisma.PointGetPayload<{ select: undefined }>
+export type QrCode = Prisma.QrCodeGetPayload<{ select: undefined; include: { challenge: true } }> & {
+  canBeRedeemedByUser(user: Pick<User, "keycloakUserId">): Promise<boolean>
+  canBeRedeemed(): Promise<boolean>
+  redemptionUrl: string
+};
+export type Team = Prisma.TeamGetPayload<{ select: undefined }> & {
+  joinCodeString: string
 }
+export type User = Prisma.UserGetPayload<{ select: undefined }>
+export type TokenSet = Prisma.TokenSetGetPayload<{ select: undefined }>
+export type Challenge = Prisma.ChallengeGetPayload<{ select: undefined }>
+export { QRCodes_category, Quest_dependency_mode } from "@prisma/client"
 
-export type SequelizeQueryTransformFactory<M extends Model> = (value: string) => SequelizeQueryTransform<M>
+const basePrisma = new PrismaClient()
+export const prisma = basePrisma.$extends({
+  name: "prismaExtensions",
+  model: {
+    user: {
+      async getTotalPoints({ where }: { where: Prisma.Args<typeof basePrisma.user, "findUnique">["where"] }) {
+        const user = await prisma.user.findUnique({
+          where,
+          select: { keycloakUserId: true, points: true },
+        })
 
-export function buildQueryFromRequest<M extends Model>(
-  request: Request,
-  transforms: Map<string, SequelizeQueryTransformFactory<M>>,
-): FindOptions<M> {
-  const options = {
-    where: [] as WhereOptions<M>[],
-    replacements: new Map<string, string>(),
-    order: [] as OrderItem[],
-  }
+        if (!user) throw new ClientError("User not found", { statusCode: 404, exposeMessage: false })
+        return prisma.point.sumPoints(user.points)
+      },
+    },
+    point: {
+      sumPoints(points: Point[]) {
+        return points.reduce((total: number, point: Point) => total + point.value, 0)
+      },
+    },
+    team: {
+      async isJoinableTeam({ where }: { where: { teamId: Team["teamId"] } }) {
+        const team_members = await basePrisma.user.count({ where: { team: { is: where } } })
+        return team_members < megateamsConfig.maxTeamMembers
+      },
+    },
+  },
+  result: {
+    team: {
+      joinCodeString: {
+        needs: { joinCode: true },
+        compute(team) {
+          return decodeTeamJoinCode(team.joinCode)
+        },
+      },
+    },
+    qrCode: {
+      canBeRedeemed: {
+        needs: {
+          qrCodeId: true,
+          state: true,
+          challengeId: true
+        },
+        compute(qrCode) {
+          return async (): Promise<boolean> => {
+            if (!qrCode.state) return false
 
-  // https://stackoverflow.com/a/17385088
-  for (const parameterName in request.query) {
-    // https://github.com/hapijs/hapi/issues/3280#issuecomment-237397365
-    if (!Object.prototype.hasOwnProperty.call(request.query, parameterName)) {
-      continue
-    }
+            if (qrCode.challengeId != null) {
+              const challenge = await prisma.challenge.findUnique({
+                where: { challengeId: qrCode.challengeId }
+              })
+              assert(challenge != null)
+              const now = new Date()
+              if (challenge.startTime != null && now < challenge.startTime) return false
+              if (challenge.expiryTime != null && now >= challenge.expiryTime) return false
+            }
 
-    const parameterValue = request.query[parameterName]
+            return true
+          }
+        },
+      },
+      canBeRedeemedByUser: {
+        needs: {
+          qrCodeId: true,
+          state: true,
+          challengeId: true,
+          claimLimit: true
+        },
+        compute(qrCode: QrCode) {
+          return async (user: Pick<User, "keycloakUserId">): Promise<boolean> => {
+            if (!(await qrCode.canBeRedeemed())) return false;
 
-    if (typeof parameterValue !== "string") {
-      throw new createHttpError.BadRequest(`Query parameter '${parameterName}' should be a string.`)
-    }
+            if (qrCode.claimLimit) {
+              const redeemsByUser = await prisma.point.count({
+                where: {
+                  originQrCodeId: qrCode.qrCodeId,
+                  redeemerUserId: user.keycloakUserId,
+                },
+              })
+              if (redeemsByUser !== 0) return false
+            }
 
-    const transformFactory = transforms.get(parameterName)
-    if (transformFactory === undefined) {
-      throw new createHttpError.BadRequest(`Query parameter '${parameterName}' is invalid.`)
-    }
+            if (qrCode.challengeId != null) {
+              const challenge = await prisma.challenge.findUnique({
+                where: { challengeId: qrCode.challengeId }
+              })
+              assert(challenge != null)
+              if (challenge.claimLimit) {
+                const points = await prisma.$queryRawTyped(
+                  getChallengePointsByUser(challenge.challengeId, user.keycloakUserId)
+                )
+                if (Number(points[0].points) !== 0) return false
+              }
+            }
 
-    const transform = transformFactory(parameterValue)
-
-    if (transform.condition) {
-      options.where.push(transform.condition)
-    }
-
-    if (transform.replacements) {
-      for (const [k, v] of transform.replacements.entries()) {
-        options.replacements.set(k, v)
-      }
-    }
-
-    if (transform.orders) {
-      options.order.push(...transform.orders)
-    }
-  }
-
-  const findOptions: FindOptions<M> = {}
-
-  if (options.where.length > 0) {
-    findOptions.where = options.where as WhereOptions<M>
-  }
-
-  if (options.replacements.size > 0) {
-    findOptions.replacements = Object.fromEntries(options.replacements)
-  }
-
-  if (options.order.length > 0) {
-    findOptions.order = options.order
-  }
-
-  return findOptions
-}
-
-export async function ensureDatabaseExists() {
-  const initialConnectOptions = mysql_options_schema.parse(config.get("mysql.data")) as MySqlConnectionOptions
-  const database_name = initialConnectOptions.database
-
-  if (!database_name) {
-    throw new Error("Database name cannot be falsy!")
-  }
-
-  delete initialConnectOptions.database
-  const connection = await mysql.createConnection(initialConnectOptions)
-
-  await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${database_name}\`;`)
-
-  await connection.destroy()
-}
-
-const sequelizeConnectOptions = sequelize_options_schema.parse(config.get("mysql.data")) as SequelizeOptions
-
-const sequelize = new Sequelize(sequelizeConnectOptions)
-
-sequelize.addModels([User, Team, Area, Megateam, Point, QRCode])
-
-export default sequelize
+            return true
+          }
+        },
+      },
+      redemptionUrl: {
+        needs: { payload: true },
+        compute(qrCode) {
+          const redemptionUrlSearchParams = new URLSearchParams({ qr_id: qrCode.payload })
+          return `${origin}/hacker/redeem?${redemptionUrlSearchParams.toString()}`
+        },
+      },
+    },
+  },
+})
