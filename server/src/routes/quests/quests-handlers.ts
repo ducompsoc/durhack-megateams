@@ -43,6 +43,7 @@ class QuestsHandlers {
       const user = request.user
       assert(user != null)
 
+      const now = new Date()
       const result = await prisma.quest.findMany({
         include: {
           challenges: {
@@ -54,8 +55,10 @@ class QuestsHandlers {
               },
             },
           },
-          usersCompleted: { where: { keycloakUserId: user.keycloakUserId } }
-        }
+          usersCompleted: { where: { keycloakUserId: user.keycloakUserId } },
+        },
+        where: { challenges: { none: { OR: [{ startTime: { gt: now } }, { expiryTime: { lt: now } }] } } },
+        orderBy: { updatedAt: "desc" }
       });
 
       const payload = result.map((quest) => ({
@@ -67,6 +70,7 @@ class QuestsHandlers {
         challenges: quest.challenges.map(challenge => ({
           name: challenge.name,
           description: challenge.description,
+          value: challenge.points,
           completed: challenge.qrCodes.reduce((count, code) => count + code.redeems.length, 0) > 0
         }))
       }))

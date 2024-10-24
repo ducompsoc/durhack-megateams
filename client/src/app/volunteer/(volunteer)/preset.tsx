@@ -6,12 +6,15 @@ import useSWR from "swr";
 export default function Preset({
   displayQR,
 }: {
-  displayQR: (id: number, preset: true) => void;
+  displayQR: (id: number) => void;
 }) {
-  const { data: { presets } = { presets: {} }, isLoading } =
-    useSWR("/qr_codes/presets");
+  const { data: { challenges } = { challenges: [] }, isLoading } =
+    useSWR("/qr_codes/challenges");
   const [selected, setSelected] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // TODO: remove this
+  const presets = {}
 
   let presetsList: any[] = Object.entries(presets).map(
     ([id, preset]: [string, any]) => {
@@ -48,7 +51,7 @@ export default function Preset({
         }
       );
       setError(null);
-      displayQR(qr.qrCodeId, true);
+      displayQR(qr.qrCodeId);
     } catch {
       setError("Failed to generate QR!");
     }
